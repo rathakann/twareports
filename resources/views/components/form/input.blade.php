@@ -1,0 +1,2 @@
+@props(['name', 'id' => null, 'type' => 'text', 'value' => null, 'icon' => null, 'error' => null])
+<div @class(['input-icon-left' => $icon])>@if ($icon)<i class="input-icon-addon" data-lucide="{{ $icon }}"></i>@endif<input {{ $attributes->merge(['class' => 'form-control'.($error ? ' is-invalid' : '')]) }} id="{{ $id ?? $name }}" name="{{ $name }}" type="{{ $type }}" value="{{ old($name, $value) }}">@if ($error)<x-form.error :message="$error" />@endif</div>

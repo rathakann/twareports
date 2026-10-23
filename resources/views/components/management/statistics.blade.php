@@ -1,0 +1,2 @@
+@props(['title' => 'Statistics', 'id' => 'statistics'])
+<section class="statistics-accordion accordion" id="{{ $id }}"><div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $id }}-body" aria-expanded="false" aria-controls="{{ $id }}-body">{{ $title }}</button></h2><div id="{{ $id }}-body" class="accordion-collapse collapse" data-statistics-id="{{ $id }}"><div class="accordion-body">{{ $slot }}</div></div></div></section>

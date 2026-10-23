@@ -1,0 +1,2 @@
+@props(['label', 'value', 'icon' => 'bar-chart-3', 'color' => 'blue', 'delta' => null, 'subtext' => null])
+<article {{ $attributes->merge(['class' => 'kpi-card']) }}><div><p class="kpi-label">{{ $label }}</p><p class="kpi-value">{{ $value }}</p>@if ($delta)<span class="kpi-delta">{{ $delta }}</span>@endif @if ($subtext)<span class="kpi-subtext">{{ $subtext }}</span>@endif</div><span class="kpi-icon kpi-icon-{{ $color }}"><i data-lucide="{{ $icon }}"></i></span></article>
