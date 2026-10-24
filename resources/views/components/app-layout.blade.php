@@ -20,9 +20,10 @@
             const mode = localStorage.getItem('tc_mode') === 'dark' ? 'dark' : 'light';
             const primary = localStorage.getItem('tc_primary');
             const bgPage = localStorage.getItem('tc_bg_page') || '#eeefff';
-            const radius = localStorage.getItem('tc_rounding') || '4px';
+            const radius = localStorage.getItem('tc_rounding') || '8px';
             const fontSize = localStorage.getItem('tc_font_size') || 'normal';
             const layout = localStorage.getItem('tc_layout') === 'horizontal' ? 'horizontal' : 'vertical';
+            const container = localStorage.getItem('tc_container') === 'container' ? 'container' : 'fluid';
             const font = localStorage.getItem('tc_font') || 'Inter';
             const lang = localStorage.getItem('twa_lang') || 'en';
             const darken = (hex) => `#${[0, 2, 4].map((offset) => Math.max(0, Math.round(parseInt(hex.slice(offset + 1, offset + 3), 16) * .7)).toString(16).padStart(2, '0')).join('')}`;
@@ -36,6 +37,8 @@
             root.style.colorScheme = mode;
             root.dataset.layout = layout;
             root.setAttribute('data-layout', layout);
+            root.dataset.container = container;
+            root.setAttribute('data-container', container);
             root.dataset.sidebar = localStorage.getItem('ks_col') === '1' ? 'collapsed' : 'expanded';
 
             root.dataset.fontSize = fontSize;
@@ -53,10 +56,19 @@
                 root.style.setProperty('--pri-soft', `${primary}1a`);
                 root.style.setProperty('--bs-primary-rgb', `${parseInt(primary.slice(1, 3), 16)}, ${parseInt(primary.slice(3, 5), 16)}, ${parseInt(primary.slice(5, 7), 16)}`);
             }
+            root.dataset.radius = radius;
+            root.setAttribute('data-radius', radius);
             if (/^\d+(\.\d+)?px$/.test(radius)) {
-                const number = parseFloat(radius);
-                root.style.setProperty('--rad-s', radius);
-                root.style.setProperty('--rad', `${Math.max(5, number + 8)}px`);
+                const radNum = parseFloat(radius) || 0;
+                const radSm = `${Math.round(radNum * 0.75)}px`;
+                const radLg = `${Math.max(radNum, Math.round(radNum * 1.5 + 2))}px`;
+                const radXl = `${Math.max(radNum, Math.round(radNum * 2 + 4))}px`;
+                root.style.setProperty('--rad-s', radNum === 0 ? '0px' : radSm);
+                root.style.setProperty('--rad', radNum === 0 ? '0px' : radLg);
+                root.style.setProperty('--bs-border-radius', radius);
+                root.style.setProperty('--bs-border-radius-sm', radNum === 0 ? '0px' : radSm);
+                root.style.setProperty('--bs-border-radius-lg', radNum === 0 ? '0px' : radLg);
+                root.style.setProperty('--bs-border-radius-xl', radNum === 0 ? '0px' : radXl);
             }
             if (lang === 'km') {
                 root.style.setProperty('--font', "'Nokora', 'Noto Sans Khmer', sans-serif");

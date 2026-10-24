@@ -990,7 +990,7 @@ jQuery(function () {
 
 const palettes = { blue: '#2563EB', sky: '#0EA5E9', purple: '#7C3AED', emerald: '#059669', royal: '#1D4ED8', orange: '#EA580C', cyan: '#06B6D4', mint: '#10B981', coral: '#F43F5E' };
 const fontSizes = { small: '12px', normal: '14px', large: '16px' };
-const themeDefaults = { mode: 'light', layout: 'vertical', sidebar: '0', primary: '#1b4fe0', bgPage: '#eeefff', font: 'Inter', radius: '4px', fontSize: 'normal' };
+const themeDefaults = { mode: 'light', layout: 'vertical', container: 'fluid', sidebar: '0', primary: '#1b4fe0', bgPage: '#eeefff', font: 'Inter', radius: '8px', fontSize: 'normal' };
 const availableFonts = ['Inter', 'Roboto', 'Poppins', 'Public Sans'];
 const khmerFont = "'Nokora', 'Noto Sans Khmer', 'Noto Sans', sans-serif";
 const isColor = (value) => /^#[0-9a-f]{6}$/i.test(value || '');
@@ -1005,6 +1005,7 @@ const applyThemePreferences = () => {
     const radius = localStorage.getItem('tc_rounding') || themeDefaults.radius;
     const fontSize = localStorage.getItem('tc_font_size') || themeDefaults.fontSize;
     const layout = localStorage.getItem('tc_layout') || themeDefaults.layout;
+    const container = localStorage.getItem('tc_container') || themeDefaults.container;
     const lang = localStorage.getItem('twa_lang') || 'en';
     root.lang = lang;
     root.dataset.lang = lang;
@@ -1030,6 +1031,8 @@ const applyThemePreferences = () => {
     root.style.colorScheme = mode;
     root.dataset.layout = layout === 'horizontal' ? 'horizontal' : 'vertical';
     root.setAttribute('data-layout', root.dataset.layout);
+    root.dataset.container = container === 'container' ? 'container' : 'fluid';
+    root.setAttribute('data-container', root.dataset.container);
     root.dataset.sidebar = localStorage.getItem('ks_col') === '1' ? 'collapsed' : 'expanded';
     const activePrimary = isColor(savedPrimary) ? primary : themeDefaults.primary;
     root.style.setProperty('--pri', activePrimary);
@@ -1055,7 +1058,20 @@ const applyThemePreferences = () => {
         root.style.setProperty('--font', `'${font}', sans-serif`);
         root.style.removeProperty('--bs-body-font-family');
     }
-    if (/^\d+(\.\d+)?px$/.test(radius || '')) { root.style.setProperty('--rad-s', radius); root.style.setProperty('--rad', `${Math.max(5, parseFloat(radius) + 8)}px`); }
+    const radNum = parseFloat(radius) || 0;
+    root.dataset.radius = radius;
+    root.setAttribute('data-radius', radius);
+    if (/^\d+(\.\d+)?px$/.test(radius || '')) {
+        const radSm = `${Math.round(radNum * 0.75)}px`;
+        const radLg = `${Math.max(radNum, Math.round(radNum * 1.5 + 2))}px`;
+        const radXl = `${Math.max(radNum, Math.round(radNum * 2 + 4))}px`;
+        root.style.setProperty('--rad-s', radNum === 0 ? '0px' : radSm);
+        root.style.setProperty('--rad', radNum === 0 ? '0px' : radLg);
+        root.style.setProperty('--bs-border-radius', radius);
+        root.style.setProperty('--bs-border-radius-sm', radNum === 0 ? '0px' : radSm);
+        root.style.setProperty('--bs-border-radius-lg', radNum === 0 ? '0px' : radLg);
+        root.style.setProperty('--bs-border-radius-xl', radNum === 0 ? '0px' : radXl);
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1132,17 +1148,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 jQuery(fontInput).val(font).trigger('change.select2');
             }
         }
-        const radiusInput = document.querySelector('[data-theme-radius]');
-        if (radiusInput) {
-            radiusInput.value = radius;
-            if (window.jQuery && jQuery(radiusInput).hasClass('select2-hidden-accessible')) {
-                jQuery(radiusInput).val(radius).trigger('change.select2');
-            }
-        }
+        const container = document.documentElement.dataset.container || localStorage.getItem('tc_container') || themeDefaults.container;
+        document.querySelectorAll('[data-container]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.container === container)));
+
+        document.querySelectorAll('[data-theme-radius]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.themeRadius === radius)));
+        const radiusRange = document.querySelector('[data-theme-radius-range]');
+        if (radiusRange) radiusRange.value = parseFloat(radius) || 0;
+        const radiusBadge = document.querySelector('#themeRadiusBadge');
+        if (radiusBadge) radiusBadge.textContent = radius;
+
         if (window.lucide) {
             window.lucide.createIcons({ icons });
         }
-        const sidebarButton = document.querySelector('[data-sidebar-preference]'); sidebarButton?.setAttribute('aria-pressed', String(shell?.classList.contains('is-sidebar-collapsed')));
         const themeToggleSwitch = document.querySelector('#themeToggleSwitch');
         if (themeToggleSwitch) themeToggleSwitch.checked = (mode === 'dark');
         const themeToggleBtn = document.querySelector('#themeToggleBtn');
@@ -1190,14 +1207,21 @@ document.addEventListener('DOMContentLoaded', () => {
     updateOrgDisplay(savedOrg);
 
     document.querySelectorAll('.org-switch-item').forEach((button) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
             const orgName = button.dataset.org;
+            const prevOrg = localStorage.getItem('twa_org') || (document.cookie.match(/(?:^|; )twa_org=([^;]*)/)?.[1] ? decodeURIComponent(document.cookie.match(/(?:^|; )twa_org=([^;]*)/)[1]) : 'NonOil Report');
             localStorage.setItem('twa_org', orgName);
             document.cookie = `twa_org=${encodeURIComponent(orgName)};path=/;max-age=31536000;SameSite=Lax`;
             updateOrgDisplay(orgName);
             closePanels();
             document.dispatchEvent(new CustomEvent('twa:org-changed', { detail: { organization: orgName } }));
             window.showToast?.(`Organization switched to ${orgName}`, 'info');
+            if (prevOrg && prevOrg !== orgName) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 350);
+            }
         });
     });
 
@@ -1353,15 +1377,9 @@ document.addEventListener('DOMContentLoaded', () => {
             submenu.addEventListener('mouseleave', leaveHandler);
         }
     });
-    document.querySelectorAll('[data-panel-toggle]').forEach((button) => button.addEventListener('click', () => {
-        const panel = document.getElementById(button.dataset.panelToggle);
-        const shouldOpen = panel?.hasAttribute('hidden');
-        closePanels();
-        if (shouldOpen) { panel?.removeAttribute('hidden'); button.setAttribute('aria-expanded', 'true'); }
-    }));
     document.querySelectorAll('[data-theme-mode]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_mode', control.dataset.themeMode); applyThemePreferences(); syncThemeControls(); closePanels(); }));
     document.querySelectorAll('[data-layout]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_layout', control.dataset.layout); applyThemePreferences(); syncThemeControls(); closeSidebar(); }));
-    document.querySelector('[data-sidebar-preference]')?.addEventListener('click', () => { if (isMobile()) return; clearHoverActive(); shell?.classList.toggle('is-sidebar-collapsed'); localStorage.setItem('ks_col', shell?.classList.contains('is-sidebar-collapsed') ? '1' : '0'); applyThemePreferences(); syncThemeControls(); });
+    document.querySelectorAll('[data-container]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_container', control.dataset.container); applyThemePreferences(); syncThemeControls(); }));
     document.querySelectorAll('[data-primary-color]').forEach((control) => control.addEventListener('click', () => { const color = palettes[control.dataset.primaryColor] || control.dataset.primaryColor; if (isColor(color)) { localStorage.setItem('tc_primary', color); applyThemePreferences(); syncThemeControls(); } }));
     document.querySelector('[data-primary-color-input]')?.addEventListener('input', (event) => { localStorage.setItem('tc_primary', event.target.value); applyThemePreferences(); syncThemeControls(); });
     document.querySelector('[data-primary-color-hex]')?.addEventListener('change', (event) => { const color = event.target.value.trim(); if (isColor(color)) { localStorage.setItem('tc_primary', color); applyThemePreferences(); syncThemeControls(); } else syncThemeControls(); });
@@ -1391,6 +1409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('[data-theme-reset]')?.addEventListener('click', () => {
         localStorage.removeItem('tc_mode');
         localStorage.removeItem('tc_layout');
+        localStorage.removeItem('tc_container');
         localStorage.removeItem('tc_primary');
         localStorage.removeItem('tc_bg_page');
         localStorage.removeItem('tc_font');
@@ -1402,7 +1421,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.querySelector('[data-theme-font]')?.addEventListener('change', (event) => { localStorage.setItem('tc_font', event.target.value); applyThemePreferences(); syncThemeControls(); });
     document.querySelectorAll('[data-font-size]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_font_size', control.dataset.fontSize); applyThemePreferences(); syncThemeControls(); }));
-    document.querySelector('[data-theme-radius]')?.addEventListener('change', (event) => { localStorage.setItem('tc_rounding', event.target.value); applyThemePreferences(); syncThemeControls(); });
+    document.querySelectorAll('[data-theme-radius]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_rounding', control.dataset.themeRadius); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelector('[data-theme-radius-range]')?.addEventListener('input', (event) => { localStorage.setItem('tc_rounding', `${event.target.value}px`); applyThemePreferences(); syncThemeControls(); });
     document.querySelectorAll('[data-theme-drawer-toggle]').forEach((trigger) => {
         trigger.addEventListener('click', (event) => {
             event.preventDefault();

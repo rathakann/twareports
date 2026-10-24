@@ -9,7 +9,7 @@
     <div class="topbar-popover-wrap">
         <button class="topbar-organization btn border-0 bg-transparent p-0 d-inline-flex align-items-center gap-2" type="button" data-panel-toggle="organization-menu" aria-expanded="false" aria-controls="organization-menu" title="Switch Organization">
             <i data-lucide="building-2"></i>
-            <span class="topbar-org-label fw-semibold text-dark">{{ $currentOrg }}</span>
+            <span class="topbar-org-label fw-semibold text-body">{{ $currentOrg }}</span>
             <i data-lucide="chevron-down" style="width: 13px; height: 13px;" class="text-secondary"></i>
         </button>
         <div class="topbar-popover shadow-sm rounded-3 p-2" id="organization-menu" hidden style="min-width: 190px;">
@@ -47,7 +47,7 @@
             <div class="topbar-popover shadow-lg rounded-3 p-0" id="notifications-menu" hidden style="min-width: 320px; max-width: 360px; right: 0;">
                 <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-body-tertiary rounded-top-3">
                     <div class="d-flex align-items-center gap-2">
-                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 14px;">Notifications</h6>
+                        <h6 class="fw-bold mb-0 text-body" style="font-size: 14px;">Notifications</h6>
                         <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0.5" style="font-size: 11px;" id="notifCountBadge">2 new</span>
                     </div>
                     <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none text-secondary" style="font-size: 12px;" id="markAllReadBtn">
@@ -55,7 +55,7 @@
                     </button>
                 </div>
                 <div class="notification-list p-2" style="max-height: 320px; overflow-y: auto;">
-                    <a href="{{ route('reports.financial.balance-sheet.index') }}" class="notification-item d-flex gap-3 p-2 rounded-2 text-decoration-none text-dark hover-bg mb-1 unread">
+                    <a href="{{ route('reports.financial.balance-sheet.index') }}" class="notification-item d-flex gap-3 p-2 rounded-2 text-decoration-none text-body hover-bg mb-1 unread">
                         <div class="rounded-circle p-2 bg-primary-subtle text-primary flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                             <i data-lucide="file-spreadsheet" style="width: 18px; height: 18px;"></i>
                         </div>
@@ -67,7 +67,7 @@
                             <p class="text-secondary text-truncate mb-0" style="font-size: 12px;">Monthly reconciliation completed.</p>
                         </div>
                     </a>
-                    <a href="{{ route('users.index') }}" class="notification-item d-flex gap-3 p-2 rounded-2 text-decoration-none text-dark hover-bg mb-1 unread">
+                    <a href="{{ route('users.index') }}" class="notification-item d-flex gap-3 p-2 rounded-2 text-decoration-none text-body hover-bg mb-1 unread">
                         <div class="rounded-circle p-2 bg-success-subtle text-success flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                             <i data-lucide="user-check" style="width: 18px; height: 18px;"></i>
                         </div>
@@ -79,7 +79,7 @@
                             <p class="text-secondary text-truncate mb-0" style="font-size: 12px;">Active administrator session verified.</p>
                         </div>
                     </a>
-                    <div class="notification-item d-flex gap-3 p-2 rounded-2 text-decoration-none text-dark hover-bg">
+                    <div class="notification-item d-flex gap-3 p-2 rounded-2 text-decoration-none text-body hover-bg">
                         <div class="rounded-circle p-2 bg-info-subtle text-info flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                             <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
                         </div>
@@ -159,7 +159,7 @@
                             {{ $topInitials }}
                         </div>
                         <div class="overflow-hidden">
-                            <h6 class="fw-bold mb-0 text-truncate text-dark" style="font-size: 15px;">{{ $topName }}</h6>
+                            <h6 class="fw-bold mb-0 text-truncate text-body" style="font-size: 15px;">{{ $topName }}</h6>
                             <small class="text-secondary text-truncate d-block" style="font-size: 12px;">{{ $topEmail }}</small>
                         </div>
                     </div>
@@ -171,18 +171,18 @@
                         <a class="dropdown-item rounded-2 py-2 px-2.5 d-flex align-items-center gap-2.5 text-secondary"
                            href="{{ route('profile.index') }}">
                             <i data-lucide="user" style="width: 17px; height: 17px;"></i>
-                            <span class="fw-medium text-dark">My Profile</span>
+                            <span class="fw-medium text-body">My Profile</span>
                         </a>
                         <a class="dropdown-item rounded-2 py-2 px-2.5 d-flex align-items-center gap-2.5 text-secondary"
                            href="{{ route('roles.index') }}">
                             <i data-lucide="shield-check" style="width: 17px; height: 17px;"></i>
-                            <span class="fw-medium text-dark">Account Settings</span>
+                            <span class="fw-medium text-body">Account Settings</span>
                         </a>
                         <button type="button"
                                 class="dropdown-item rounded-2 py-2 px-2.5 d-flex align-items-center gap-2.5 text-secondary w-100 border-0 bg-transparent text-start"
                                 data-theme-drawer-toggle>
                             <i data-lucide="settings" style="width: 17px; height: 17px;"></i>
-                            <span class="fw-medium text-dark">Settings</span>
+                            <span class="fw-medium text-body">Settings</span>
                         </button>
                     </div>
 
