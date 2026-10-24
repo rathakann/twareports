@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Role;
 use App\Models\User;
 use App\Support\ExportPermission;
+use App\Support\Navigation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,8 +16,6 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller implements HasMiddleware
@@ -45,7 +45,7 @@ class UserController extends Controller implements HasMiddleware
                 ExportPermission::authorize('users', $request->input('export_format'));
             }
 
-            $query = User::with(['roles', 'permissions'])->select('users.*');
+            $query = User::with('roles')->select('users.*');
 
             if ($request->filled('role') && $request->role !== 'all') {
                 $query->whereHas('roles', function ($q) use ($request): void {
@@ -78,9 +78,6 @@ class UserController extends Controller implements HasMiddleware
                 ->addColumn('roles_list', function (User $user): array {
                     return $user->roles->pluck('name')->toArray();
                 })
-                ->addColumn('permissions_list', function (User $user): array {
-                    return $user->permissions->pluck('name')->toArray();
-                })
                 ->addColumn('action', function (User $user): string {
                     return view('users.partials.actions', compact('user'))->render();
                 })
@@ -102,12 +99,10 @@ class UserController extends Controller implements HasMiddleware
         Gate::authorize('users.create');
 
         $roles = Role::with('permissions')->orderBy('name')->get();
-        $permissions = Permission::orderBy('name')->get()->groupBy(function (Permission $permission): string {
-            return explode('.', $permission->name)[0] ?? 'general';
-        });
         $navigation = config('navigation');
+        $landingPageOptions = Navigation::getLandingPageOptions();
 
-        return view('users.create', compact('roles', 'permissions', 'navigation'));
+        return view('users.create', compact('roles', 'navigation', 'landingPageOptions'));
     }
 
     /**
@@ -122,6 +117,7 @@ class UserController extends Controller implements HasMiddleware
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'status' => $validated['status'],
+            'landing_page' => $validated['landing_page'] ?? null,
             'is_admin' => in_array('Super Admin', $validated['roles'] ?? []) || in_array('Admin', $validated['roles'] ?? []),
         ]);
 
@@ -129,15 +125,11 @@ class UserController extends Controller implements HasMiddleware
             $user->syncRoles($validated['roles']);
         }
 
-        if (! empty($validated['permissions'])) {
-            $user->syncPermissions($validated['permissions']);
-        }
-
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'User created successfully.',
-                'user' => $user->load(['roles', 'permissions']),
+                'user' => $user->load('roles'),
             ], 201);
         }
 
@@ -152,23 +144,16 @@ class UserController extends Controller implements HasMiddleware
     {
         Gate::authorize('users.edit');
 
-        $user->load(['roles.permissions', 'permissions']);
+        $user->load('roles.permissions');
         $roles = Role::with('permissions')->orderBy('name')->get();
-        $permissions = Permission::orderBy('name')->get()->groupBy(function (Permission $permission): string {
-            return explode('.', $permission->name)[0] ?? 'general';
-        });
-
-        $inheritedPermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-        $directPermissions = $user->permissions->pluck('name')->toArray();
         $navigation = config('navigation');
+        $landingPageOptions = Navigation::getLandingPageOptions();
 
         return view('users.edit', compact(
             'user',
             'roles',
-            'permissions',
-            'inheritedPermissions',
-            'directPermissions',
-            'navigation'
+            'navigation',
+            'landingPageOptions'
         ));
     }
 
@@ -195,6 +180,7 @@ class UserController extends Controller implements HasMiddleware
             'name' => $validated['name'],
             'email' => $validated['email'],
             'status' => $validated['status'],
+            'landing_page' => $validated['landing_page'] ?? null,
         ];
 
         if (! empty($validated['password'])) {
@@ -206,9 +192,8 @@ class UserController extends Controller implements HasMiddleware
             $user->syncRoles($validated['roles']);
         }
 
-        if (isset($validated['permissions'])) {
-            $user->syncPermissions($validated['permissions']);
-        }
+        // Direct user permissions are disabled; all permissions are governed solely by roles
+        $user->syncPermissions([]);
 
         $user->update($updateData);
 
@@ -216,7 +201,7 @@ class UserController extends Controller implements HasMiddleware
             return response()->json([
                 'success' => true,
                 'message' => 'User updated successfully.',
-                'user' => $user->fresh(['roles', 'permissions']),
+                'user' => $user->fresh('roles'),
             ]);
         }
 

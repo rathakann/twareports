@@ -11,6 +11,7 @@
 @import './theme/library.css';
 @import './theme/demo-pages.css';
 @import './theme/layout.css';
+@import './theme/mantis-components.css';
 
 /* Input Icon Left extensions for Select2, selects, and textareas */
 .input-icon-left {
@@ -168,6 +169,25 @@
 
 .topbar-lang-toggle .lang-stage-km {
     font-family: 'Nokora', sans-serif !important;
+}
+
+/* Topbar User Avatar Circle Guarantee */
+.topbar-user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    border-radius: 50% !important;
+    background-color: var(--pri, #1b4fe0) !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+    line-height: 1 !important;
 }
 
 /* Global Dark Mode Overrides for Bootstrap elements */
@@ -460,19 +480,41 @@ button[data-lang='km'],
 
 /* Khmer Mode Typography */
 html[lang='km'],
+html[data-lang='km'],
 html[lang='km'] body,
+html[data-lang='km'] body,
 html[lang='km'] input,
+html[data-lang='km'] input,
 html[lang='km'] select,
+html[data-lang='km'] select,
 html[lang='km'] textarea,
+html[data-lang='km'] textarea,
 html[lang='km'] button,
+html[data-lang='km'] button,
 html[lang='km'] .btn,
+html[data-lang='km'] .btn,
 html[lang='km'] .form-control,
+html[data-lang='km'] .form-control,
 html[lang='km'] .form-select,
+html[data-lang='km'] .form-select,
 html[lang='km'] .select2,
+html[data-lang='km'] .select2,
 html[lang='km'] .select2-container,
+html[data-lang='km'] .select2-container,
+html[lang='km'] .table,
+html[data-lang='km'] .table,
+html[lang='km'] .card,
+html[data-lang='km'] .card,
+html[lang='km'] .modal,
+html[data-lang='km'] .modal,
+html[lang='km'] .dropdown-menu,
+html[data-lang='km'] .dropdown-menu,
+html[lang='km'] .nav,
+html[data-lang='km'] .nav,
 [lang='km'],
-[lang^='km-'] {
-    font-family: Nokora, 'Google Sans', 'Noto Sans', sans-serif !important;
+[lang^='km-'],
+[data-lang='km'] {
+    font-family: 'Nokora', 'Noto Sans Khmer', sans-serif !important;
 }
 
 /* ==========================================================================
@@ -909,6 +951,7 @@ table.dataTable thead>tr>th {
 .dataTables_wrapper .dataTables_filter input,
 .dt-container .dt-search input {
     background-color: var(--bg-inp);
+    background-image: none;
     border: 1px solid var(--bdr);
     border-radius: var(--rad-s);
     color: var(--tx1);
@@ -954,36 +997,52 @@ table.dataTable thead>tr>th {
     display: inline-flex !important;
     align-items: center !important;
     vertical-align: middle !important;
-    gap: 8px !important;
+    gap: 6px !important;
     margin-bottom: 0 !important;
     white-space: nowrap !important;
     font-size: var(--fs-base, 13px) !important;
-    line-height: 1.5 !important;
+    line-height: 1 !important;
     color: var(--tx2, #475569) !important;
     cursor: pointer;
 }
 
 .dataTables_wrapper .dataTables_length select,
 .dt-container .dt-length select {
-    display: inline-block !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     vertical-align: middle !important;
     width: auto !important;
-    min-width: 60px !important;
+    min-width: 58px !important;
     height: 30px !important;
     min-height: 30px !important;
-    line-height: 1.5 !important;
+    line-height: 28px !important;
     background-color: var(--bg-inp, #ffffff) !important;
     border: 1px solid var(--bdr, #cbd5e1) !important;
     border-radius: var(--rad-s, 4px) !important;
     color: var(--tx1, #0f172a) !important;
-    padding: 2px 24px 2px 10px !important;
+    padding: 0 20px 0 10px !important;
     margin: 0 4px !important;
     font-size: var(--fs-base, 13px) !important;
-    background-position: right 8px center !important;
-    background-size: 14px 10px !important;
-    outline: none;
+    text-align: center !important;
+    text-align-last: center !important;
+    -webkit-text-align-last: center !important;
+    -moz-text-align-last: center !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 6px center !important;
+    background-size: 12px 8px !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    outline: none !important;
     cursor: pointer;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
+}
+
+.dataTables_wrapper .dataTables_length select option,
+.dt-container .dt-length select option {
+    text-align: center;
 }
 
 .dataTables_wrapper .dataTables_info,
@@ -1125,7 +1184,13 @@ table.dataTable thead>tr>th {
 [data-theme='dark'] .dataTables_wrapper .dataTables_filter input,
 [data-bs-theme='dark'] .dataTables_wrapper .dataTables_filter input,
 [data-theme='dark'] .dt-container .dt-search input,
-[data-bs-theme='dark'] .dt-container .dt-search input,
+[data-bs-theme='dark'] .dt-container .dt-search input {
+    background-color: var(--bg-inp) !important;
+    border-color: var(--bdr) !important;
+    color: var(--tx1) !important;
+    background-image: none !important;
+}
+
 [data-theme='dark'] .dataTables_wrapper .dataTables_length select,
 [data-bs-theme='dark'] .dataTables_wrapper .dataTables_length select,
 [data-theme='dark'] .dt-container .dt-length select,
@@ -1133,6 +1198,10 @@ table.dataTable thead>tr>th {
     background-color: var(--bg-inp) !important;
     border-color: var(--bdr) !important;
     color: var(--tx1) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 6px center !important;
+    background-size: 12px 8px !important;
 }
 
 [data-theme='dark'] .dataTables_wrapper .dataTables_info,
@@ -1297,14 +1366,14 @@ table.dataTable thead>tr>th {
 }
 
 [data-font-size="small"] {
-    --fs-base: 12.5px;
+    --fs-base: 12px;
     --tbl-cell-py: 5px;
     --tbl-cell-px: 10px;
-    --tbl-font-size: 12px;
+    --tbl-font-size: 11.5px;
     --tbl-avatar-size: 26px;
     --tbl-avatar-font: 10.5px;
-    --tbl-name-font: 12px;
-    --tbl-email-font: 10.5px;
+    --tbl-name-font: 11.5px;
+    --tbl-email-font: 10px;
     --tbl-btn-height: 25px;
     --tbl-btn-font: 11px;
     --tbl-btn-icon: 13px;
@@ -1316,16 +1385,16 @@ table.dataTable thead>tr>th {
 }
 
 [data-font-size="large"] {
-    --fs-base: 15.5px;
+    --fs-base: 16px;
     --tbl-cell-py: 13px;
     --tbl-cell-px: 14px;
-    --tbl-font-size: 14.5px;
+    --tbl-font-size: 15px;
     --tbl-avatar-size: 38px;
     --tbl-avatar-font: 14px;
-    --tbl-name-font: 14.5px;
-    --tbl-email-font: 12.5px;
+    --tbl-name-font: 15px;
+    --tbl-email-font: 13px;
     --tbl-btn-height: 33px;
-    --tbl-btn-font: 13.5px;
+    --tbl-btn-font: 14px;
     --tbl-btn-icon: 16px;
     --tbl-badge-font: 12px;
     --tbl-badge-py: 4px;
@@ -1445,7 +1514,67 @@ table.dataTable thead>tr>th {
     min-height: var(--tbl-btn-height, 29px) !important;
     height: var(--tbl-btn-height, 29px) !important;
     min-width: 32px !important;
+}
+
+/* Standalone single button or only child in a group keeps all rounded corners */
+.btn.btn-action:only-child,
+.table .btn-action:only-child,
+.btn-group > .btn:first-child:last-child,
+.btn-group-sm > .btn:first-child:last-child,
+.table .btn-group > .btn:first-child:last-child,
+.table .btn-group-sm > .btn:first-child:last-child,
+:not(.btn-group) > .btn.btn-action {
     border-radius: var(--rad-s, 4px) !important;
+}
+
+/* Grouped action buttons when more than one: conjoined without rounded inner corners */
+.btn-group > .btn:first-child:not(:last-child),
+.btn-group-sm > .btn:first-child:not(:last-child),
+.table .btn-group > .btn:first-child:not(:last-child),
+.table .btn-group-sm > .btn:first-child:not(:last-child),
+.btn-group > .btn.btn-action:first-child:not(:last-child),
+.table td .btn-group > .btn:first-child:not(:last-child) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: var(--rad-s, 4px) !important;
+    border-bottom-left-radius: var(--rad-s, 4px) !important;
+    margin-right: 0 !important;
+}
+
+.btn-group > .btn:last-child:not(:first-child),
+.btn-group-sm > .btn:last-child:not(:first-child),
+.table .btn-group > .btn:last-child:not(:first-child),
+.table .btn-group-sm > .btn:last-child:not(:first-child),
+.btn-group > .btn.btn-action:last-child:not(:first-child),
+.table td .btn-group > .btn:last-child:not(:first-child) {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: var(--rad-s, 4px) !important;
+    border-bottom-right-radius: var(--rad-s, 4px) !important;
+    margin-left: -1px !important;
+}
+
+.btn-group > .btn:not(:first-child):not(:last-child),
+.btn-group-sm > .btn:not(:first-child):not(:last-child),
+.table .btn-group > .btn:not(:first-child):not(:last-child),
+.table .btn-group-sm > .btn:not(:first-child):not(:last-child),
+.btn-group > .btn.btn-action:not(:first-child):not(:last-child),
+.table td .btn-group > .btn:not(:first-child):not(:last-child) {
+    border-radius: 0 !important;
+    margin-left: -1px !important;
+}
+
+/* Active or hovered button borders elevate cleanly above neighbors */
+.btn-group > .btn:hover,
+.btn-group > .btn:focus,
+.btn-group > .btn:active,
+.btn-group-sm > .btn:hover,
+.btn-group-sm > .btn:focus,
+.btn-group-sm > .btn:active,
+.table .btn-group > .btn:hover,
+.table .btn-group > .btn:focus,
+.table .btn-group > .btn:active {
+    z-index: 2 !important;
 }
 
 #users-table .btn-group-sm > .btn svg,
@@ -1457,6 +1586,7 @@ table.dataTable thead>tr>th {
     width: var(--tbl-btn-icon, 14px) !important;
     height: var(--tbl-btn-icon, 14px) !important;
     flex-shrink: 0 !important;
+    pointer-events: none !important;
 }
 
 /* Report Date Badge & Optical Icon Alignment */
@@ -1702,6 +1832,125 @@ table.dataTable thead>tr>th {
 }
 
 .btn-filter-toggle > *,
-.btn-definition-toggle > * {
-    pointer-events: none;
+.btn-filter-toggle *,
+.btn-definition-toggle > *,
+.btn-definition-toggle *,
+.btn-action > *,
+.btn-action *,
+.btn-action svg,
+.btn-action svg *,
+.btn-action i,
+.btn[class*='btn-view'] > *,
+.btn[class*='btn-view'] *,
+.btn[class*='btn-view'] svg,
+.btn[class*='btn-view'] svg *,
+.btn[class*='btn-view'] i {
+    pointer-events: none !important;
+}
+
+.btn.btn-action,
+.btn[class*='btn-view'],
+.btn-filter-toggle,
+.btn-definition-toggle {
+    pointer-events: auto !important;
+}
+
+/* Fractional utility classes (Bootstrap 5 extension) */
+.gap-1\.5 { gap: 0.375rem !important; }
+.gap-2\.5 { gap: 0.625rem !important; }
+.p-1\.5 { padding: 0.375rem !important; }
+.p-2\.5 { padding: 0.625rem !important; }
+.py-1\.5 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+.py-2\.5 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+.px-1\.5 { padding-left: 0.375rem !important; padding-right: 0.375rem !important; }
+.px-2\.5 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+.mb-1\.5 { margin-bottom: 0.375rem !important; }
+.mb-2\.5 { margin-bottom: 0.625rem !important; }
+.my-1\.5 { margin-top: 0.375rem !important; margin-bottom: 0.375rem !important; }
+.my-2\.5 { margin-top: 0.625rem !important; margin-bottom: 0.625rem !important; }
+.me-1\.5 { margin-right: 0.375rem !important; }
+.ms-1\.5 { margin-left: 0.375rem !important; }
+.g-2\.5 { --bs-gutter-x: 0.625rem; --bs-gutter-y: 0.625rem; }
+
+/* Ensure Lucide SVGs in flex containers retain intended size and don't collapse */
+.d-flex > svg.lucide,
+.d-inline-flex > svg.lucide {
+    flex-shrink: 0;
+}
+
+/* Permission Matrix Module Select All Box */
+.module-select-all-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px;
+    border-radius: var(--rad-s, 4px);
+    background-color: var(--bg-card, #ffffff);
+    border: 1px solid var(--bdr, #e5e7eb);
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--tr, 0.2s);
+}
+
+.module-select-all-box:hover {
+    border-color: var(--pri, #1b4fe0);
+    background-color: var(--pri-soft, #eef2ff);
+}
+
+.module-select-all-box .switch-field {
+    margin-bottom: 0;
+    gap: 0;
+}
+
+.module-select-all-box .switch-field-control {
+    width: 44px !important;
+    height: 24px !important;
+    min-width: 44px !important;
+    flex-shrink: 0;
+}
+
+.module-select-all-box .switch-field-thumb {
+    width: 18px !important;
+    height: 18px !important;
+    top: 3px !important;
+    left: 3px !important;
+}
+
+.module-select-all-box .switch-field-input:checked + .switch-field-control .switch-field-thumb {
+    transform: translateX(20px) !important;
+}
+
+.module-select-all-box .switch-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tx2, #6b7280);
+    cursor: pointer;
+    margin-bottom: 0;
+    line-height: 1;
+}
+
+.module-select-all-box:hover .switch-field-label {
+    color: var(--pri, #1b4fe0);
+}
+
+[data-theme='dark'] .module-select-all-box,
+[data-bs-theme='dark'] .module-select-all-box {
+    background-color: var(--bg-card, #1e2435);
+    border-color: var(--bdr, #2a3347);
+}
+
+[data-theme='dark'] .module-select-all-box:hover,
+[data-bs-theme='dark'] .module-select-all-box:hover {
+    border-color: var(--pri-light, #69b1ff);
+    background-color: rgba(27, 79, 224, 0.12);
+}
+
+[data-theme='dark'] .module-select-all-box .switch-field-label,
+[data-bs-theme='dark'] .module-select-all-box .switch-field-label {
+    color: var(--tx2, #94a3b8);
+}
+
+[data-theme='dark'] .module-select-all-box:hover .switch-field-label,
+[data-bs-theme='dark'] .module-select-all-box:hover .switch-field-label {
+    color: var(--pri-light, #69b1ff);
 }

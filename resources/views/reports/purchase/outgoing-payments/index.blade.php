@@ -372,31 +372,43 @@
             });
 
             // Payment View Detail Modal Handler
-            $(document).on('click', '.btn-view-payment', function() {
-                const payId = $(this).data('id');
-                const btn = $(this);
-                btn.prop('disabled', true);
+            $(document).on('click', '.btn-view-payment, .btn-view-payment *', function(e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-payment');
+                const payId = btn.data('id') || btn.attr('data-id');
+                if (!payId) return;
 
+                function renderPaymentModal(pay) {
+                    $('#modal-pay-num').text(pay.payment_num);
+                    $('#modal-vendor-name').text(pay.vendor_name);
+                    $('#modal-vendor-code').text(pay.vendor_code);
+                    $('#modal-doc-date').text(formatDateText(pay.doc_date));
+                    $('#modal-method').text(pay.payment_method);
+                    $('#modal-ref-num').text(pay.reference_num || '-');
+                    $('#modal-bank-account').text(pay.bank_account || '-');
+                    $('#modal-status-badge').html(getStatusBadge(pay.status));
+                    $('#modal-amount-paid').text(formatMoney(pay.amount_paid, pay.currency));
+                    $('#modal-remarks').text(pay.remarks || 'No remarks provided.');
+
+                    const modalEl = document.getElementById('modal-payment-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.payment_num || rowData.id)) {
+                    renderPaymentModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/purchase/outgoing-payments/${payId}`,
                     type: 'GET',
                     success: function(res) {
                         if (res.success && res.data) {
-                            const pay = res.data;
-                            $('#modal-pay-num').text(pay.payment_num);
-                            $('#modal-vendor-name').text(pay.vendor_name);
-                            $('#modal-vendor-code').text(pay.vendor_code);
-                            $('#modal-doc-date').text(formatDateText(pay.doc_date));
-                            $('#modal-method').text(pay.payment_method);
-                            $('#modal-ref-num').text(pay.reference_num || '-');
-                            $('#modal-bank-account').text(pay.bank_account || '-');
-                            $('#modal-status-badge').html(getStatusBadge(pay.status));
-                            $('#modal-amount-paid').text(formatMoney(pay.amount_paid, pay.currency));
-                            $('#modal-remarks').text(pay.remarks || 'No remarks provided.');
-
-                            const modal = new bootstrap.Modal(document.getElementById('modal-payment-details'));
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderPaymentModal(res.data);
                         }
                     },
                     complete: function() {

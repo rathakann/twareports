@@ -379,31 +379,43 @@
             });
 
             // Deposit View Detail Modal Handler
-            $(document).on('click', '.btn-view-deposit', function() {
-                const depId = $(this).data('id');
-                const btn = $(this);
-                btn.prop('disabled', true);
+            $(document).on('click', '.btn-view-deposit, .btn-view-deposit *', function(e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-deposit');
+                const depId = btn.data('id') || btn.attr('data-id');
+                if (!depId) return;
 
+                function renderDepositModal(dep) {
+                    $('#modal-dep-num').text(dep.deposit_num);
+                    $('#modal-bank-name').text(dep.bank_name);
+                    $('#modal-bank-account').text(dep.bank_account);
+                    $('#modal-journal-ref').text(dep.journal_ref || 'None');
+                    $('#modal-dep-date').text(formatDateText(dep.deposit_date));
+                    $('#modal-dep-type').text(dep.deposit_type);
+                    $('#modal-recon-badge').html(getReconBadge(dep.reconciliation_status));
+                    $('#modal-status-badge').html(getStatusBadge(dep.status));
+                    $('#modal-total-amount').text(formatMoney(dep.total_amount, dep.currency));
+                    $('#modal-remarks').text(dep.remarks || 'No remarks provided.');
+
+                    const modalEl = document.getElementById('modal-deposit-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.deposit_num || rowData.id)) {
+                    renderDepositModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/sales/deposits/${depId}`,
                     type: 'GET',
                     success: function(res) {
                         if (res.success && res.data) {
-                            const dep = res.data;
-                            $('#modal-dep-num').text(dep.deposit_num);
-                            $('#modal-bank-name').text(dep.bank_name);
-                            $('#modal-bank-account').text(dep.bank_account);
-                            $('#modal-journal-ref').text(dep.journal_ref || 'None');
-                            $('#modal-dep-date').text(formatDateText(dep.deposit_date));
-                            $('#modal-dep-type').text(dep.deposit_type);
-                            $('#modal-recon-badge').html(getReconBadge(dep.reconciliation_status));
-                            $('#modal-status-badge').html(getStatusBadge(dep.status));
-                            $('#modal-total-amount').text(formatMoney(dep.total_amount, dep.currency));
-                            $('#modal-remarks').text(dep.remarks || 'No remarks provided.');
-
-                            const modal = new bootstrap.Modal(document.getElementById('modal-deposit-details'));
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderDepositModal(res.data);
                         }
                     },
                     complete: function() {

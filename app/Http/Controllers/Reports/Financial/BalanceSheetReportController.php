@@ -67,7 +67,7 @@ class BalanceSheetReportController extends Controller implements HasMiddleware
                     });
                 })
                 ->addColumn('action', function (BalanceSheetItem $item): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-item" data-id="'.$item->id.'" title="View Account Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-item" data-id="'.$item->uuid.'" title="View Account Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

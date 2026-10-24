@@ -367,34 +367,46 @@
             });
 
             // PO View Detail Modal Handler
-            $(document).on('click', '.btn-view-po', function() {
-                const poId = $(this).data('id');
-                const btn = $(this);
-                btn.prop('disabled', true);
+            $(document).on('click', '.btn-view-po, .btn-view-po *', function(e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-po');
+                const poId = btn.data('id') || btn.attr('data-id');
+                if (!poId) return;
 
+                function renderPoModal(po) {
+                    $('#modal-po-num').text(po.doc_num);
+                    $('#modal-vendor-name').text(po.vendor_name);
+                    $('#modal-vendor-code').text(po.vendor_code);
+                    $('#modal-payment-terms').text(po.payment_terms || 'Standard');
+                    $('#modal-doc-date').text(formatDateText(po.doc_date));
+                    $('#modal-delivery-date').text(formatDateText(po.delivery_date));
+                    $('#modal-buyer-name').text(po.buyer_name || '-');
+                    $('#modal-status-badge').html(getStatusBadge(po.status));
+                    $('#modal-subtotal').text(formatMoney(po.subtotal, po.currency));
+                    $('#modal-tax').text(formatMoney(po.tax_amount, po.currency));
+                    $('#modal-discount').text(formatMoney(po.discount_amount, po.currency));
+                    $('#modal-total').text(formatMoney(po.doc_total, po.currency));
+                    $('#modal-remarks').text(po.remarks || 'No remarks provided.');
+
+                    const modalEl = document.getElementById('modal-po-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.doc_num || rowData.id)) {
+                    renderPoModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/purchase/purchase-orders/${poId}`,
                     type: 'GET',
                     success: function(res) {
                         if (res.success && res.data) {
-                            const po = res.data;
-                            $('#modal-po-num').text(po.doc_num);
-                            $('#modal-vendor-name').text(po.vendor_name);
-                            $('#modal-vendor-code').text(po.vendor_code);
-                            $('#modal-payment-terms').text(po.payment_terms || 'Standard');
-                            $('#modal-doc-date').text(formatDateText(po.doc_date));
-                            $('#modal-delivery-date').text(formatDateText(po.delivery_date));
-                            $('#modal-buyer-name').text(po.buyer_name || '-');
-                            $('#modal-status-badge').html(getStatusBadge(po.status));
-                            $('#modal-subtotal').text(formatMoney(po.subtotal, po.currency));
-                            $('#modal-tax').text(formatMoney(po.tax_amount, po.currency));
-                            $('#modal-discount').text(formatMoney(po.discount_amount, po.currency));
-                            $('#modal-total').text(formatMoney(po.doc_total, po.currency));
-                            $('#modal-remarks').text(po.remarks || 'No remarks provided.');
-
-                            const modal = new bootstrap.Modal(document.getElementById('modal-po-details'));
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderPoModal(res.data);
                         }
                     },
                     complete: function() {

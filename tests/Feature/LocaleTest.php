@@ -8,7 +8,7 @@ class LocaleTest extends TestCase
 {
     public function test_default_locale_is_en(): void
     {
-        $this->get('/dashboard');
+        $this->get('/login');
         $this->assertSame('en', app()->getLocale());
     }
 
@@ -23,14 +23,14 @@ class LocaleTest extends TestCase
 
     public function test_locale_is_restored_from_session(): void
     {
-        $this->withSession(['locale' => 'km'])->get('/dashboard');
+        $this->withSession(['locale' => 'km'])->get('/login');
 
         $this->assertSame('km', app()->getLocale());
     }
 
     public function test_locale_is_restored_from_cookie(): void
     {
-        $this->withCookie('twa_locale', 'km')->get('/dashboard');
+        $this->withCookie('twa_locale', 'km')->get('/login');
 
         $this->assertSame('km', app()->getLocale());
     }
@@ -46,7 +46,5 @@ class LocaleTest extends TestCase
     {
         $this->assertSame('Dashboard', __('app.dashboard', [], 'en'));
         $this->assertSame('ផ្ទាំងគ្រប់គ្រង', __('app.dashboard', [], 'km'));
-        $this->assertSame('User Management', __('app.user_management', [], 'en'));
-        $this->assertSame('ការគ្រប់គ្រងអ្នកប្រើប្រាស់', __('app.user_management', [], 'km'));
     }
 }

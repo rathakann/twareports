@@ -68,7 +68,7 @@ class PurchaseOrderReportController extends Controller implements HasMiddleware
                     });
                 })
                 ->addColumn('action', function (PurchaseOrder $po): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-po" data-id="'.$po->id.'" title="View Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-po" data-id="'.$po->uuid.'" title="View Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

@@ -357,28 +357,45 @@
                 table.draw();
             });
 
-            $(document).on('click', '.btn-view-item', function () {
-                const id = $(this).data('id');
+            $(document).on('click', '.btn-view-item, .btn-view-item *', function (e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-item');
+                const id = btn.data('id') || btn.attr('data-id');
+                if (!id) return;
+
+                function renderItemModal(d) {
+                    $('#modal-acc-code').text(d.account_code);
+                    $('#modal-acc-name').text(d.account_name);
+                    $('#modal-acc-category').text(d.category);
+                    $('#modal-acc-status').text(d.status || 'Active');
+                    $('#modal-as-of-date').text(formatDateText(d.as_of_date));
+                    $('#modal-current-balance').text(formatMoney(d.amount));
+                    $('#modal-prior-balance').text(formatMoney(d.previous_amount));
+                    $('#modal-notes').text(d.notes || 'No audit notes recorded for this line item.');
+
+                    const modalEl = document.getElementById('modal-bs-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.account_code || rowData.id)) {
+                    renderItemModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/financial/balance-sheet/${id}`,
                     type: 'GET',
                     success: function (res) {
                         if (res && res.data) {
-                            const d = res.data;
-                            $('#modal-acc-code').text(d.account_code);
-                            $('#modal-acc-name').text(d.account_name);
-                            $('#modal-acc-category').text(d.category);
-                            $('#modal-acc-status').text(d.status || 'Active');
-                            $('#modal-as-of-date').text(formatDateText(d.as_of_date));
-                            $('#modal-current-balance').text(formatMoney(d.amount));
-                            $('#modal-prior-balance').text(formatMoney(d.previous_amount));
-                            $('#modal-notes').text(d.notes || 'No audit notes recorded for this line item.');
-
-                            const modalEl = document.getElementById('modal-bs-details');
-                            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderItemModal(res.data);
                         }
+                    },
+                    complete: function () {
+                        btn.prop('disabled', false);
                     }
                 });
             });

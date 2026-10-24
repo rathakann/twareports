@@ -96,7 +96,7 @@
     </div>
 
     <!-- Filters Section -->
-    <div id="gl-filter-card" class="card border-0 shadow-sm rounded-3 mb-4 filter-section">
+    <div id="gl-filter-card" class="card border-0 shadow-sm rounded-3 mb-2 filter-section">
         <div class="card-body p-3">
             <div class="row g-3 align-items-end">
                 <div class="col-md-3 col-sm-6">
@@ -385,30 +385,47 @@
                 table.draw();
             });
 
-            $(document).on('click', '.btn-view-entry', function () {
-                const id = $(this).data('id');
+            $(document).on('click', '.btn-view-entry, .btn-view-entry *', function (e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-entry');
+                const id = btn.data('id') || btn.attr('data-id');
+                if (!id) return;
+
+                function renderEntryModal(d) {
+                    $('#modal-entry-num').text(d.entry_number);
+                    $('#modal-acc-name').text(d.account_name);
+                    $('#modal-acc-code').text(d.account_code);
+                    $('#modal-source-doc').text((d.source_doc_type || '') + (d.source_doc_num ? ' (' + d.source_doc_num + ')' : ''));
+                    $('#modal-posted-by').text(d.posted_by || 'System');
+                    $('#modal-doc-date').text(formatDateText(d.doc_date));
+                    $('#modal-debit-val').text(formatMoney(d.debit));
+                    $('#modal-credit-val').text(formatMoney(d.credit));
+                    $('#modal-balance-val').text(formatMoney(d.balance));
+                    $('#modal-desc').text(d.description || 'No detailed narrative provided.');
+
+                    const modalEl = document.getElementById('modal-gl-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.entry_number || rowData.id)) {
+                    renderEntryModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/financial/general-ledger/${id}`,
                     type: 'GET',
                     success: function (res) {
                         if (res && res.data) {
-                            const d = res.data;
-                            $('#modal-entry-num').text(d.entry_number);
-                            $('#modal-acc-name').text(d.account_name);
-                            $('#modal-acc-code').text(d.account_code);
-                            $('#modal-source-doc').text((d.source_doc_type || '') + (d.source_doc_num ? ' (' + d.source_doc_num + ')' : ''));
-                            $('#modal-posted-by').text(d.posted_by || 'System');
-                            $('#modal-doc-date').text(formatDateText(d.doc_date));
-                            $('#modal-debit-val').text(formatMoney(d.debit));
-                            $('#modal-credit-val').text(formatMoney(d.credit));
-                            $('#modal-balance-val').text(formatMoney(d.balance));
-                            $('#modal-desc').text(d.description || 'No detailed narrative provided.');
-
-                            const modalEl = document.getElementById('modal-gl-details');
-                            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderEntryModal(res.data);
                         }
+                    },
+                    complete: function () {
+                        btn.prop('disabled', false);
                     }
                 });
             });

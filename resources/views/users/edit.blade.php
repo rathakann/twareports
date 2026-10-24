@@ -13,7 +13,7 @@
         title="Edit User: {{ $user->name }}"
         section="Access Control"
         icon="user-pen"
-        description="Update user account credentials, change active status, and modify role and permission assignments.">
+        description="Update user account credentials, change active status, and modify assigned roles.">
         <x-slot:actions>
             <a href="{{ route('users.index') }}" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
                 <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
@@ -39,7 +39,7 @@
 
         <div class="row g-4">
             <!-- Account Details -->
-            <div class="col-lg-5">
+            <div class="col-lg-7">
                 <div class="card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-header bg-transparent border-bottom py-3">
                         <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
@@ -105,144 +105,182 @@
                             @endif
                         </div>
 
-                        <hr class="my-2 text-secondary">
-
                         <div>
-                            <label class="form-label small fw-semibold text-secondary d-block mb-2">Assign Roles</label>
-                            <div class="d-flex flex-column gap-2">
-                                @php($userRoles = old('roles', $user->roles->pluck('name')->toArray()))
-                                @foreach ($roles as $role)
-                                    @php($isPrimarySuperAdmin = $user->id === 1 && $role->name === 'Super Admin')
-                                    <div class="switch-field p-2 rounded-2 border bg-light bg-opacity-50 d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <input class="switch-field-input role-checkbox" type="checkbox" name="roles[]"
-                                                value="{{ $role->name }}" id="role_{{ $role->id }}"
-                                                data-permissions='@json($role->permissions->pluck("name"))'
-                                                {{ in_array($role->name, $userRoles) ? 'checked' : '' }}
-                                                {{ $isPrimarySuperAdmin ? 'checked disabled' : '' }}>
-                                            <label class="switch-field-control mb-0" for="role_{{ $role->id }}">
-                                                <span class="switch-field-thumb"></span>
-                                            </label>
-                                            <label class="switch-field-label fw-semibold text-dark mb-0" for="role_{{ $role->id }}">
-                                                {{ $role->name }}
-                                            </label>
-                                        </div>
-                                        @if ($isPrimarySuperAdmin)
-                                            <input type="hidden" name="roles[]" value="Super Admin">
-                                        @endif
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size: 11px;">
-                                            {{ $role->permissions->count() }} permissions
-                                        </span>
-                                    </div>
-                                @endforeach
+                            <label for="landing_page" class="form-label small fw-semibold text-secondary d-flex justify-content-between align-items-center">
+                                <span>Default Landing Page</span>
+                                <span class="text-muted fw-normal" style="font-size: 11px;">Page visited upon login</span>
+                            </label>
+                            <div class="input-icon-left">
+                                <i class="input-icon-addon" data-lucide="compass"></i>
+                                <select name="landing_page" id="landing_page" class="form-select js-select2 @error('landing_page') is-invalid @enderror">
+                                    <option value="" data-permission="">Default (Dashboard)</option>
+                                    @foreach ($landingPageOptions as $group => $options)
+                                        <optgroup label="{{ $group }}">
+                                            @foreach ($options as $route => $label)
+                                                @php
+                                                    $reqPerm = \App\Support\Navigation::getRequiredPermissionForRoute($route);
+                                                    $reqPermStr = is_array($reqPerm) ? implode('|', $reqPerm) : ($reqPerm ?? '');
+                                                @endphp
+                                                <option value="{{ $route }}" data-permission="{{ $reqPermStr }}" {{ old('landing_page', $user->landing_page) === $route ? 'selected' : '' }}>
+                                                    {{ $label }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
                             </div>
+                            @error('landing_page')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            <div id="landing-page-permission-alert" class="alert alert-warning py-2 px-3 mt-2 rounded-2 small d-none align-items-center gap-2 mb-0">
+                                <i data-lucide="shield-alert" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                                <span>The selected landing page requires the <strong id="landing-page-required-perm"></strong> permission. Please assign a role with this capability.</span>
+                            </div>
+                            <small class="text-muted d-block mt-1">If not defined, logging in always brings this user to the Dashboard.</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Granular Permissions Matrix -->
-            <div class="col-lg-7">
-                <div class="card border-0 shadow-sm rounded-3">
+            <!-- Role Assignment -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
                         <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
-                            <i data-lucide="key" style="width: 18px; height: 18px;" class="text-primary"></i>
-                            <span>Direct User Permissions</span>
+                            <i data-lucide="shield-check" style="width: 18px; height: 18px;" class="text-primary"></i>
+                            <span>Assign Roles</span>
                         </h2>
-                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25" style="font-size: 11px;">
-                            Inherited permissions highlighted automatically
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size: 11px;">
+                            Role-Based Access
                         </span>
                     </div>
-                    <div class="card-body p-4">
-                        <p class="text-secondary small mb-3">
-                            Direct permissions are granted individually to this user in addition to any permissions inherited from assigned roles.
+                    <div class="card-body p-4 d-flex flex-column gap-3">
+                        <p class="text-secondary small mb-1">
+                            User permissions and system access rights are managed entirely through roles. Assign one or more roles to this user.
                         </p>
-
-                        <div class="row g-3">
-                            @php($selectedDirectPerms = old('permissions', $directPermissions))
-                            @foreach ($permissions as $module => $modulePermissions)
-                                <div class="col-12">
-                                    <div class="border rounded-3 p-3 bg-white">
-                                        <h3 class="h6 fw-bold text-uppercase text-secondary mb-2" style="font-size: 12px; letter-spacing: 0.5px;">
-                                            Module: {{ $module }}
-                                        </h3>
-                                        <div class="row g-2">
-                                            @foreach ($modulePermissions as $permission)
-                                                <div class="col-md-6">
-                                                    <div class="switch-field permission-container p-2 rounded-2 border bg-white d-flex align-items-center justify-content-between" id="perm_wrapper_{{ $permission->name }}">
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <input class="switch-field-input permission-checkbox" type="checkbox" name="permissions[]"
-                                                                value="{{ $permission->name }}" id="perm_{{ $permission->id }}"
-                                                                data-permission-name="{{ $permission->name }}"
-                                                                {{ in_array($permission->name, $selectedDirectPerms) ? 'checked' : '' }}>
-                                                            <label class="switch-field-control mb-0" for="perm_{{ $permission->id }}">
-                                                                <span class="switch-field-thumb"></span>
-                                                            </label>
-                                                            <label class="switch-field-label small fw-semibold text-dark mb-0" for="perm_{{ $permission->id }}">
-                                                                {{ $permission->name }}
-                                                            </label>
-                                                        </div>
-                                                        <span class="badge bg-primary bg-opacity-10 text-primary inherited-badge d-none" style="font-size: 10px;">
-                                                            Inherited from Role
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            @php($userRoles = old('roles', $user->roles->pluck('name')->toArray()))
+                            @foreach ($roles as $role)
+                                @php($isPrimarySuperAdmin = $user->id === 1 && $role->name === 'Super Admin')
+                                <div class="switch-field p-2 rounded-2 border bg-light bg-opacity-50 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input class="switch-field-input role-checkbox" type="checkbox" name="roles[]"
+                                            value="{{ $role->name }}" id="role_{{ $role->id }}"
+                                            data-permissions='@json($role->permissions->pluck("name"))'
+                                            {{ in_array($role->name, $userRoles) ? 'checked' : '' }}
+                                            {{ $isPrimarySuperAdmin ? 'checked disabled' : '' }}>
+                                        <label class="switch-field-control mb-0" for="role_{{ $role->id }}">
+                                            <span class="switch-field-thumb"></span>
+                                        </label>
+                                        <label class="switch-field-label fw-semibold text-dark mb-0" for="role_{{ $role->id }}">
+                                            {{ $role->name }}
+                                        </label>
                                     </div>
+                                    @if ($isPrimarySuperAdmin)
+                                        <input type="hidden" name="roles[]" value="Super Admin">
+                                    @endif
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size: 11px;">
+                                        {{ $role->permissions->count() }} permissions
+                                    </span>
                                 </div>
                             @endforeach
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-end gap-2">
-                        <a href="{{ route('users.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-2 shadow-sm">
-                            <i data-lucide="check" style="width: 18px; height: 18px;"></i>
-                            <span>Save Changes</span>
-                        </button>
-                    </div>
                 </div>
             </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="{{ route('users.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-2 shadow-sm">
+                <i data-lucide="check" style="width: 18px; height: 18px;"></i>
+                <span>Save Changes</span>
+            </button>
         </div>
     </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const roleCheckboxes = document.querySelectorAll('.role-checkbox');
-            const permissionContainers = document.querySelectorAll('.permission-container');
+            const landingPageSelect = document.getElementById('landing_page');
+            const landingPageAlert = document.getElementById('landing-page-permission-alert');
+            const landingPagePermText = document.getElementById('landing-page-required-perm');
+            const userForm = document.querySelector('form[action="{{ route('users.update', $user) }}"]');
 
-            function updateInheritedPermissions() {
-                const inherited = new Set();
+            function getActivePermissions() {
+                const permissions = new Set();
+                let isSuperAdmin = false;
 
                 roleCheckboxes.forEach(cb => {
                     if (cb.checked) {
+                        if (cb.value === 'Super Admin') {
+                            isSuperAdmin = true;
+                        }
                         try {
                             const perms = JSON.parse(cb.dataset.permissions || '[]');
-                            perms.forEach(p => inherited.add(p));
+                            perms.forEach(p => permissions.add(p));
                         } catch (e) {}
                     }
                 });
 
-                permissionContainers.forEach(container => {
-                    const checkbox = container.querySelector('.permission-checkbox');
-                    const badge = container.querySelector('.inherited-badge');
-                    const permName = checkbox.dataset.permissionName;
+                return { permissions, isSuperAdmin };
+            }
 
-                    if (inherited.has(permName)) {
-                        badge.classList.remove('d-none');
-                        container.classList.add('bg-primary', 'bg-opacity-10', 'border-primary');
-                    } else {
-                        badge.classList.add('d-none');
-                        container.classList.remove('bg-primary', 'bg-opacity-10', 'border-primary');
+            function checkLandingPagePermission() {
+                if (!landingPageSelect || !landingPageAlert) {
+                    return true;
+                }
+
+                const selectedOption = landingPageSelect.options[landingPageSelect.selectedIndex];
+                const required = selectedOption ? (selectedOption.dataset.permission || '') : '';
+                const { permissions, isSuperAdmin } = getActivePermissions();
+
+                if (!required || isSuperAdmin) {
+                    landingPageAlert.classList.add('d-none');
+                    landingPageAlert.classList.remove('d-flex');
+                    landingPageSelect.classList.remove('is-invalid');
+                    return true;
+                }
+
+                const options = required.split('|').map(s => s.trim()).filter(Boolean);
+                const hasRequired = options.some(opt => permissions.has(opt));
+
+                if (hasRequired) {
+                    landingPageAlert.classList.add('d-none');
+                    landingPageAlert.classList.remove('d-flex');
+                    landingPageSelect.classList.remove('is-invalid');
+                    return true;
+                } else {
+                    if (landingPagePermText) {
+                        landingPagePermText.textContent = options.join(' or ');
                     }
-                });
+                    landingPageAlert.classList.remove('d-none');
+                    landingPageAlert.classList.add('d-flex');
+                    landingPageSelect.classList.add('is-invalid');
+                    return false;
+                }
+            }
+
+            if (landingPageSelect) {
+                landingPageSelect.addEventListener('change', checkLandingPagePermission);
+                if (window.jQuery) {
+                    window.jQuery(landingPageSelect).on('change', checkLandingPagePermission);
+                }
             }
 
             roleCheckboxes.forEach(cb => {
-                cb.addEventListener('change', updateInheritedPermissions);
+                cb.addEventListener('change', checkLandingPagePermission);
             });
 
-            updateInheritedPermissions();
+            userForm?.addEventListener('submit', function (e) {
+                if (!checkLandingPagePermission()) {
+                    e.preventDefault();
+                    landingPageSelect?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    landingPageSelect?.focus();
+                }
+            });
+
+            checkLandingPagePermission();
         });
     </script>
 </x-app-layout>

@@ -69,7 +69,7 @@ class SalesPurchaseOrderReportController extends Controller implements HasMiddle
                     });
                 })
                 ->addColumn('action', function (SalesPurchaseOrder $order): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-order" data-id="'.$order->id.'" title="View Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-order" data-id="'.$order->uuid.'" title="View Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

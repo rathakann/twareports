@@ -73,7 +73,7 @@ class OutgoingPaymentReportController extends Controller implements HasMiddlewar
                     });
                 })
                 ->addColumn('action', function (OutgoingPayment $payment): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-payment" data-id="'.$payment->id.'" title="View Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-payment" data-id="'.$payment->uuid.'" title="View Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

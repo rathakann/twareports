@@ -76,7 +76,7 @@ class DepositReportController extends Controller implements HasMiddleware
                     });
                 })
                 ->addColumn('action', function (Deposit $deposit): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-deposit" data-id="'.$deposit->id.'" title="View Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-deposit" data-id="'.$deposit->uuid.'" title="View Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

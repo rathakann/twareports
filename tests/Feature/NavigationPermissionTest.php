@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Support\Navigation;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class NavigationPermissionTest extends TestCase
@@ -98,6 +98,7 @@ class NavigationPermissionTest extends TestCase
 
         $groupLabels = collect($filtered)->pluck('label')->all();
         $this->assertContains('Workspace', $groupLabels);
+        $this->assertContains('Components', $groupLabels);
         $this->assertContains('Access Control', $groupLabels);
 
         $accessGroup = collect($filtered)->firstWhere('label', 'Access Control');
@@ -122,5 +123,49 @@ class NavigationPermissionTest extends TestCase
         $response->assertSee('horizontal-report-dropdown', false);
         $response->assertSee('reports/purchase/purchase-orders', false);
         $response->assertSee('reports/sales/ar-invoices', false);
+    }
+
+    /**
+     * Test navigation item is active on create page.
+     */
+    public function test_navigation_item_is_active_on_create_page(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        $response = $this->actingAs($superAdmin)->get(route('roles.create'));
+
+        $response->assertOk();
+        // The sidebar-item for roles should be marked is-active on roles.create
+        $response->assertSee('is-active', false);
+    }
+
+    /**
+     * Test navigation item is active on edit page.
+     */
+    public function test_navigation_item_is_active_on_edit_page(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        $response = $this->actingAs($superAdmin)->get(route('users.edit', $superAdmin));
+
+        $response->assertOk();
+        // The sidebar-item for users should be marked is-active on users.edit
+        $response->assertSee('is-active', false);
+    }
+
+    /**
+     * Test Navigation helper isRouteActive directly.
+     */
+    public function test_navigation_helper_is_route_active_for_resource_subroutes(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        $this->actingAs($superAdmin)->get(route('roles.create'));
+        $this->assertTrue(Navigation::isRouteActive('roles.index'));
+        $this->assertFalse(Navigation::isRouteActive('users.index'));
+
+        $this->actingAs($superAdmin)->get(route('users.edit', $superAdmin));
+        $this->assertTrue(Navigation::isRouteActive('users.index'));
+        $this->assertFalse(Navigation::isRouteActive('roles.index'));
     }
 }

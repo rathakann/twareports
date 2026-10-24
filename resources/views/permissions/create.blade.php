@@ -52,7 +52,7 @@
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
                     <small class="text-secondary d-block mt-1">
-                        Use dot-notation like <code>module.action</code> to enable automatic grouping in the role and user permissions matrix.
+                        Use dot-notation like <code>module.action</code> to enable automatic grouping in the role permissions matrix.
                     </small>
                 </div>
             </div>

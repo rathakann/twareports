@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUuid;
 use Database\Factories\OutgoingPaymentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class OutgoingPayment extends Model
 {
     /** @use HasFactory<OutgoingPaymentFactory> */
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +18,7 @@ class OutgoingPayment extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'uuid',
         'payment_num',
         'doc_date',
         'vendor_code',

@@ -67,7 +67,7 @@ class TrialBalanceReportController extends Controller implements HasMiddleware
                     });
                 })
                 ->addColumn('action', function (TrialBalanceAccount $account): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-account" data-id="'.$account->id.'" title="View Ledger Card"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-account" data-id="'.$account->uuid.'" title="View Ledger Card"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

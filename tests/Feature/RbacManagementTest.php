@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class RbacManagementTest extends TestCase
@@ -56,7 +56,6 @@ class RbacManagementTest extends TestCase
                         'email',
                         'status',
                         'roles_list',
-                        'permissions_list',
                         'action',
                     ],
                 ],
@@ -189,9 +188,9 @@ class RbacManagementTest extends TestCase
     }
 
     /**
-     * Test creating a user with both roles (syncRoles) and direct permissions (syncPermissions).
+     * Test creating a user with roles (managed exclusively from roles).
      */
-    public function test_user_can_be_created_with_roles_and_direct_permissions(): void
+    public function test_user_can_be_created_with_roles(): void
     {
         $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
 
@@ -201,7 +200,6 @@ class RbacManagementTest extends TestCase
             'password' => 'SecurePass123!',
             'status' => 'active',
             'roles' => ['User'],
-            'permissions' => ['users.create', 'users.edit'],
         ]);
 
         $response->assertRedirect(route('users.index'));
@@ -209,15 +207,13 @@ class RbacManagementTest extends TestCase
         $createdUser = User::where('email', 'analyst@twareports.test')->first();
         $this->assertNotNull($createdUser);
         $this->assertTrue($createdUser->hasRole('User'));
-        $this->assertTrue($createdUser->hasDirectPermission('users.create'));
-        $this->assertTrue($createdUser->hasDirectPermission('users.edit'));
-        $this->assertFalse($createdUser->hasDirectPermission('roles.delete'));
+        $this->assertEmpty($createdUser->permissions);
     }
 
     /**
-     * Test updating a user updates roles (syncRoles) and direct permissions (syncPermissions).
+     * Test updating a user updates roles and clears any direct permissions.
      */
-    public function test_user_can_be_updated_with_roles_and_direct_permissions(): void
+    public function test_user_can_be_updated_with_roles(): void
     {
         $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
 
@@ -225,12 +221,11 @@ class RbacManagementTest extends TestCase
         $targetUser->assignRole('User');
         $targetUser->givePermissionTo('users.view');
 
-        $response = $this->actingAs($superAdmin)->put('/users/'.$targetUser->id, [
+        $response = $this->actingAs($superAdmin)->put(route('users.update', $targetUser), [
             'name' => 'Updated User Name',
             'email' => $targetUser->email,
             'status' => 'active',
             'roles' => ['Admin'],
-            'permissions' => ['permissions.manage'],
         ]);
 
         $response->assertRedirect(route('users.index'));
@@ -239,8 +234,8 @@ class RbacManagementTest extends TestCase
         $this->assertSame('Updated User Name', $targetUser->name);
         $this->assertTrue($targetUser->hasRole('Admin'));
         $this->assertFalse($targetUser->hasRole('User'));
-        $this->assertTrue($targetUser->hasDirectPermission('permissions.manage'));
         $this->assertFalse($targetUser->hasDirectPermission('users.view'));
+        $this->assertEmpty($targetUser->permissions);
     }
 
     /**
@@ -253,7 +248,7 @@ class RbacManagementTest extends TestCase
 
         $this->assertSame('active', $staffUser->status);
 
-        $response = $this->actingAs($superAdmin)->patchJson('/users/'.$staffUser->id.'/status', [
+        $response = $this->actingAs($superAdmin)->patchJson(route('users.status', $staffUser), [
             'status' => 'inactive',
         ]);
 
@@ -290,7 +285,7 @@ class RbacManagementTest extends TestCase
     {
         $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
 
-        $response = $this->actingAs($superAdmin)->deleteJson('/users/'.$superAdmin->id);
+        $response = $this->actingAs($superAdmin)->deleteJson(route('users.destroy', $superAdmin));
 
         $response->assertForbidden();
 
@@ -305,14 +300,14 @@ class RbacManagementTest extends TestCase
         $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
 
         // Via PATCH endpoint
-        $patchResponse = $this->actingAs($superAdmin)->patchJson('/users/'.$superAdmin->id.'/status', [
+        $patchResponse = $this->actingAs($superAdmin)->patchJson(route('users.status', $superAdmin), [
             'status' => 'inactive',
         ]);
         $patchResponse->assertForbidden();
         $this->assertSame('active', $superAdmin->fresh()->status);
 
         // Via PUT update endpoint
-        $putResponse = $this->actingAs($superAdmin)->put('/users/'.$superAdmin->id, [
+        $putResponse = $this->actingAs($superAdmin)->put(route('users.update', $superAdmin), [
             'name' => $superAdmin->name,
             'email' => $superAdmin->email,
             'status' => 'inactive',
@@ -333,7 +328,7 @@ class RbacManagementTest extends TestCase
         $adminUser = User::where('email', 'admin@twareports.test')->first();
         $adminUser->givePermissionTo('users.edit');
 
-        $revokeResponse = $this->actingAs($adminUser)->put('/users/'.$superAdmin->id, [
+        $revokeResponse = $this->actingAs($adminUser)->put(route('users.update', $superAdmin), [
             'name' => $superAdmin->name,
             'email' => $superAdmin->email,
             'status' => 'active',
@@ -345,7 +340,7 @@ class RbacManagementTest extends TestCase
 
         // Attempt to delete Super Admin role itself
         $superAdminRole = Role::findByName('Super Admin');
-        $deleteRoleResponse = $this->actingAs($superAdmin)->deleteJson('/roles/'.$superAdminRole->id);
+        $deleteRoleResponse = $this->actingAs($superAdmin)->deleteJson(route('roles.destroy', $superAdminRole));
 
         $deleteRoleResponse->assertForbidden();
         $this->assertDatabaseHas('roles', ['name' => 'Super Admin']);
@@ -392,5 +387,129 @@ class RbacManagementTest extends TestCase
             ->getJson("/permissions?draw=2&created_date={$pastDate}", ['X-Requested-With' => 'XMLHttpRequest']);
         $permissionsNoMatchResponse->assertOk();
         $this->assertEquals(0, $permissionsNoMatchResponse->json('recordsFiltered'));
+    }
+
+    /**
+     * Test creating and updating a role with default landing page.
+     */
+    public function test_can_create_and_update_role_with_default_landing_page(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        // 1. Create role with default landing page
+        $createResponse = $this->actingAs($superAdmin)->post(route('roles.store'), [
+            'name' => 'Auditor',
+            'landing_page' => 'reports.financial.balance-sheet.index',
+            'permissions' => ['reports.financial.balance-sheet.view'],
+        ]);
+
+        $createResponse->assertRedirect(route('roles.index'));
+        $this->assertDatabaseHas('roles', [
+            'name' => 'Auditor',
+            'landing_page' => 'reports.financial.balance-sheet.index',
+        ]);
+
+        $role = Role::findByName('Auditor');
+
+        // 2. Update role landing page with corresponding permission
+        $updateResponse = $this->actingAs($superAdmin)->put(route('roles.update', $role), [
+            'name' => 'Auditor',
+            'landing_page' => 'reports.financial.general-ledger.index',
+            'permissions' => ['reports.financial.general-ledger.view'],
+        ]);
+
+        $updateResponse->assertRedirect(route('roles.index'));
+        $this->assertDatabaseHas('roles', [
+            'id' => $role->id,
+            'landing_page' => 'reports.financial.general-ledger.index',
+        ]);
+    }
+
+    /**
+     * Test assigning landing page without permission to role is prevented.
+     */
+    public function test_cannot_assign_landing_page_without_permission_to_role(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        $response = $this->actingAs($superAdmin)->post(route('roles.store'), [
+            'name' => 'Unauthorized Role',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+            'permissions' => ['reports.purchase.purchase-orders.view'],
+        ]);
+
+        $response->assertSessionHasErrors(['landing_page']);
+        $this->assertDatabaseMissing('roles', [
+            'name' => 'Unauthorized Role',
+        ]);
+    }
+
+    /**
+     * Test Super Admin role can be assigned any landing page without specific permissions.
+     */
+    public function test_super_admin_role_can_have_any_landing_page(): void
+    {
+        $superAdminUser = User::where('email', 'superadmin@twareports.test')->first();
+        $superAdminRole = Role::findByName('Super Admin');
+
+        $response = $this->actingAs($superAdminUser)->put(route('roles.update', $superAdminRole), [
+            'name' => 'Super Admin',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+        ]);
+
+        $response->assertRedirect(route('roles.index'));
+        $this->assertDatabaseHas('roles', [
+            'name' => 'Super Admin',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+        ]);
+    }
+
+    /**
+     * Test assigning landing page without permission to user is prevented.
+     */
+    public function test_cannot_assign_landing_page_without_permission_to_user(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        $response = $this->actingAs($superAdmin)->post(route('users.store'), [
+            'name' => 'No Perm User',
+            'email' => 'noperm@twareports.test',
+            'password' => 'Password123!',
+            'status' => 'active',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+            'roles' => [],
+        ]);
+
+        $response->assertSessionHasErrors(['landing_page']);
+        $this->assertDatabaseMissing('users', [
+            'email' => 'noperm@twareports.test',
+        ]);
+    }
+
+    /**
+     * Test user can be assigned landing page when role provides the required permission.
+     */
+    public function test_can_assign_landing_page_to_user_when_role_provides_permission(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        // Create a role that grants ar-invoices.view
+        $salesRole = Role::firstOrCreate(['name' => 'Sales Staff', 'guard_name' => 'web']);
+        $salesRole->syncPermissions(['reports.sales.ar-invoices.view']);
+
+        $response = $this->actingAs($superAdmin)->post(route('users.store'), [
+            'name' => 'Permitted User',
+            'email' => 'permitted@twareports.test',
+            'password' => 'Password123!',
+            'status' => 'active',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+            'roles' => ['Sales Staff'],
+        ]);
+
+        $response->assertRedirect(route('users.index'));
+        $this->assertDatabaseHas('users', [
+            'email' => 'permitted@twareports.test',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+        ]);
     }
 }

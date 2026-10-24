@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
+use App\Support\Navigation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
+use Illuminate\Validation\Validator;
 
 class RoleRequest extends FormRequest
 {
@@ -38,8 +40,44 @@ class RoleRequest extends FormRequest
                 'max:255',
                 Rule::unique('roles', 'name')->ignore($roleId),
             ],
+            'landing_page' => ['nullable', 'string', 'max:100'],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['string', 'exists:permissions,name'],
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * @param  Validator  $validator
+     */
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $landingPage = $this->input('landing_page');
+            if (empty($landingPage)) {
+                return;
+            }
+
+            /** @var Role|null $role */
+            $role = $this->route('role');
+            $roleName = $this->input('name') ?? ($role instanceof Role ? $role->name : null);
+
+            // Super Admin has universal access
+            if ($roleName === 'Super Admin') {
+                return;
+            }
+
+            $permissions = (array) $this->input('permissions', []);
+
+            if (! Navigation::permissionsAllowRoute($permissions, $landingPage)) {
+                $required = Navigation::getRequiredPermissionForRoute($landingPage);
+                $reqStr = is_array($required) ? implode(' or ', $required) : str_replace('|', ' or ', (string) $required);
+                $validator->errors()->add(
+                    'landing_page',
+                    "The selected default landing page requires the '{$reqStr}' permission, which is not assigned to this role."
+                );
+            }
+        });
     }
 }

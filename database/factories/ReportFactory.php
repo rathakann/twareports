@@ -22,6 +22,7 @@ class ReportFactory extends Factory
             'user_id' => User::factory(),
             'title' => fake()->sentence(),
             'content' => fake()->paragraphs(3, true),
+            'uuid' => fake()->uuid(),
         ];
     }
 }

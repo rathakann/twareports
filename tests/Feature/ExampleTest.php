@@ -2,11 +2,21 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(RolePermissionSeeder::class);
+    }
+
     /**
      * A basic test example.
      */
@@ -17,9 +27,18 @@ class ExampleTest extends TestCase
         $response->assertRedirectToRoute('dashboard');
     }
 
-    public function test_the_dashboard_renders_the_application_layout(): void
+    public function test_guests_are_redirected_to_login_when_accessing_dashboard(): void
     {
         $response = $this->get('/dashboard');
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_the_dashboard_renders_the_application_layout(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertOk();
         $response->assertSee('TWA Reports');
@@ -28,7 +47,9 @@ class ExampleTest extends TestCase
 
     public function test_the_component_showcase_renders_the_reusable_library(): void
     {
-        $response = $this->get('/theme/components');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/theme/components');
 
         $response->assertOk();
         $response->assertSee('UI Components');
@@ -37,7 +58,9 @@ class ExampleTest extends TestCase
 
     public function test_the_example_listing_renders_static_demonstration_data(): void
     {
-        $response = $this->get('/theme/listing');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/theme/listing');
 
         $response->assertOk();
         $response->assertSee('Example Listing');
@@ -46,7 +69,9 @@ class ExampleTest extends TestCase
 
     public function test_the_example_form_renders_the_safe_workflow(): void
     {
-        $response = $this->get('/theme/form');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/theme/form');
 
         $response->assertOk();
         $response->assertSee('Validation demonstration only');
@@ -54,14 +79,18 @@ class ExampleTest extends TestCase
 
     public function test_the_example_form_validates_required_demonstration_fields(): void
     {
-        $response = $this->post('/theme/form', []);
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/theme/form', []);
 
         $response->assertSessionHasErrors(['name', 'category']);
     }
 
     public function test_the_example_form_confirms_validation_without_persisting_data(): void
     {
-        $response = $this->post('/theme/form', [
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/theme/form', [
             'name' => 'Quarterly demonstration',
             'category' => 'operations',
             'effective_date' => '2026-10-16',

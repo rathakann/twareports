@@ -4,6 +4,38 @@
         <section class="theme-setting"><p>Appearance</p><div class="theme-choice-grid"><button type="button" data-theme-mode="light" aria-pressed="false"><i data-lucide="sun"></i>Light</button><button type="button" data-theme-mode="dark" aria-pressed="false"><i data-lucide="moon"></i>Dark</button></div></section>
         <section class="theme-setting"><p>Navigation layout</p><div class="theme-choice-grid"><button type="button" data-layout="vertical" aria-pressed="false"><i data-lucide="panel-left"></i>Vertical</button><button type="button" data-layout="horizontal" aria-pressed="false"><i data-lucide="menu"></i>Horizontal</button></div><div class="mt-2"><button type="button" class="theme-setting-toggle" data-sidebar-preference aria-pressed="false"><i data-lucide="panel-left-close"></i><span>Collapsed sidebar</span></button></div></section>
         <section class="theme-setting"><p>Primary color</p><div class="theme-colors">@foreach (['blue', 'sky', 'purple', 'emerald', 'royal', 'orange', 'cyan', 'mint', 'coral'] as $color)<button type="button" class="theme-color theme-color-{{ $color }}" data-primary-color="{{ $color }}" aria-label="Use {{ $color }} primary color" aria-pressed="false"></button>@endforeach</div><label class="theme-field-label mt-3" for="themePrimary">Custom hexadecimal color</label><div class="d-flex gap-2"><input id="themePrimary" class="form-control form-control-color" type="color" value="#1b4fe0" data-primary-color-input><input class="form-control" type="text" value="#1b4fe0" maxlength="7" pattern="#[0-9A-Fa-f]{6}" data-primary-color-hex aria-label="Custom hexadecimal color"></div></section>
+        <section class="theme-setting">
+            <p>Page background</p>
+            <div class="theme-bg-presets">
+                @php
+                    $bgPresets = [
+                        'indigo' => ['color' => '#eeefff', 'name' => 'Soft Indigo (Default)'],
+                        'slate' => ['color' => '#f4f6fb', 'name' => 'Cool Slate'],
+                        'zinc' => ['color' => '#f8fafc', 'name' => 'Clean Zinc'],
+                        'pearl' => ['color' => '#fdfbf7', 'name' => 'Warm Pearl'],
+                        'sky' => ['color' => '#f0f7ff', 'name' => 'Soft Sky'],
+                        'mint' => ['color' => '#f0fdf4', 'name' => 'Soft Mint'],
+                        'violet' => ['color' => '#f5f3ff', 'name' => 'Soft Violet'],
+                        'white' => ['color' => '#ffffff', 'name' => 'Pure White'],
+                    ];
+                @endphp
+                @foreach ($bgPresets as $preset)
+                    <button type="button"
+                            class="theme-bg-preset"
+                            style="background-color: {{ $preset['color'] }}; border: 1.5px solid var(--bdr2, #cbd5e1);"
+                            data-bg-preset="{{ $preset['color'] }}"
+                            title="{{ $preset['name'] }}"
+                            aria-label="{{ $preset['name'] }}"
+                            aria-pressed="false">
+                    </button>
+                @endforeach
+            </div>
+            <label class="theme-field-label mt-3" for="themeBgColor">Custom background color</label>
+            <div class="d-flex gap-2">
+                <input id="themeBgColor" class="form-control form-control-color" type="color" value="#eeefff" data-bg-color-input aria-label="Color picker for custom background">
+                <input class="form-control" type="text" value="#eeefff" maxlength="7" pattern="#[0-9A-Fa-f]{6}" data-bg-color-hex aria-label="Custom background hexadecimal color">
+            </div>
+        </section>
         <section class="theme-setting"><label class="theme-field-label" for="themeFont">Typography</label><select id="themeFont" class="form-select js-select2" data-theme-font><option value="Inter" data-icon="type">Inter</option><option value="Roboto" data-icon="case-sensitive">Roboto</option><option value="Poppins" data-icon="heading">Poppins</option><option value="Public Sans" data-icon="baseline">Public Sans</option></select><small class="theme-help">Khmer content uses Nokora, Google Sans, Noto Sans, sans-serif.</small></section>
         <section class="theme-setting"><p>Font size & table density</p><div class="theme-choice-grid" style="grid-template-columns: repeat(3, 1fr);"><button type="button" data-font-size="small" aria-pressed="false"><i data-lucide="minimize-2"></i>Small</button><button type="button" data-font-size="normal" aria-pressed="false"><i data-lucide="type"></i>Normal</button><button type="button" data-font-size="large" aria-pressed="false"><i data-lucide="maximize-2"></i>Large</button></div></section>
         <section class="theme-setting"><label class="theme-field-label" for="themeRadius">Control rounding</label><select id="themeRadius" class="form-select js-select2" data-theme-radius><option value="0px" data-icon="square">Square</option><option value="4px" data-icon="box">Compact</option><option value="8px" data-icon="rectangle-horizontal">Comfortable</option><option value="12px" data-icon="circle">Rounded</option></select></section>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUuid;
 use Database\Factories\SalesPurchaseOrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class SalesPurchaseOrder extends Model
 {
     /** @use HasFactory<SalesPurchaseOrderFactory> */
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +18,7 @@ class SalesPurchaseOrder extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'uuid',
         'doc_num',
         'customer_code',
         'customer_name',

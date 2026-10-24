@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Reports\Financial\BalanceSheetReportController;
 use App\Http\Controllers\Reports\Financial\CashFlowReportController;
 use App\Http\Controllers\Reports\Financial\GeneralLedgerReportController;
@@ -41,21 +42,34 @@ Route::get('/locale/{lang}', function (string $lang) {
     return redirect()->back();
 })->name('locale.switch');
 
-// Demonstration Showcase
-Route::view('/dashboard', 'dashboard', [
-    'navigation' => config('navigation'),
-])->name('dashboard');
-
-Route::view('/theme/components', 'theme.components', [
-    'navigation' => config('navigation'),
-])->name('theme.components');
-
-Route::get('/theme/listing', [ThemeDemonstrationController::class, 'listing'])->name('theme.listing');
-Route::get('/theme/form', [ThemeDemonstrationController::class, 'form'])->name('theme.form');
-Route::post('/theme/form', [ThemeDemonstrationController::class, 'store'])->name('theme.form.store');
+// Lightweight Session Status Check (for automatic timeout redirect)
+Route::get('/auth/session-status', function () {
+    return response()->json([
+        'authenticated' => auth()->check() && (auth()->user()?->isActive() ?? false),
+    ]);
+})->name('auth.session-status');
 
 // Protected Routes (Session Authentication + Active Account Verification)
 Route::middleware(['auth', 'active'])->group(function (): void {
+    // Dashboard
+    Route::view('/dashboard', 'dashboard', [
+        'navigation' => config('navigation'),
+    ])->name('dashboard');
+
+    // Theme & Component Showcase
+    Route::view('/theme/components', 'theme.components', [
+        'navigation' => config('navigation'),
+    ])->name('theme.components');
+
+    Route::get('/theme/listing', [ThemeDemonstrationController::class, 'listing'])->name('theme.listing');
+    Route::get('/theme/form', [ThemeDemonstrationController::class, 'form'])->name('theme.form');
+    Route::post('/theme/form', [ThemeDemonstrationController::class, 'store'])->name('theme.form.store');
+
+    // User Profile & Settings
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
     // RBAC: User Management
     Route::patch('/users/{user}/status', [UserController::class, 'toggleStatus'])
         ->middleware('permission:users.status')

@@ -68,7 +68,7 @@ class ApInvoiceReportController extends Controller implements HasMiddleware
                     });
                 })
                 ->addColumn('action', function (ApInvoice $invoice): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-invoice" data-id="'.$invoice->id.'" title="View Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-invoice" data-id="'.$invoice->uuid.'" title="View Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

@@ -9,7 +9,7 @@
     @can('users.delete')
         @if ($user->id !== auth()->id() && (! $user->hasRole('Super Admin') || $user->id !== 1))
             <button type="button" class="btn btn-outline-danger d-inline-flex align-items-center gap-1 btn-delete-user btn-action"
-                data-user-id="{{ $user->id }}"
+                data-user-id="{{ $user->uuid }}"
                 data-user-name="{{ $user->name }}"
                 data-delete-url="{{ route('users.destroy', $user) }}"
                 title="Delete User">

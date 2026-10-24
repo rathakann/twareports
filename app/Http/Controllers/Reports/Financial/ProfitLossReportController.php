@@ -77,7 +77,7 @@ class ProfitLossReportController extends Controller implements HasMiddleware
                     return ($pct >= 0 ? '+' : '').number_format($pct, 1).'%';
                 })
                 ->addColumn('action', function (ProfitLossItem $item): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-item" data-id="'.$item->id.'" title="View Line Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-item" data-id="'.$item->uuid.'" title="View Line Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);

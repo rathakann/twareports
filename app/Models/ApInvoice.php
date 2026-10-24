@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUuid;
 use Database\Factories\ApInvoiceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class ApInvoice extends Model
 {
     /** @use HasFactory<ApInvoiceFactory> */
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +18,7 @@ class ApInvoice extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'uuid',
         'invoice_num',
         'po_reference',
         'vendor_code',

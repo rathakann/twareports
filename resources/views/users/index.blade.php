@@ -11,7 +11,7 @@
         title="User Management"
         section="Access Control"
         icon="users"
-        description="Administer user credentials, security status, assigned roles, and granular direct permissions.">
+        description="Administer user credentials, security status, and assigned roles.">
         <x-slot:actions>
             <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 shadow-sm btn-filter-toggle" data-target="#users-filter-card" title="Toggle Filters" aria-expanded="true">
                 <i data-lucide="filter" style="width: 16px; height: 16px;"></i>
@@ -87,7 +87,6 @@
                             <th class="text-center" style="width: 140px;">Actions</th>
                             <th>User</th>
                             <th>Assigned Roles</th>
-                            <th>Direct Permissions</th>
                             <th>Status</th>
                             <th>Created At</th>
                         </tr>
@@ -145,7 +144,7 @@
                         console.error('Users DataTable AJAX Error:', error, thrown, xhr.responseText);
                     }
                 },
-                order: [[6, 'desc']],
+                order: [[5, 'desc']],
                 columns: [
                     {
                         data: null,
@@ -218,34 +217,16 @@
                         }
                     },
                     {
-                        data: 'permissions_list',
-                        name: 'permissions_list',
-                        orderable: false,
-                        searchable: false,
-                        render: function (perms) {
-                            if (!perms || perms.length === 0) {
-                                return '<span class="text-muted small">Inherited only</span>';
-                            }
-                            if (perms.length <= 2) {
-                                return perms.map(p => `<span class="badge bg-info bg-opacity-10 text-info me-1">${p}</span>`).join('');
-                            }
-                            return `
-                                <span class="badge bg-info bg-opacity-10 text-info me-1">${perms[0]}</span>
-                                <span class="badge bg-secondary bg-opacity-10 text-secondary" title="${perms.slice(1).join(', ')}">+${perms.length - 1} more</span>
-                            `;
-                        }
-                    },
-                    {
                         data: 'status',
                         name: 'status',
                         render: function (status, type, row) {
                             const isActive = status === 'active';
-                            const isSelf = row.id === {{ auth()->id() ?? 0 }};
+                            const isSelf = row.uuid === '{{ auth()->user()?->uuid ?? "" }}';
                             return `
                                 <div class="d-flex align-items-center gap-2 status-cell">
                                     <div class="form-check form-switch status-switch-wrapper mb-0">
                                         <input class="form-check-input status-toggle" type="checkbox" role="switch"
-                                            data-user-id="${row.id}"
+                                            data-user-id="${row.uuid}"
                                             ${isActive ? 'checked' : ''}
                                             ${isSelf ? 'disabled title="You cannot toggle your own status"' : ''}
                                             style="cursor: pointer;">

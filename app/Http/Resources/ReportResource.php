@@ -19,10 +19,11 @@ class ReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uuid,
+            'uuid' => $this->uuid,
             'title' => $this->title,
             'content' => $this->content,
-            'user_id' => $this->user_id,
+            'user_id' => $this->user?->uuid ?? $this->user_id,
             'author' => UserResource::make($this->whenLoaded('user')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),

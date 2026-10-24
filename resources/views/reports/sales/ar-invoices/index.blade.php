@@ -393,35 +393,47 @@
             });
 
             // Invoice View Detail Modal Handler
-            $(document).on('click', '.btn-view-invoice', function() {
-                const invId = $(this).data('id');
-                const btn = $(this);
-                btn.prop('disabled', true);
+            $(document).on('click', '.btn-view-invoice, .btn-view-invoice *', function(e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-invoice');
+                const invId = btn.data('id') || btn.attr('data-id');
+                if (!invId) return;
 
+                function renderInvoiceModal(inv) {
+                    $('#modal-inv-num').text(inv.invoice_num);
+                    $('#modal-order-ref').text(inv.order_reference || 'Direct Invoice');
+                    $('#modal-customer-name').text(inv.customer_name);
+                    $('#modal-customer-code').text(inv.customer_code);
+                    $('#modal-payment-terms').text(inv.payment_terms || 'Net 30');
+                    $('#modal-doc-date').text(formatDateText(inv.doc_date));
+                    $('#modal-due-date').text(formatDateText(inv.due_date));
+                    $('#modal-status-badge').html(getStatusBadge(inv.status));
+                    $('#modal-subtotal').text(formatMoney(inv.subtotal, inv.currency));
+                    $('#modal-tax').text(formatMoney(inv.tax_amount, inv.currency));
+                    $('#modal-total').text(formatMoney(inv.doc_total, inv.currency));
+                    $('#modal-paid').text(formatMoney(inv.paid_amount, inv.currency));
+                    $('#modal-balance').text(formatMoney(inv.balance_due, inv.currency));
+                    $('#modal-remarks').text(inv.remarks || 'No remarks provided.');
+
+                    const modalEl = document.getElementById('modal-ar-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.invoice_num || rowData.id)) {
+                    renderInvoiceModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/sales/ar-invoices/${invId}`,
                     type: 'GET',
                     success: function(res) {
                         if (res.success && res.data) {
-                            const inv = res.data;
-                            $('#modal-inv-num').text(inv.invoice_num);
-                            $('#modal-order-ref').text(inv.order_reference || 'Direct Invoice');
-                            $('#modal-customer-name').text(inv.customer_name);
-                            $('#modal-customer-code').text(inv.customer_code);
-                            $('#modal-payment-terms').text(inv.payment_terms || 'Net 30');
-                            $('#modal-doc-date').text(formatDateText(inv.doc_date));
-                            $('#modal-due-date').text(formatDateText(inv.due_date));
-                            $('#modal-status-badge').html(getStatusBadge(inv.status));
-                            $('#modal-subtotal').text(formatMoney(inv.subtotal, inv.currency));
-                            $('#modal-tax').text(formatMoney(inv.tax_amount, inv.currency));
-                            $('#modal-total').text(formatMoney(inv.doc_total, inv.currency));
-                            $('#modal-paid').text(formatMoney(inv.paid_amount, inv.currency));
-                            $('#modal-balance').text(formatMoney(inv.balance_due, inv.currency));
-                            $('#modal-remarks').text(inv.remarks || 'No remarks provided.');
-
-                            const modal = new bootstrap.Modal(document.getElementById('modal-ar-details'));
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderInvoiceModal(res.data);
                         }
                     },
                     complete: function() {

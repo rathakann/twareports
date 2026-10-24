@@ -2,11 +2,11 @@
     <x-slot:breadcrumb>
         <a href="{{ route('dashboard') }}"><i data-lucide="house"></i> Home</a>
         <span>/</span>
-        <span class="text-secondary">Theme</span>
+        <span class="text-secondary">Components</span>
         <span>/</span>
         <span class="fw-semibold text-dark" aria-current="page">Example Form</span>
     </x-slot:breadcrumb>
-    <x-management.page-header title="Example Form" section="Theme" icon="file-pen-line" description="Validation demonstration only. Submitted values are never saved."><x-slot:actions><x-status-badge status="Safe workflow" tone="success" /></x-slot:actions></x-management.page-header>
+    <x-management.page-header title="Example Form" section="Components" icon="file-pen-line" description="Validation demonstration only. Submitted values are never saved."><x-slot:actions><x-status-badge status="Safe workflow" tone="success" /></x-slot:actions></x-management.page-header>
     @if (session('success'))<x-alert>{{ session('success') }}</x-alert>@endif
     <form method="POST" action="{{ route('theme.form.store') }}">@csrf<x-content-card title="Demonstration details" subtitle="Required fields use Laravel validation; no database operation follows validation."><div class="row g-3"><div class="col-md-6"><x-form.label for="demo-name" required>Name</x-form.label><x-form.input name="name" id="demo-name" icon="file-text" placeholder="Enter a demonstration name" :error="$errors->first('name')" /></div><div class="col-md-6"><x-form.label for="demo-category" required>Category</x-form.label><x-form.select name="category" id="demo-category" icon="layers" :options="['general' => 'General', 'finance' => 'Finance', 'operations' => 'Operations']" :selected="old('category')" searchable placeholder="Choose a category" :error="$errors->first('category')" /></div><div class="col-md-6"><x-form.label for="demo-date">Effective date</x-form.label><x-form.date-picker name="effective_date" id="demo-date" value="{{ old('effective_date') }}" placeholder="YYYY-MM-DD" :error="$errors->first('effective_date')" /></div><div class="col-md-6 d-flex align-items-end"><x-form.switch-field name="is_visible" id="demo-visible" :checked="old('is_visible', true)">Visible in demonstration</x-form.switch-field></div><div class="col-12"><x-form.label for="demo-notes">Notes</x-form.label><x-form.textarea name="notes" id="demo-notes" icon="message-square" :value="old('notes')" rows="4" placeholder="Optional notes, up to 500 characters" :error="$errors->first('notes')" /></div></div><div class="form-actions"><a class="btn btn-outline-secondary" href="{{ route('dashboard') }}">Cancel</a><x-button type="submit" icon="check">Validate demonstration</x-button></div></x-content-card></form>
 </x-app-layout>

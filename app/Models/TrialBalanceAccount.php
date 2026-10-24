@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TrialBalanceAccount extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     /**
      * The table associated with the model.
@@ -22,6 +23,7 @@ class TrialBalanceAccount extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'uuid',
         'account_code',
         'account_name',
         'classification',

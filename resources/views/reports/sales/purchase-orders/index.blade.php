@@ -376,35 +376,47 @@
             });
 
             // View Details Modal Handler
-            $(document).on('click', '.btn-view-order', function() {
-                const orderId = $(this).data('id');
-                const btn = $(this);
-                btn.prop('disabled', true);
+            $(document).on('click', '.btn-view-order, .btn-view-order *', function(e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-order');
+                const orderId = btn.data('id') || btn.attr('data-id');
+                if (!orderId) return;
 
+                function renderOrderModal(ord) {
+                    $('#modal-order-num').text(ord.doc_num);
+                    $('#modal-cust-ref').text(ord.customer_ref_num || 'None');
+                    $('#modal-customer-name').text(ord.customer_name);
+                    $('#modal-customer-code').text(ord.customer_code);
+                    $('#modal-payment-terms').text(ord.payment_terms || 'Net 30');
+                    $('#modal-doc-date').text(formatDateText(ord.doc_date));
+                    $('#modal-delivery-date').text(formatDateText(ord.delivery_date));
+                    $('#modal-sales-rep').text(ord.sales_employee || '-');
+                    $('#modal-status-badge').html(getStatusBadge(ord.status));
+                    $('#modal-subtotal').text(formatMoney(ord.subtotal, ord.currency));
+                    $('#modal-tax').text(formatMoney(ord.tax_amount, ord.currency));
+                    $('#modal-discount').text(formatMoney(ord.discount_amount, ord.currency));
+                    $('#modal-total').text(formatMoney(ord.doc_total, ord.currency));
+                    $('#modal-remarks').text(ord.remarks || 'No remarks provided.');
+
+                    const modalEl = document.getElementById('modal-order-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.doc_num || rowData.id)) {
+                    renderOrderModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/sales/purchase-orders/${orderId}`,
                     type: 'GET',
                     success: function(res) {
                         if (res.success && res.data) {
-                            const ord = res.data;
-                            $('#modal-order-num').text(ord.doc_num);
-                            $('#modal-cust-ref').text(ord.customer_ref_num || 'None');
-                            $('#modal-customer-name').text(ord.customer_name);
-                            $('#modal-customer-code').text(ord.customer_code);
-                            $('#modal-payment-terms').text(ord.payment_terms || 'Net 30');
-                            $('#modal-doc-date').text(formatDateText(ord.doc_date));
-                            $('#modal-delivery-date').text(formatDateText(ord.delivery_date));
-                            $('#modal-sales-rep').text(ord.sales_employee || '-');
-                            $('#modal-status-badge').html(getStatusBadge(ord.status));
-                            $('#modal-subtotal').text(formatMoney(ord.subtotal, ord.currency));
-                            $('#modal-tax').text(formatMoney(ord.tax_amount, ord.currency));
-                            $('#modal-discount').text(formatMoney(ord.discount_amount, ord.currency));
-                            $('#modal-total').text(formatMoney(ord.doc_total, ord.currency));
-                            $('#modal-remarks').text(ord.remarks || 'No remarks provided.');
-
-                            const modal = new bootstrap.Modal(document.getElementById('modal-order-details'));
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderOrderModal(res.data);
                         }
                     },
                     complete: function() {

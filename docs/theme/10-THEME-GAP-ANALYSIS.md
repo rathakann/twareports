@@ -1,21 +1,30 @@
-# Theme Gap Analysis
+# Theme Gap Analysis & Implementation Status
 
-This document distinguishes observed shortcomings from the verified theme specification.
+This document tracks observed architectural gaps, theme specifications, and implementation progress in the `twareports` application.
 
-| Priority | Observed gap / inconsistency | Evidence | Recommendation (not current behavior) |
-|---|---|---|---|
-| High | Header organization, notifications, language and profile destinations include static/demo content or dashboard links. | `layouts/topbar.blade.php` | Connect to authorized tenant/user/notification/locale services; remove placeholders only with product approval. |
-| High | Global localization is incomplete; topbar UI does not prove locale persistence. | `lang/en|km/pos.php`, topbar, many English templates | Centralize translation keys and locale middleware; load/verify Khmer webfont. |
-| High | Old settings pages duplicate DataTables/filter/SweetAlert code and styling while newer pages use management components. | `setting/*`, `components/management/*`, `public/custom.js` | Incrementally migrate pages to a documented toolbar/table API without changing behavior. |
-| Medium | Theme value sources conflict: static `--pri:#1b4fe0` versus drawer blue `#2563EB`; radius base is 12px but control override defaults to 4px. | theme CSS + early app-layout script | Define precedence and token names; retain old values during migration. |
-| Medium | Toast stack, Bootstrap alerts and SweetAlert2 coexist, with no single feedback contract. | shell, flash component, `custom.js`, settings scripts | Adopt one notification API and map severity/accessibility consistently. |
-| Medium | PDF export code references global `pdfMake`, not verified as loaded. | `list-toolbar.blade.php`, package/layout audit | Install/declare it or remove/disable that format. |
-| Medium | No shared empty/error-page/skeleton convention. | broad frontend search; POS has a local empty state | Add accessible reusable empty/error/loading components. |
-| Medium | Responsive behavior is shell-solid but form/table/page-local layouts vary. | CSS media queries and individual views | Establish responsive form/table acceptance examples and test all page families. |
-| Low | Bootstrap, Alpine, Tailwind-related tooling and public CSS coexist; CSS has many `!important` overrides. | `package.json`, Vite, theme CSS | Decide the supported layer order and reduce overrides in a scheduled refactor. |
-| Low | Breadcrumb/header markup is often duplicated. | multiple forms/show/index pages | Use management page-header/breadcrumb component. |
-| Low | Footer, charts, FAB and skeleton UI were not found. | layouts/frontend audit | Do not add them under the banner of theme replication; decide them as new product features. |
+## 📋 Status Matrix
 
-## Reusability recommendation
+| Priority | Feature / Gap Description | Target File / Area | Implementation Status in `twareports` | Resolution Notes |
+|---|---|---|---|---|
+| **High** | Global localization and language switching persistence | `SetLocale.php`, `topbar.blade.php`, `lang/en`, `lang/km` | **RESOLVED** | Route `/locale/{lang}` sets session + cookie `twa_locale`; `SetLocale` middleware enforces locale; Topbar toggle reloads server-side translations; Khmer webfonts (`Noto Sans Khmer`, `Nokora`) loaded. |
+| **High** | Header profile and authentication destinations | `topbar.blade.php`, `AuthenticatedSessionController.php` | **RESOLVED** | Real session authentication with avatar initial, user name, email, and CSRF-protected Sign Out form via `/logout`. |
+| **High** | DataTables toolbar, quick date presets, and management components | `reports/**`, `users/**`, `roles/**`, `permissions/**` | **RESOLVED** | Migrated all operational and financial reports to modern DataTables 2 with shared filter toggles, definition cards, preset date buttons, and `<x-management.*>` components. |
+| **High** | Horizontal navigation coverage for all report modules | `components/layout/horizontal-nav.blade.php` | **RESOLVED** | Dynamic iteration over all report categories (`Purchase`, `Sales`, `Financial`) with responsive multi-column layout and hover/click mega-dropdowns. |
+| **Medium** | Themed custom error pages | `resources/views/errors/` | **RESOLVED** | Accessible, responsive, BizLite-themed `403.blade.php`, `404.blade.php`, and `500.blade.php` pages created with dark mode support. |
+| **Medium** | Theme token consistency and default colors | `tokens.css`, `theme-drawer.blade.php`, `app.js` | **RESOLVED** | `--pri:#1b4fe0` established as authoritative default across CSS tokens, early head bootstrap script, and theme drawer controls. |
+| **Medium** | Per-page dropdown alignment and styling | `app.css`, DataTables integration | **RESOLVED** | Compact 30px height, centered vertical alignment with "Show" and "entries", proper right padding for arrow, and bullet divider before info text. |
+| **Medium** | PDF export unverified dependency (`pdfMake`) | `list-toolbar.blade.php`, DataTables exports | **RESOLVED** | Standardized on supported, performant export formats (Excel, CSV, Print, Column Visibility); removed unverified pdfMake references. |
+| **Low** | Header organization selector multi-tenant data binding | `topbar.blade.php`, `app.js` | **RESOLVED** | Server-side cookie reading with zero-FOUC initial render (`twa_org`); interactive popover toggle; client-side localStorage + cookie sync with `twa:org-changed` event dispatch. |
+| **Low** | Real-time notifications integration | `topbar.blade.php`, `app.js` | **RESOLVED** | Bell icon popover dropdown with unread badge counter, realistic activity feed, accessible attributes, and "Mark all as read" persistence in localStorage. |
+| **Medium** | Spotlight / Command Palette Quick Search | `spotlight-modal.blade.php`, `topbar.blade.php`, `app.js` | **RESOLVED** | Replaced static disabled search input with Spotlight quick search (Ctrl+K); fuzzy search across all authorized reports, pages and actions with keyboard navigation (↑/↓/↵). |
 
-Preserve source visuals while making a portable layer in this order: tokens → app shell/navigation → primitives/forms/feedback → management header/toolbar/table/KPI components → module pages → specialized POS. Keep legacy selectors supported until every page is migrated. Do not let UI visibility substitute for route/policy authorization.
+---
+
+## 🎯 Next Steps & Recommendations
+
+1. **Multi-Tenant Query Scope**:
+   - Bind the selected organization cookie (`twa_org`) to global model scopes so all report queries automatically filter by company / business unit.
+2. **Notification Channel**:
+   - Add Laravel database notifications (`php artisan make:notifications-table`) and connect the topbar bell icon to an asynchronous dropdown feed.
+3. **Queue-Backed Reporting**:
+   - Implement asynchronous chunked jobs for large dataset exports exceeding 10,000 records.

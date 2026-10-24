@@ -9,6 +9,11 @@ return [
                 'icon' => 'layout-dashboard',
                 'route' => 'dashboard',
             ],
+        ],
+    ],
+    [
+        'label' => 'Components',
+        'items' => [
             [
                 'label' => 'UI Components',
                 'icon' => 'blocks',

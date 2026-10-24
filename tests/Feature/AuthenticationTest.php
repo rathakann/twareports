@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
@@ -259,5 +261,148 @@ class AuthenticationTest extends TestCase
         $userEndpointJson = $userEndpointResponse->getContent();
         $this->assertStringNotContainsString('password', $userEndpointJson);
         $this->assertStringNotContainsString('remember_token', $userEndpointJson);
+    }
+
+    /**
+     * Test web login view renders successfully.
+     */
+    public function test_web_login_view_renders_successfully(): void
+    {
+        $response = $this->get('/login');
+
+        $response->assertOk()
+            ->assertSee('Welcome back')
+            ->assertSee('loginSubmitBtn')
+            ->assertSee('Remember me on this device');
+    }
+
+    /**
+     * Test web login brings user to Dashboard by default when landing_page is undefined.
+     */
+    public function test_web_login_redirects_to_dashboard_by_default_when_landing_page_is_undefined(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'jane@example.com',
+            'password' => 'SecurePassword123!',
+            'status' => 'active',
+            'landing_page' => null,
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => 'jane@example.com',
+            'password' => 'SecurePassword123!',
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * Test web login brings user to defined landing page when specified and user has permission.
+     */
+    public function test_web_login_redirects_to_custom_landing_page_when_defined(): void
+    {
+        Permission::firstOrCreate(['name' => 'reports.sales.ar-invoices.view', 'guard_name' => 'web']);
+
+        $user = User::factory()->create([
+            'email' => 'ar_user@example.com',
+            'password' => 'SecurePassword123!',
+            'status' => 'active',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+        ]);
+        $user->givePermissionTo('reports.sales.ar-invoices.view');
+
+        $response = $this->post('/login', [
+            'email' => 'ar_user@example.com',
+            'password' => 'SecurePassword123!',
+        ]);
+
+        $response->assertRedirect(route('reports.sales.ar-invoices.index'));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * Test web login brings user to their assigned role's default landing page when user landing_page is null.
+     */
+    public function test_web_login_redirects_to_role_landing_page_when_user_landing_page_is_null(): void
+    {
+        $perm = Permission::firstOrCreate(['name' => 'reports.purchase.purchase-orders.view', 'guard_name' => 'web']);
+
+        $role = Role::create([
+            'name' => 'Purchase Specialist',
+            'guard_name' => 'web',
+            'landing_page' => 'reports.purchase.purchase-orders.index',
+        ]);
+        $role->givePermissionTo($perm);
+
+        $user = User::factory()->create([
+            'email' => 'purchasing@example.com',
+            'password' => 'SecurePassword123!',
+            'status' => 'active',
+            'landing_page' => null,
+        ]);
+        $user->assignRole($role);
+
+        $response = $this->post('/login', [
+            'email' => 'purchasing@example.com',
+            'password' => 'SecurePassword123!',
+        ]);
+
+        $response->assertRedirect(route('reports.purchase.purchase-orders.index'));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * Test web login prioritizes user-specific landing page over role landing page.
+     */
+    public function test_web_login_prioritizes_user_landing_page_over_role_landing_page(): void
+    {
+        $purchasePerm = Permission::firstOrCreate(['name' => 'reports.purchase.purchase-orders.view', 'guard_name' => 'web']);
+        $arPerm = Permission::firstOrCreate(['name' => 'reports.sales.ar-invoices.view', 'guard_name' => 'web']);
+
+        $role = Role::create([
+            'name' => 'General Manager',
+            'guard_name' => 'web',
+            'landing_page' => 'reports.purchase.purchase-orders.index',
+        ]);
+        $role->givePermissionTo($purchasePerm);
+
+        $user = User::factory()->create([
+            'email' => 'gm@example.com',
+            'password' => 'SecurePassword123!',
+            'status' => 'active',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+        ]);
+        $user->assignRole($role);
+        $user->givePermissionTo($arPerm);
+
+        $response = $this->post('/login', [
+            'email' => 'gm@example.com',
+            'password' => 'SecurePassword123!',
+        ]);
+
+        $response->assertRedirect(route('reports.sales.ar-invoices.index'));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * Test web login falls back to dashboard if user lacks permission for configured landing page.
+     */
+    public function test_web_login_falls_back_to_dashboard_if_user_lacks_permission_for_configured_landing_page(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'unauthorized_landing@example.com',
+            'password' => 'SecurePassword123!',
+            'status' => 'active',
+            'landing_page' => 'reports.sales.ar-invoices.index',
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => 'unauthorized_landing@example.com',
+            'password' => 'SecurePassword123!',
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+        $this->assertAuthenticatedAs($user);
     }
 }

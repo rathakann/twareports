@@ -384,29 +384,46 @@
                 table.draw();
             });
 
-            $(document).on('click', '.btn-view-entry', function () {
-                const id = $(this).data('id');
+            $(document).on('click', '.btn-view-entry, .btn-view-entry *', function (e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-entry');
+                const id = btn.data('id') || btn.attr('data-id');
+                if (!id) return;
+
+                function renderEntryModal(d) {
+                    $('#modal-ref-num').text(d.reference_num);
+                    $('#modal-desc').text(d.description);
+                    $('#modal-act-type').text(d.activity_type);
+                    $('#modal-method').text(d.payment_method);
+                    $('#modal-doc-date').text(formatDateText(d.doc_date));
+                    $('#modal-inflow').text(formatMoney(d.inflow_amount));
+                    $('#modal-outflow').text(formatMoney(d.outflow_amount));
+                    $('#modal-net').text(formatMoney(d.net_amount));
+                    $('#modal-target-acc').text(d.account_name);
+
+                    const modalEl = document.getElementById('modal-cf-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.reference_num || rowData.id)) {
+                    renderEntryModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/financial/cash-flow/${id}`,
                     type: 'GET',
                     success: function (res) {
                         if (res && res.data) {
-                            const d = res.data;
-                            $('#modal-ref-num').text(d.reference_num);
-                            $('#modal-desc').text(d.description);
-                            $('#modal-act-type').text(d.activity_type);
-                            $('#modal-method').text(d.payment_method);
-                            $('#modal-doc-date').text(formatDateText(d.doc_date));
-                            $('#modal-inflow').text(formatMoney(d.inflow_amount));
-                            $('#modal-outflow').text(formatMoney(d.outflow_amount));
-                            $('#modal-net').text(formatMoney(d.net_amount));
-                            $('#modal-target-acc').text(d.account_name);
-
-                            const modalEl = document.getElementById('modal-cf-details');
-                            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderEntryModal(res.data);
                         }
+                    },
+                    complete: function () {
+                        btn.prop('disabled', false);
                     }
                 });
             });

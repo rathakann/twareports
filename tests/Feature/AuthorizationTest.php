@@ -102,7 +102,7 @@ class AuthorizationTest extends TestCase
 
         // User B attempts to update User A's report
         $updateResponse = $this->withHeader('Authorization', 'Bearer '.$tokenB)
-            ->putJson('/api/reports/'.$reportA->id, [
+            ->putJson('/api/reports/'.$reportA->uuid, [
                 'title' => 'Tampered Title by User B',
                 'content' => 'Tampered content.',
             ]);
@@ -119,7 +119,7 @@ class AuthorizationTest extends TestCase
 
         // User B attempts to delete User A's report
         $deleteResponse = $this->withHeader('Authorization', 'Bearer '.$tokenB)
-            ->deleteJson('/api/reports/'.$reportA->id);
+            ->deleteJson('/api/reports/'.$reportA->uuid);
 
         $deleteResponse->assertForbidden();
 

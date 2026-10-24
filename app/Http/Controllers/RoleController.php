@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RoleRequest;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Support\ExportPermission;
+use App\Support\Navigation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,8 +14,6 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -93,8 +94,9 @@ class RoleController extends Controller implements HasMiddleware
             return explode('.', $permission->name)[0] ?? 'general';
         });
         $navigation = config('navigation');
+        $landingPageOptions = Navigation::getLandingPageOptions();
 
-        return view('roles.create', compact('permissions', 'navigation'));
+        return view('roles.create', compact('permissions', 'navigation', 'landingPageOptions'));
     }
 
     /**
@@ -105,6 +107,7 @@ class RoleController extends Controller implements HasMiddleware
         $role = Role::create([
             'name' => $request->name,
             'guard_name' => 'web',
+            'landing_page' => $request->input('landing_page') ?: null,
         ]);
 
         if ($request->has('permissions')) {
@@ -138,8 +141,9 @@ class RoleController extends Controller implements HasMiddleware
             return explode('.', $permission->name)[0] ?? 'general';
         });
         $navigation = config('navigation');
+        $landingPageOptions = Navigation::getLandingPageOptions();
 
-        return view('roles.edit', compact('role', 'permissions', 'rolePermissions', 'navigation'));
+        return view('roles.edit', compact('role', 'permissions', 'rolePermissions', 'navigation', 'landingPageOptions'));
     }
 
     /**
@@ -153,6 +157,7 @@ class RoleController extends Controller implements HasMiddleware
 
         $role->update([
             'name' => $request->name,
+            'landing_page' => $request->input('landing_page') ?: null,
         ]);
 
         $role->syncPermissions($request->input('permissions', []));

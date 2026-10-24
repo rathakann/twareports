@@ -54,7 +54,7 @@
                                     <div class="d-flex flex-column gap-1">
                                         @foreach ($category['children'] as $child)
                                             @php
-                                                $childActive = isset($child['route']) && request()->routeIs($child['route'].'*');
+                                                $childActive = isset($child['route']) && \App\Support\Navigation::isRouteActive($child['route']);
                                             @endphp
                                             <a class="dropdown-item py-1.5 px-2 rounded-2 d-flex align-items-center gap-2 {{ $childActive ? 'active' : '' }}"
                                                href="{{ isset($child['route']) ? route($child['route']) : '#' }}">
@@ -75,7 +75,7 @@
                     @if (! empty($item['children']))
                         @php
                             $visibleSub = collect($item['children'])->filter(fn ($c) => \App\Support\Navigation::userCanAccess($c));
-                            $isItemActive = $visibleSub->contains(fn ($c) => isset($c['route']) && request()->routeIs($c['route'].'*'));
+                            $isItemActive = $visibleSub->contains(fn ($c) => \App\Support\Navigation::isItemActive($c));
                         @endphp
                         @if ($visibleSub->isNotEmpty())
                             <div class="horizontal-nav-item dropdown">
@@ -90,7 +90,7 @@
                                 </button>
                                 <div class="dropdown-menu horizontal-dropdown-single-menu shadow border p-2">
                                     @foreach ($visibleSub as $c)
-                                        <a class="dropdown-item py-1.5 px-2 rounded-2 d-flex align-items-center gap-2 {{ isset($c['route']) && request()->routeIs($c['route'].'*') ? 'active' : '' }}"
+                                        <a class="dropdown-item py-1.5 px-2 rounded-2 d-flex align-items-center gap-2 {{ isset($c['route']) && \App\Support\Navigation::isRouteActive($c['route']) ? 'active' : '' }}"
                                            href="{{ isset($c['route']) ? route($c['route']) : '#' }}">
                                             <i data-lucide="{{ $c['icon'] ?? 'circle' }}" style="width: 14px; height: 14px;"></i>
                                             <span>{{ $c['label'] }}</span>
@@ -100,7 +100,7 @@
                             </div>
                         @endif
                     @elseif (isset($item['route']))
-                        <a href="{{ route($item['route']) }}" class="horizontal-nav-link {{ request()->routeIs($item['route'].'*') ? 'active' : '' }}">
+                        <a href="{{ route($item['route']) }}" class="horizontal-nav-link {{ \App\Support\Navigation::isRouteActive($item['route']) ? 'active' : '' }}">
                             <i data-lucide="{{ $item['icon'] ?? 'circle' }}"></i>
                             <span>{{ $item['label'] }}</span>
                         </a>

@@ -380,29 +380,46 @@
                 table.draw();
             });
 
-            $(document).on('click', '.btn-view-account', function () {
-                const id = $(this).data('id');
+            $(document).on('click', '.btn-view-account, .btn-view-account *', function (e) {
+                e.preventDefault();
+                const btn = $(this).closest('.btn-view-account');
+                const id = btn.data('id') || btn.attr('data-id');
+                if (!id) return;
+
+                function renderAccountModal(d) {
+                    $('#modal-acc-code').text(d.account_code);
+                    $('#modal-acc-name').text(d.account_name);
+                    $('#modal-acc-class').text(d.classification);
+                    $('#modal-acc-stmt').text(d.statement_type);
+                    $('#modal-doc-date').text(formatDateText(d.doc_date));
+                    $('#modal-open-bal').text(formatMoney(d.beginning_balance));
+                    $('#modal-debit-val').text(formatMoney(d.debit_amount));
+                    $('#modal-credit-val').text(formatMoney(d.credit_amount));
+                    $('#modal-end-bal').text(formatMoney(d.ending_balance));
+
+                    const modalEl = document.getElementById('modal-tb-details');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    if (window.lucide) window.lucide.createIcons();
+                }
+
+                const rowData = table.row(btn.closest('tr')).data();
+                if (rowData && (rowData.account_code || rowData.id)) {
+                    renderAccountModal(rowData);
+                    return;
+                }
+
+                btn.prop('disabled', true);
                 $.ajax({
                     url: `/reports/financial/trial-balance/${id}`,
                     type: 'GET',
                     success: function (res) {
                         if (res && res.data) {
-                            const d = res.data;
-                            $('#modal-acc-code').text(d.account_code);
-                            $('#modal-acc-name').text(d.account_name);
-                            $('#modal-acc-class').text(d.classification);
-                            $('#modal-acc-stmt').text(d.statement_type);
-                            $('#modal-doc-date').text(formatDateText(d.doc_date));
-                            $('#modal-open-bal').text(formatMoney(d.beginning_balance));
-                            $('#modal-debit-val').text(formatMoney(d.debit_amount));
-                            $('#modal-credit-val').text(formatMoney(d.credit_amount));
-                            $('#modal-end-bal').text(formatMoney(d.ending_balance));
-
-                            const modalEl = document.getElementById('modal-tb-details');
-                            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                            modal.show();
-                            if (window.lucide) window.lucide.createIcons();
+                            renderAccountModal(res.data);
                         }
+                    },
+                    complete: function () {
+                        btn.prop('disabled', false);
                     }
                 });
             });

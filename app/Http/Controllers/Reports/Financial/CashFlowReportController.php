@@ -68,7 +68,7 @@ class CashFlowReportController extends Controller implements HasMiddleware
                     });
                 })
                 ->addColumn('action', function (CashFlowEntry $entry): string {
-                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-entry" data-id="'.$entry->id.'" title="View Cash Entry Details"><i data-lucide="eye"></i></button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary btn-action btn-view-entry" data-id="'.$entry->uuid.'" title="View Cash Entry Details"><i data-lucide="eye"></i></button>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
