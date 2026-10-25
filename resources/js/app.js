@@ -10,6 +10,51 @@ import DataTable from 'datatables.net-bs5';
 window.bootstrap = bootstrap;
 window.Alpine = Alpine;
 window.$ = window.jQuery = jQuery;
+window.Swal = Swal;
+
+// jQuery plugin bridge for Bootstrap 5 Modal
+if (jQuery && jQuery.fn && bootstrap && bootstrap.Modal) {
+    jQuery.fn.modal = function (action, ...args) {
+        return this.each(function () {
+            const instance = bootstrap.Modal.getOrCreateInstance(this);
+            if (typeof action === 'string' && typeof instance[action] === 'function') {
+                instance[action](...args);
+            }
+        });
+    };
+}
+
+// Global SweetAlert Toast helper configured with user's preferred position
+const Toast = Swal.mixin({
+    toast: true,
+    position: localStorage.getItem('tc_toast_position') || 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer);
+        toast.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+});
+window.Toast = Toast;
+
+// Intercept any legacy alert() calls to use SweetAlert Toast instead of native browser popup
+window.alert = (message) => {
+    if (window.Toast) {
+        window.Toast.fire({
+            icon: 'info',
+            title: String(message ?? '')
+        });
+    } else if (window.Swal) {
+        window.Swal.fire({
+            icon: 'info',
+            text: String(message ?? ''),
+            confirmButtonText: 'OK'
+        });
+    } else {
+        console.warn('Alert called:', message);
+    }
+};
 
 // Flatpickr with Global Presets (Today, This week, This month, Last month, Last 3 month) & Footer Actions
 const getPresetDateRange = (preset) => {
@@ -365,12 +410,20 @@ const executeExport = (format, title, headers, rows) => {
         navigator.clipboard.writeText(text).then(() => {
             showExportSuccessToast(rows.length, 'Clipboard');
         }).catch(() => {
-            alert(`Copied ${rows.length} rows to clipboard`);
+            if (window.Toast) {
+                window.Toast.fire({ icon: 'info', title: `Copied ${rows.length} rows to clipboard` });
+            } else if (window.Swal) {
+                window.Swal.fire({ icon: 'info', title: 'Clipboard', text: `Copied ${rows.length} rows to clipboard` });
+            }
         });
     } else if (format === 'print') {
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
-            alert('Please allow popups to print table data.');
+            if (window.Toast) {
+                window.Toast.fire({ icon: 'warning', title: 'Please allow popups to print table data.' });
+            } else if (window.Swal) {
+                window.Swal.fire({ icon: 'warning', title: 'Popups Blocked', text: 'Please allow popups to print table data.' });
+            }
             return;
         }
         const humanTitle = title.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -797,14 +850,17 @@ jQuery(document).on('click', '.dt-export-action', function (e) {
 
     if (!userCanExport(format, tableId, settings)) {
         const errorMsg = `You do not have permission to export as ${String(format).toUpperCase()}.`;
-        if (window.Swal) {
+        if (window.Toast) {
+            window.Toast.fire({
+                icon: 'error',
+                title: errorMsg
+            });
+        } else if (window.Swal) {
             window.Swal.fire({
                 icon: 'error',
                 title: 'Export Not Permitted',
                 text: errorMsg
             });
-        } else {
-            alert(errorMsg);
         }
         return;
     }
@@ -861,10 +917,10 @@ jQuery(document).on('click', '.dt-export-action', function (e) {
                 if (window.Swal) window.Swal.close();
                 if (xhr && xhr.status === 403) {
                     const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'You do not have permission to export this data.';
-                    if (window.Swal) {
+                    if (window.Toast) {
+                        window.Toast.fire({ icon: 'error', title: msg });
+                    } else if (window.Swal) {
                         window.Swal.fire({ icon: 'error', title: 'Export Forbidden', text: msg });
-                    } else {
-                        alert(msg);
                     }
                     return;
                 }
@@ -1880,6 +1936,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.showToast = (message, type = 'success') => {
+    const icon = (type === 'danger' || type === 'error') ? 'error' : (type === 'warning' ? 'warning' : (type === 'info' ? 'info' : 'success'));
+    if (window.Toast) {
+        window.Toast.fire({
+            icon: icon,
+            title: String(message ?? '')
+        });
+        return;
+    }
     const stack = document.getElementById('ksToastStack');
     if (!stack) return;
     const toastEl = document.createElement('div');

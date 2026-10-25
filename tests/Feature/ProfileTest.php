@@ -232,4 +232,58 @@ class ProfileTest extends TestCase
         $response->assertSee(route('profile.index'));
         $response->assertSee('My Profile');
     }
+
+    /**
+     * Test user can delete their account profile with correct password.
+     */
+    public function test_user_can_delete_their_account_profile_with_correct_password(): void
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('SecretPass123!'),
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($user)->delete(route('profile.destroy'), [
+            'password' => 'SecretPass123!',
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    /**
+     * Test user cannot delete account profile with incorrect password.
+     */
+    public function test_user_cannot_delete_account_profile_with_incorrect_password(): void
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('SecretPass123!'),
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($user)->delete(route('profile.destroy'), [
+            'password' => 'WrongPassword!',
+        ]);
+
+        $response->assertSessionHasErrorsIn('userDeletion', 'password');
+        $this->assertAuthenticatedAs($user);
+        $this->assertDatabaseHas('users', ['id' => $user->id]);
+    }
+
+    /**
+     * Test the only active Super Admin cannot delete their account.
+     */
+    public function test_lone_super_admin_cannot_delete_their_account(): void
+    {
+        $superAdmin = User::where('email', 'superadmin@twareports.test')->first();
+
+        $response = $this->actingAs($superAdmin)->delete(route('profile.destroy'), [
+            'password' => 'password',
+        ]);
+
+        $response->assertSessionHasErrorsIn('userDeletion', 'password');
+        $this->assertAuthenticatedAs($superAdmin);
+        $this->assertDatabaseHas('users', ['id' => $superAdmin->id]);
+    }
 }

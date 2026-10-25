@@ -129,6 +129,7 @@
                     ? strtoupper(substr($topParts[0], 0, 1) . substr(end($topParts), 0, 1))
                     : strtoupper(substr($topName, 0, 2));
                 $topRole = $topUser->roles?->first()?->name ?? 'Administrator';
+                $topAvatarUrl = $topUser->avatar_url;
             @endphp
 
             <div class="dropdown topbar-user-dropdown">
@@ -140,8 +141,12 @@
                         data-bs-auto-close="true"
                         aria-expanded="false"
                         title="{{ $topName }}">
-                    <span class="topbar-user-avatar rounded-circle">
-                        {{ $topInitials }}
+                    <span class="topbar-user-avatar rounded-circle overflow-hidden d-inline-flex align-items-center justify-content-center">
+                        @if ($topAvatarUrl)
+                            <img src="{{ $topAvatarUrl }}" alt="{{ $topName }}" class="w-100 h-100 object-fit-cover rounded-circle user-avatar-preview">
+                        @else
+                            <span class="user-initials-text">{{ $topInitials }}</span>
+                        @endif
                     </span>
                     <span class="topbar-user-info d-none d-sm-inline-flex flex-column text-start">
                         <span class="topbar-user-name">{{ $topName }}</span>
@@ -155,8 +160,12 @@
                      style="min-width: 250px;">
                     <!-- User Header -->
                     <div class="d-flex align-items-center gap-3 mb-2.5">
-                        <div class="topbar-menu-avatar flex-shrink-0">
-                            {{ $topInitials }}
+                        <div class="topbar-menu-avatar flex-shrink-0 overflow-hidden d-inline-flex align-items-center justify-content-center">
+                            @if ($topAvatarUrl)
+                                <img src="{{ $topAvatarUrl }}" alt="{{ $topName }}" class="w-100 h-100 object-fit-cover rounded-circle user-avatar-preview">
+                            @else
+                                <span class="user-initials-text">{{ $topInitials }}</span>
+                            @endif
                         </div>
                         <div class="overflow-hidden">
                             <h6 class="fw-bold mb-0 text-truncate text-body" style="font-size: 15px;">{{ $topName }}</h6>

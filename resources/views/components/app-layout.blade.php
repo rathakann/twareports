@@ -130,6 +130,32 @@
         @include('components.layout.theme-drawer')
         <div id="ksToastStack" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1085;" aria-live="polite" aria-atomic="true"></div>
     </div>
+    @if (session('success') || session('status') || session('error') || session('danger'))
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const toast = window.Toast || (window.Swal ? {
+                    fire: (opts) => window.Swal.fire({
+                        toast: true,
+                        position: localStorage.getItem('tc_toast_position') || 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        ...opts
+                    })
+                } : null);
+
+                if (toast) {
+                    @if (session('success'))
+                        toast.fire({ icon: 'success', title: @json(session('success')) });
+                    @elseif (session('status'))
+                        toast.fire({ icon: 'info', title: @json(session('status')) });
+                    @elseif (session('error') || session('danger'))
+                        toast.fire({ icon: 'error', title: @json(session('error') ?? session('danger')) });
+                    @endif
+                }
+            });
+        </script>
+    @endif
     @stack('scripts')
 </body>
 </html>

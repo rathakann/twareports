@@ -5,13 +5,7 @@
 @import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.css';
 @import 'sweetalert2/dist/sweetalert2.css';
 @import 'datatables.net-bs5/css/dataTables.bootstrap5.css';
-@import './theme/tokens.css';
-@import './theme/base.css';
-@import './theme/components.css';
-@import './theme/library.css';
-@import './theme/demo-pages.css';
-@import './theme/layout.css';
-@import './theme/mantis-components.css';
+@import './theme/theme.css';
 
 /* Input Icon Left extensions for Select2, selects, and textareas */
 .input-icon-left {

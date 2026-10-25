@@ -3,18 +3,34 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <meta name="description" content="TWA Reports - Secure Enterprise Authentication">
-    <title>Sign In · TWA Reports</title>
+    <title>{{ __('app.sign_in') }} · {{ config('app.name', 'TWA Reports') }}</title>
     <script>
         (function () {
             try {
-                const storedMode = localStorage.getItem('tc_mode') || 'light';
+                const storedMode = localStorage.getItem('tc_mode') === 'dark' ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', storedMode);
                 document.documentElement.setAttribute('data-bs-theme', storedMode);
-                const storedLang = localStorage.getItem('twa_lang') || '{{ app()->getLocale() }}';
-                document.documentElement.setAttribute('data-lang', storedLang);
-                document.documentElement.setAttribute('lang', storedLang);
-                if (storedLang === 'km') {
+                document.documentElement.dataset.theme = storedMode;
+                document.documentElement.dataset.bsTheme = storedMode;
+                document.documentElement.style.colorScheme = storedMode;
+
+                if (storedMode === 'dark') {
+                    document.documentElement.style.removeProperty('--bg-page');
+                    document.documentElement.style.removeProperty('--bs-body-bg');
+                } else {
+                    const savedBg = localStorage.getItem('tc_bg_page') || '#eeefff';
+                    document.documentElement.style.setProperty('--bg-page', savedBg);
+                    document.documentElement.style.setProperty('--bs-body-bg', savedBg);
+                }
+
+                const currentLocale = '{{ app()->getLocale() }}';
+                localStorage.setItem('twa_lang', currentLocale);
+                document.documentElement.setAttribute('data-lang', currentLocale);
+                document.documentElement.setAttribute('lang', currentLocale);
+                document.documentElement.dataset.lang = currentLocale;
+                if (currentLocale === 'km') {
                     document.documentElement.style.setProperty('--font', "'Nokora', 'Noto Sans Khmer', sans-serif");
                     document.documentElement.style.setProperty('--font-kh', "'Nokora', 'Noto Sans Khmer', sans-serif");
                     document.documentElement.style.setProperty('--bs-body-font-family', "'Nokora', 'Noto Sans Khmer', sans-serif");
@@ -26,8 +42,10 @@
 </head>
 <body class="auth-viewport">
     <!-- Ambient Backdrop Glows -->
-    <div class="auth-ambient-glow auth-glow-primary"></div>
-    <div class="auth-ambient-glow auth-glow-secondary"></div>
+    <div class="auth-glow-container" aria-hidden="true">
+        <div class="auth-ambient-glow auth-glow-primary"></div>
+        <div class="auth-ambient-glow auth-glow-secondary"></div>
+    </div>
 
     <!-- Auth Top Bar -->
     <header class="auth-topbar d-flex align-items-center justify-content-between">
@@ -35,24 +53,23 @@
             <span class="auth-logo-badge" style="width: 36px; height: 36px; border-radius: 10px;">
                 <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
             </span>
-            <span class="fw-bold text-dark fs-6" style="color: var(--tx1) !important;">TWA Reports</span>
+            <span class="fw-bold fs-6" style="color: var(--tx1) !important;">TWA Reports</span>
         </a>
 
         <div class="d-flex align-items-center gap-2">
             <!-- Language Switcher Pill -->
-            <div class="btn-group btn-group-sm rounded-pill p-1 border" style="background-color: var(--bg-card); border-color: var(--bdr) !important;">
-                <a href="{{ route('locale.switch', 'en') }}" class="btn btn-sm rounded-pill px-2.5 py-0.5 fw-semibold {{ app()->getLocale() === 'en' ? 'btn-primary' : 'text-secondary' }}" style="font-size: 11px;">
+            <div class="auth-lang-switcher shadow-sm">
+                <a href="{{ route('locale.switch', 'en') }}" onclick="setAuthLocale('en')" class="auth-lang-btn {{ app()->getLocale() === 'en' ? 'active' : '' }}" aria-label="Switch to English" title="English">
                     EN
                 </a>
-                <a href="{{ route('locale.switch', 'km') }}" class="btn btn-sm rounded-pill px-2.5 py-0.5 fw-semibold {{ app()->getLocale() === 'km' ? 'btn-primary' : 'text-secondary' }}" style="font-size: 11px;">
-                    KM
+                <a href="{{ route('locale.switch', 'km') }}" onclick="setAuthLocale('km')" class="auth-lang-btn {{ app()->getLocale() === 'km' ? 'active' : '' }}" aria-label="Switch to Khmer" title="ភាសាខ្មែរ">
+                    ខ្មែរ
                 </a>
             </div>
 
             <!-- Theme Toggle Button -->
-            <button type="button" id="authThemeToggleBtn" class="btn btn-sm rounded-circle p-2 border d-flex align-items-center justify-content-center"
-                style="background-color: var(--bg-card); border-color: var(--bdr) !important; color: var(--tx2); width: 34px; height: 34px;"
-                title="Toggle Light / Dark mode" aria-label="Toggle theme">
+            <button type="button" id="authThemeToggleBtn" class="auth-theme-btn shadow-sm"
+                title="{{ __('app.toggle_theme') }}" aria-label="{{ __('app.toggle_theme') }}" role="switch" aria-checked="false">
                 <i data-lucide="moon" id="authThemeMoonIcon" style="width: 16px; height: 16px;"></i>
                 <i data-lucide="sun" id="authThemeSunIcon" class="d-none" style="width: 16px; height: 16px;"></i>
             </button>
@@ -68,8 +85,8 @@
                         <i data-lucide="shield-check" style="width: 28px; height: 28px;"></i>
                     </span>
                 </div>
-                <h1 class="h4 fw-bold mb-1" style="color: var(--tx1);">Welcome back</h1>
-                <p class="text-secondary small mb-0">Sign in with your credentials to access your dashboard</p>
+                <h1 class="h4 fw-bold mb-1" style="color: var(--tx1);">{{ __('app.welcome_back') }}</h1>
+                <p class="small mb-0" style="color: var(--tx2);">{{ __('app.login_subtitle') }}</p>
             </div>
 
             @if ($errors->any())
@@ -95,7 +112,7 @@
 
                 <!-- Email Input -->
                 <div>
-                    <label for="email" class="form-label small fw-semibold text-secondary mb-1.5">Email Address</label>
+                    <label for="email" class="form-label small fw-semibold mb-1.5" style="color: var(--tx2);">{{ __('app.email_address') }}</label>
                     <div class="auth-input-group">
                         <span class="auth-input-icon">
                             <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
@@ -108,7 +125,7 @@
                 <!-- Password Input with Toggle -->
                 <div>
                     <div class="d-flex justify-content-between align-items-center mb-1.5">
-                        <label for="password" class="form-label small fw-semibold text-secondary mb-0">Password</label>
+                        <label for="password" class="form-label small fw-semibold mb-0" style="color: var(--tx2);">{{ __('app.password') }}</label>
                     </div>
                     <div class="auth-input-group">
                         <span class="auth-input-icon">
@@ -116,7 +133,7 @@
                         </span>
                         <input id="password" type="password" name="password" required autocomplete="current-password"
                             class="auth-input @error('password') is-invalid @enderror" placeholder="••••••••">
-                        <button type="button" class="auth-password-toggle" id="togglePasswordBtn" title="Toggle password visibility" aria-label="Toggle password visibility">
+                        <button type="button" class="auth-password-toggle" id="togglePasswordBtn" title="{{ __('app.toggle_password') }}" aria-label="{{ __('app.toggle_password') }}">
                             <i data-lucide="eye" id="togglePasswordIcon" style="width: 18px; height: 18px;"></i>
                         </button>
                     </div>
@@ -128,36 +145,36 @@
                     <label class="switch-field-control" for="remember">
                         <span class="switch-field-thumb"></span>
                     </label>
-                    <label class="switch-field-label small text-secondary" for="remember">
-                        Remember me on this device
+                    <label class="switch-field-label small" for="remember" style="color: var(--tx2);">
+                        {{ __('app.remember_me') }}
                     </label>
                 </div>
 
                 <!-- Submit Button with Loading State -->
                 <button type="submit" id="loginSubmitBtn" class="btn btn-primary btn-auth-submit w-100 d-flex align-items-center justify-content-center gap-2 mt-2 shadow-sm">
                     <span id="loginBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                    <span id="loginBtnText">Sign In</span>
+                    <span id="loginBtnText">{{ __('app.sign_in') }}</span>
                     <i data-lucide="arrow-right" id="loginBtnIcon" style="width: 18px; height: 18px;"></i>
                 </button>
             </form>
 
             <!-- Quick-fill Demo Accounts -->
             <div class="mt-4 pt-3 border-top" style="border-color: var(--bdr) !important;">
-                <p class="text-secondary small fw-semibold mb-2 text-center" style="font-size: 11.5px; letter-spacing: 0.3px;">
-                    QUICK DEMO CREDENTIALS
+                <p class="small fw-semibold mb-2 text-center" style="font-size: 11.5px; letter-spacing: 0.3px; color: var(--tx3);">
+                    {{ __('app.quick_demo_credentials') }}
                 </p>
                 <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
                     <button type="button" class="auth-demo-chip" onclick="fillCredentials('superadmin@twareports.test', 'password')">
                         <i data-lucide="crown" style="width: 14px; height: 14px; color: #f59e0b;"></i>
-                        <span>Super Admin</span>
+                        <span>{{ __('app.super_admin') }}</span>
                     </button>
                     <button type="button" class="auth-demo-chip" onclick="fillCredentials('admin@twareports.test', 'password')">
                         <i data-lucide="user-check" style="width: 14px; height: 14px; color: #10b981;"></i>
-                        <span>Admin</span>
+                        <span>{{ __('app.admin') }}</span>
                     </button>
                 </div>
-                <p class="text-secondary text-center small mb-0" style="font-size: 11.5px; color: var(--tx3) !important;">
-                    &copy; {{ date('Y') }} TWA Reports. All rights reserved.
+                <p class="text-center small mb-0" style="font-size: 11.5px; color: var(--tx3) !important;">
+                    &copy; {{ date('Y') }} TWA Reports. {{ __('app.all_rights_reserved') }}
                 </p>
             </div>
         </div>
@@ -165,6 +182,12 @@
 
     <!-- Interactive Client Scripts -->
     <script>
+        // Language Switcher Helper
+        window.setAuthLocale = function (lang) {
+            localStorage.setItem('twa_lang', lang);
+            document.cookie = `twa_locale=${lang};path=/;max-age=31536000;SameSite=Lax`;
+        };
+
         // Password Visibility Toggle
         document.getElementById('togglePasswordBtn')?.addEventListener('click', function () {
             const passwordInput = document.getElementById('password');
@@ -183,7 +206,7 @@
             }
         });
 
-        // Quick Credentials Filler
+        // Quick Credentials Filler (Without forcing bg-white which breaks dark mode)
         window.fillCredentials = function (email, password) {
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
@@ -191,11 +214,9 @@
 
             if (emailInput) {
                 emailInput.value = email;
-                emailInput.classList.add('bg-white');
             }
             if (passwordInput) {
                 passwordInput.value = password;
-                passwordInput.classList.add('bg-white');
             }
             submitBtn?.focus();
         };
@@ -224,7 +245,7 @@
             loginBtnSpinner?.classList.remove('d-none');
             loginBtnIcon?.classList.add('d-none');
             if (loginBtnText) {
-                loginBtnText.textContent = 'Signing in...';
+                loginBtnText.textContent = '{{ __('app.signing_in') }}';
             }
         });
 
@@ -233,12 +254,15 @@
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const moonIcon = document.getElementById('authThemeMoonIcon');
             const sunIcon = document.getElementById('authThemeSunIcon');
+            const toggleBtn = document.getElementById('authThemeToggleBtn');
             if (isDark) {
                 moonIcon?.classList.add('d-none');
                 sunIcon?.classList.remove('d-none');
+                toggleBtn?.setAttribute('aria-checked', 'true');
             } else {
                 moonIcon?.classList.remove('d-none');
                 sunIcon?.classList.add('d-none');
+                toggleBtn?.setAttribute('aria-checked', 'false');
             }
             if (window.lucide) {
                 window.lucide.createIcons();
@@ -248,9 +272,25 @@
         document.getElementById('authThemeToggleBtn')?.addEventListener('click', function () {
             const current = document.documentElement.getAttribute('data-theme') || 'light';
             const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('tc_mode', next);
             document.documentElement.setAttribute('data-theme', next);
             document.documentElement.setAttribute('data-bs-theme', next);
-            localStorage.setItem('tc_mode', next);
+            document.documentElement.dataset.theme = next;
+            document.documentElement.dataset.bsTheme = next;
+            document.documentElement.style.colorScheme = next;
+
+            if (next === 'dark') {
+                document.documentElement.style.removeProperty('--bg-page');
+                document.documentElement.style.removeProperty('--bs-body-bg');
+            } else {
+                const savedBg = localStorage.getItem('tc_bg_page') || '#eeefff';
+                document.documentElement.style.setProperty('--bg-page', savedBg);
+                document.documentElement.style.setProperty('--bs-body-bg', savedBg);
+            }
+
+            if (window.BizLiteTheme && typeof window.BizLiteTheme.applyThemePreferences === 'function') {
+                window.BizLiteTheme.applyThemePreferences();
+            }
             syncLoginThemeIcons();
         });
 

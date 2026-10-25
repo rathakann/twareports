@@ -21,6 +21,7 @@
             $sideInitials = count($sideParts) >= 2
                 ? strtoupper(substr($sideParts[0], 0, 1) . substr(end($sideParts), 0, 1))
                 : strtoupper(substr($sideName, 0, 2));
+            $sideAvatarUrl = $sideUser->avatar_url;
         @endphp
 
         <div class="sidebar-footer">
@@ -34,8 +35,12 @@
                         aria-expanded="false"
                         title="{{ $sideName }}">
                     <div class="d-flex align-items-center gap-2 overflow-hidden">
-                        <span class="sidebar-user-avatar flex-shrink-0">
-                            {{ $sideInitials }}
+                        <span class="sidebar-user-avatar flex-shrink-0 overflow-hidden d-inline-flex align-items-center justify-content-center">
+                            @if ($sideAvatarUrl)
+                                <img src="{{ $sideAvatarUrl }}" alt="{{ $sideName }}" class="w-100 h-100 object-fit-cover rounded-circle user-avatar-preview">
+                            @else
+                                <span class="user-initials-text">{{ $sideInitials }}</span>
+                            @endif
                         </span>
                         <span class="sidebar-user-name fw-semibold text-truncate text-start">
                             {{ $sideName }}
@@ -49,8 +54,12 @@
                      style="min-width: 220px;">
                     <!-- User Header -->
                     <div class="d-flex align-items-center gap-2.5 mb-2.5">
-                        <span class="sidebar-menu-avatar flex-shrink-0">
-                            {{ $sideInitials }}
+                        <span class="sidebar-menu-avatar flex-shrink-0 overflow-hidden d-inline-flex align-items-center justify-content-center">
+                            @if ($sideAvatarUrl)
+                                <img src="{{ $sideAvatarUrl }}" alt="{{ $sideName }}" class="w-100 h-100 object-fit-cover rounded-circle user-avatar-preview">
+                            @else
+                                <span class="user-initials-text">{{ $sideInitials }}</span>
+                            @endif
                         </span>
                         <div class="overflow-hidden">
                             <h6 class="fw-bold mb-0 text-truncate text-dark fs-6">{{ $sideName }}</h6>

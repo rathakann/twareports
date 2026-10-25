@@ -13,10 +13,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'is_admin', 'status', 'landing_page', 'uuid'])]
+#[Fillable(['name', 'email', 'avatar', 'password', 'is_admin', 'status', 'landing_page', 'uuid'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -31,11 +32,21 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'avatar',
         'password',
         'is_admin',
         'status',
         'landing_page',
         'uuid',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'avatar_url',
     ];
 
     /**
@@ -68,6 +79,28 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    /**
+     * Get the URL to the user's profile photo/avatar.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if ($this->avatar && Storage::disk('public')->exists($this->avatar)) {
+            return '/storage/'.ltrim($this->avatar, '/');
+        }
+
+        return null;
+    }
+
+    /**
+     * Delete the user's avatar file from storage disk if it exists.
+     */
+    public function deleteAvatarFile(): void
+    {
+        if ($this->avatar && Storage::disk('public')->exists($this->avatar)) {
+            Storage::disk('public')->delete($this->avatar);
+        }
     }
 
     /**

@@ -300,14 +300,17 @@
                     error: function (xhr) {
                         checkbox.prop('checked', !isChecked);
                         const message = xhr.responseJSON?.message || 'Failed to update user status.';
-                        if (window.Swal) {
+                        if (window.Toast) {
+                            window.Toast.fire({
+                                icon: 'error',
+                                title: message
+                            });
+                        } else if (window.Swal) {
                             window.Swal.fire({
                                 icon: 'error',
                                 title: 'Status Update Denied',
                                 text: message
                             });
-                        } else {
-                            alert(message);
                         }
                     }
                 });
@@ -324,7 +327,12 @@
                         url: deleteUrl,
                         type: 'DELETE',
                         success: function (data) {
-                            if (window.Swal) {
+                            if (window.Toast) {
+                                window.Toast.fire({
+                                    icon: 'success',
+                                    title: data.message || 'User deleted successfully.'
+                                });
+                            } else if (window.Swal) {
                                 window.Swal.fire({
                                     toast: true,
                                     position: 'top-end',
@@ -338,14 +346,17 @@
                         },
                         error: function (xhr) {
                             const message = xhr.responseJSON?.message || 'Failed to delete user.';
-                            if (window.Swal) {
+                            if (window.Toast) {
+                                window.Toast.fire({
+                                    icon: 'error',
+                                    title: message
+                                });
+                            } else if (window.Swal) {
                                 window.Swal.fire({
                                     icon: 'error',
                                     title: 'Delete Failed',
                                     text: message
                                 });
-                            } else {
-                                alert(message);
                             }
                         }
                     });
@@ -365,7 +376,7 @@
                             performDelete();
                         }
                     });
-                } else if (confirm(`Are you sure you want to delete ${userName}?`)) {
+                } else {
                     performDelete();
                 }
             });

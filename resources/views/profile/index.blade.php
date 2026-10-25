@@ -34,7 +34,7 @@
 
     @php
         $activeTab = $activeTab ?? request()->query('tab', session('active_tab', 'personal'));
-        if ($errors->has('current_password') || $errors->has('password') || $errors->has('password_confirmation')) {
+        if ($errors->userDeletion->isNotEmpty() || $errors->has('current_password') || $errors->has('password') || $errors->has('password_confirmation')) {
             $activeTab = 'security';
         } elseif ($errors->has('name') || $errors->has('email')) {
             $activeTab = 'personal';
@@ -54,14 +54,43 @@
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <!-- User Identity (Avatar + Name + Badges + Meta) -->
                 <div class="d-flex align-items-center gap-3">
-                    <div class="position-relative flex-shrink-0">
-                        <div class="d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm"
-                             style="width: 56px; height: 56px; font-size: 20px; background: linear-gradient(135deg, #1890ff 0%, #10239e 100%);">
-                            {{ $initials }}
+                    <div class="position-relative flex-shrink-0 avatar-badge-wrapper cursor-pointer dropdown" id="bannerAvatarWrapper">
+                        <div class="profile-avatar-display d-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-sm overflow-hidden"
+                             style="width: 56px; height: 56px; font-size: 20px; background: linear-gradient(135deg, var(--pri, #1890ff) 0%, #10239e 100%);"
+                             id="bannerAvatarTrigger"
+                             data-bs-toggle="dropdown"
+                             aria-expanded="false"
+                             title="Click to manage profile photo">
+                            @if ($user->avatar_url)
+                                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-100 h-100 object-fit-cover user-avatar-image">
+                            @else
+                                <span class="user-avatar-initials">{{ $initials }}</span>
+                            @endif
                         </div>
                         <span class="position-absolute bottom-0 end-0 border border-2 border-white rounded-circle {{ $user->isActive() ? 'bg-success' : 'bg-secondary' }}"
                               title="{{ $user->isActive() ? 'Active Account' : 'Inactive Account' }}"
-                              style="width: 13px; height: 13px;"></span>
+                              style="width: 13px; height: 13px; z-index: 2;"></span>
+                        <span class="avatar-hover-overlay rounded-circle d-flex align-items-center justify-content-center">
+                            <i data-lucide="camera" style="width: 18px; height: 18px; color: #ffffff;"></i>
+                        </span>
+
+                        <ul class="dropdown-menu shadow-sm border py-1" style="font-size: 13px; min-width: 175px;">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 py-1.5" id="btnDropdownUploadAvatar">
+                                    <i data-lucide="upload" style="width: 14px; height: 14px;" class="text-primary"></i>
+                                    <span>Upload New Photo</span>
+                                </button>
+                            </li>
+                            <li class="btn-remove-avatar-item {{ $user->avatar_url ? '' : 'd-none' }}">
+                                <button type="button" class="dropdown-item d-flex align-items-center gap-2 py-1.5 text-danger btn-remove-avatar-trigger">
+                                    <i data-lucide="trash-2" style="width: 14px; height: 14px;" class="text-danger"></i>
+                                    <span>Remove Photo</span>
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- Hidden input for file selection -->
+                        <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/webp,image/gif" class="d-none">
                     </div>
 
                     <div>
@@ -371,6 +400,39 @@
                             </button>
                         </div>
                     </form>
+
+                    <!-- Danger Zone: Delete Profile Account -->
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="p-3 p-md-4 rounded-3 border border-danger-subtle bg-danger-subtle bg-opacity-10">
+                            <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <div class="rounded-2 p-1 bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 26px; height: 26px;">
+                                            <i data-lucide="alert-triangle" style="width: 15px; height: 15px;"></i>
+                                        </div>
+                                        <h3 class="fs-6 fw-bold text-danger mb-0">Delete Account</h3>
+                                    </div>
+                                    <p class="text-secondary fs-xs mb-0" style="max-width: 620px;">
+                                        Once your account profile is permanently deleted, all of your user data, avatar, and assigned permissions will be permanently erased. Please be certain before proceeding.
+                                    </p>
+                                </div>
+                                <button type="button" 
+                                        class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1.5 shadow-sm"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteAccountModal">
+                                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                    <span>Delete Account</span>
+                                </button>
+                            </div>
+
+                            @if ($errors->userDeletion->isNotEmpty())
+                                <div class="alert alert-danger fs-xs mt-3 mb-0 p-2 d-flex align-items-center gap-2">
+                                    <i data-lucide="alert-circle" style="width: 14px; height: 14px;" class="flex-shrink-0"></i>
+                                    <span>{{ $errors->userDeletion->first() }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <!-- =========================================================================
@@ -808,6 +870,167 @@
         </div>
     </div>
 
+    <!-- Avatar Crop & Preview Modal -->
+    <div class="modal fade" id="avatarCropModal" tabindex="-1" aria-labelledby="avatarCropModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden">
+                <div class="modal-header border-bottom py-2.5 px-3 px-md-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-2 p-1.5 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i data-lucide="crop" style="width: 16px; height: 16px;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fs-6 fw-bold mb-0 text-dark" id="avatarCropModalLabel">Crop Profile Photo</h5>
+                            <p class="text-secondary fs-xs mb-0">Adjust position and zoom to fit your avatar</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-3 p-md-4">
+                    <div class="row g-4 align-items-center">
+                        <!-- Left: Crop Canvas Workspace -->
+                        <div class="col-lg-7">
+                            <div class="crop-workspace-container position-relative rounded-3 overflow-hidden d-flex align-items-center justify-content-center shadow-inner" style="height: 340px; background-color: #0f172a; cursor: grab;">
+                                <canvas id="cropCanvas" width="340" height="340" class="d-block"></canvas>
+                                <!-- Drag hint -->
+                                <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 px-2.5 py-1 rounded-pill bg-black bg-opacity-60 text-white fs-xs pointer-events-none d-flex align-items-center gap-1.5">
+                                    <i data-lucide="move" style="width: 12px; height: 12px;"></i>
+                                    <span>Drag to reposition image</span>
+                                </div>
+                            </div>
+
+                            <!-- Zoom & Rotate Controls Toolbar -->
+                            <div class="mt-3 p-2.5 bg-body-tertiary rounded-3 border d-flex align-items-center gap-3">
+                                <span class="text-secondary fs-xs fw-semibold d-flex align-items-center gap-1 flex-shrink-0">
+                                    <i data-lucide="zoom-in" style="width: 14px; height: 14px;"></i>
+                                    <span>Zoom:</span>
+                                </span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary p-1 d-flex align-items-center justify-content-center" id="cropZoomOutBtn" title="Zoom out" style="width: 28px; height: 28px;">
+                                    <i data-lucide="minus" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <input type="range" class="form-range flex-grow-1" id="cropZoomRange" min="0.5" max="3" step="0.01" value="1">
+                                <button type="button" class="btn btn-sm btn-outline-secondary p-1 d-flex align-items-center justify-content-center" id="cropZoomInBtn" title="Zoom in" style="width: 28px; height: 28px;">
+                                    <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <div class="vr my-1"></div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary p-1 d-flex align-items-center justify-content-center" id="cropRotateLeftBtn" title="Rotate left 90°" style="width: 28px; height: 28px;">
+                                    <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary p-1 d-flex align-items-center justify-content-center" id="cropRotateRightBtn" title="Rotate right 90°" style="width: 28px; height: 28px;">
+                                    <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary p-1 d-flex align-items-center justify-content-center" id="cropResetBtn" title="Reset crop" style="width: 28px; height: 28px;">
+                                    <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right: Live Previews -->
+                        <div class="col-lg-5">
+                            <div class="p-3 bg-body-tertiary rounded-3 border text-center">
+                                <h6 class="fs-xs fw-bold text-uppercase text-secondary letter-spacing-1 mb-3">Live Real-time Preview</h6>
+                                
+                                <div class="d-flex flex-column align-items-center gap-3">
+                                    <!-- Large Circle Preview -->
+                                    <div>
+                                        <div class="preview-box-large rounded-circle overflow-hidden shadow-sm mx-auto border border-2 border-primary" style="width: 120px; height: 120px; background: var(--bg-card);">
+                                            <canvas id="cropPreviewLarge" width="120" height="120" class="w-100 h-100"></canvas>
+                                        </div>
+                                        <small class="text-secondary fs-xs mt-1 d-block">Profile Banner (120px)</small>
+                                    </div>
+
+                                    <!-- Small Circle Preview -->
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div>
+                                            <div class="preview-box-small rounded-circle overflow-hidden shadow-sm mx-auto border border-primary" style="width: 44px; height: 44px; background: var(--bg-card);">
+                                                <canvas id="cropPreviewSmall" width="44" height="44" class="w-100 h-100"></canvas>
+                                            </div>
+                                            <small class="text-secondary fs-xs mt-1 d-block">Topbar Nav (44px)</small>
+                                        </div>
+                                        <div>
+                                            <div class="preview-box-xs rounded-circle overflow-hidden shadow-sm mx-auto border border-primary" style="width: 30px; height: 30px; background: var(--bg-card);">
+                                                <canvas id="cropPreviewXs" width="30" height="30" class="w-100 h-100"></canvas>
+                                            </div>
+                                            <small class="text-secondary fs-xs mt-1 d-block">Sidebar (30px)</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="text-secondary fs-xs mt-3 mb-0">
+                                    This image will be stored securely in the system folder and displayed across all headers.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top py-2.5 px-3 px-md-4 bg-body-tertiary">
+                    <button type="button" class="btn btn-sm btn-outline-danger me-auto btn-remove-avatar-trigger {{ $user->avatar_url ? '' : 'd-none' }}">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                        <span>Remove Current Photo</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm" id="btnSaveAvatarCrop">
+                        <span class="spinner-border spinner-border-sm d-none" id="saveAvatarSpinner" role="status" aria-hidden="true"></span>
+                        <i data-lucide="check" id="saveAvatarCheckIcon" style="width: 15px; height: 15px;"></i>
+                        <span id="saveAvatarText">Save &amp; Apply Photo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <form method="POST" action="{{ route('profile.destroy') }}">
+                    @csrf
+                    @method('DELETE')
+                    <div class="modal-header border-bottom pb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle p-2 bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title fs-6 fw-bold text-danger mb-0" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
+                                <p class="text-secondary fs-xs mb-0">This action cannot be undone.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-3">
+                        <p class="text-secondary fs-sm mb-3">
+                            Are you sure you want to delete your profile account? Once deleted, you will be permanently logged out and your account record will be erased.
+                        </p>
+                        <div class="mb-3">
+                            <label for="delete_account_password" class="form-label fs-xs fw-semibold text-dark mb-1">
+                                Please enter your password to confirm:
+                            </label>
+                            <input type="password" 
+                                   name="password" 
+                                   id="delete_account_password" 
+                                   class="form-control form-control-sm @if($errors->userDeletion->has('password')) is-invalid @endif" 
+                                   placeholder="Your current password" 
+                                   required>
+                            @if ($errors->userDeletion->has('password'))
+                                <div class="invalid-feedback fs-xs">{{ $errors->userDeletion->first('password') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top pt-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1.5">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                            <span>Permanently Delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Immediate Synchronous Tab Rehydration (Prevents any visual flicker on page refresh) -->
     <script>
         (function () {
@@ -1157,6 +1380,571 @@
                     });
                 });
             })();
+
+            // =========================================================================
+            // Interactive Profile Photo Upload, Crop & Preview System
+            // =========================================================================
+            (function () {
+                const bannerTrigger = document.getElementById('bannerAvatarTrigger');
+                const avatarFileInput = document.getElementById('avatarFileInput');
+                const avatarCropModalEl = document.getElementById('avatarCropModal');
+                const cropCanvas = document.getElementById('cropCanvas');
+                const cropZoomRange = document.getElementById('cropZoomRange');
+                const cropZoomInBtn = document.getElementById('cropZoomInBtn');
+                const cropZoomOutBtn = document.getElementById('cropZoomOutBtn');
+                const cropRotateLeftBtn = document.getElementById('cropRotateLeftBtn');
+                const cropRotateRightBtn = document.getElementById('cropRotateRightBtn');
+                const cropResetBtn = document.getElementById('cropResetBtn');
+                const btnSaveAvatarCrop = document.getElementById('btnSaveAvatarCrop');
+                const saveAvatarSpinner = document.getElementById('saveAvatarSpinner');
+                const saveAvatarCheckIcon = document.getElementById('saveAvatarCheckIcon');
+                const saveAvatarText = document.getElementById('saveAvatarText');
+
+                const previewLarge = document.getElementById('cropPreviewLarge');
+                const previewSmall = document.getElementById('cropPreviewSmall');
+                const previewXs = document.getElementById('cropPreviewXs');
+
+                let modalInstance = null;
+
+                function hideCropModal() {
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    } else if (avatarCropModalEl && window.bootstrap && window.bootstrap.Modal) {
+                        const inst = window.bootstrap.Modal.getInstance(avatarCropModalEl);
+                        if (inst) inst.hide();
+                    }
+                }
+
+                let currentImage = null;
+                let imageWidth = 0;
+                let imageHeight = 0;
+
+                // Crop geometry constants
+                const canvasSize = 340;
+                const cropDiameter = 260;
+                const cropRadius = cropDiameter / 2;
+                const cropCenter = canvasSize / 2; // 170
+
+                let baseScale = 1;
+                let scale = 1;
+                let posX = 0;
+                let posY = 0;
+                let rotation = 0;
+
+                let isDragging = false;
+                let startX = 0;
+                let startY = 0;
+
+                function triggerFilePicker() {
+                    if (avatarFileInput) {
+                        avatarFileInput.value = '';
+                        avatarFileInput.click();
+                    }
+                }
+
+                const btnDropdownUploadAvatar = document.getElementById('btnDropdownUploadAvatar');
+                if (btnDropdownUploadAvatar) btnDropdownUploadAvatar.addEventListener('click', triggerFilePicker);
+
+                if (avatarFileInput) {
+                    avatarFileInput.addEventListener('change', function (e) {
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) return;
+
+                        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                        if (!validTypes.includes(file.type)) {
+                            if (window.Toast) {
+                                window.Toast.fire({ icon: 'error', title: 'Please select a valid image (JPG, PNG, WebP, or GIF).' });
+                            } else if (window.Swal) {
+                                window.Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select a valid image (JPG, PNG, WebP, or GIF).' });
+                            }
+                            return;
+                        }
+
+                        if (file.size > 5 * 1024 * 1024) {
+                            if (window.Toast) {
+                                window.Toast.fire({ icon: 'error', title: 'Image file size must be less than 5MB.' });
+                            } else if (window.Swal) {
+                                window.Swal.fire({ icon: 'error', title: 'File Too Large', text: 'Image file size must be less than 5MB.' });
+                            }
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            const img = new Image();
+                            img.onload = function () {
+                                currentImage = img;
+                                imageWidth = img.naturalWidth || img.width;
+                                imageHeight = img.naturalHeight || img.height;
+
+                                const minDim = Math.min(imageWidth, imageHeight);
+                                baseScale = cropDiameter / minDim;
+
+                                scale = 1;
+                                posX = 0;
+                                posY = 0;
+                                rotation = 0;
+                                if (cropZoomRange) cropZoomRange.value = 1;
+
+                                if (!modalInstance && window.bootstrap && window.bootstrap.Modal) {
+                                    modalInstance = window.bootstrap.Modal.getOrCreateInstance(avatarCropModalEl);
+                                }
+                                if (modalInstance) {
+                                    modalInstance.show();
+                                }
+
+                                setTimeout(drawWorkspace, 120);
+                            };
+                            img.src = evt.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+
+                function drawWorkspace() {
+                    if (!currentImage || !cropCanvas) return;
+
+                    const ctx = cropCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvasSize, canvasSize);
+
+                    // 1. Draw transformed image
+                    ctx.save();
+                    ctx.translate(cropCenter + posX, cropCenter + posY);
+                    ctx.rotate((rotation * Math.PI) / 180);
+                    const effectiveScale = baseScale * scale;
+                    ctx.scale(effectiveScale, effectiveScale);
+                    ctx.drawImage(currentImage, -imageWidth / 2, -imageHeight / 2);
+                    ctx.restore();
+
+                    // 2. Draw circular crop mask
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+                    ctx.beginPath();
+                    ctx.rect(0, 0, canvasSize, canvasSize);
+                    ctx.arc(cropCenter, cropCenter, cropRadius, 0, Math.PI * 2, true);
+                    ctx.fill();
+
+                    // 3. Draw circle border guide
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([6, 4]);
+                    ctx.beginPath();
+                    ctx.arc(cropCenter, cropCenter, cropRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Update live previews
+                    drawPreview(previewLarge, 120);
+                    drawPreview(previewSmall, 44);
+                    drawPreview(previewXs, 30);
+                }
+
+                function drawPreview(canvas, targetSize) {
+                    if (!canvas || !currentImage) return;
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, targetSize, targetSize);
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(targetSize / 2, targetSize / 2, targetSize / 2, 0, Math.PI * 2);
+                    ctx.clip();
+
+                    const previewRatio = targetSize / cropDiameter;
+                    ctx.translate(targetSize / 2 + posX * previewRatio, targetSize / 2 + posY * previewRatio);
+                    ctx.rotate((rotation * Math.PI) / 180);
+                    const effectiveScale = baseScale * scale * previewRatio;
+                    ctx.scale(effectiveScale, effectiveScale);
+                    ctx.drawImage(currentImage, -imageWidth / 2, -imageHeight / 2);
+                    ctx.restore();
+                }
+
+                // Drag & Pan handlers
+                if (cropCanvas) {
+                    cropCanvas.addEventListener('mousedown', function (e) {
+                        isDragging = true;
+                        startX = e.clientX - posX;
+                        startY = e.clientY - posY;
+                        cropCanvas.style.cursor = 'grabbing';
+                    });
+
+                    window.addEventListener('mousemove', function (e) {
+                        if (!isDragging) return;
+                        posX = e.clientX - startX;
+                        posY = e.clientY - startY;
+                        drawWorkspace();
+                    });
+
+                    window.addEventListener('mouseup', function () {
+                        if (isDragging) {
+                            isDragging = false;
+                            cropCanvas.style.cursor = 'grab';
+                        }
+                    });
+
+                    cropCanvas.addEventListener('touchstart', function (e) {
+                        if (e.touches.length === 1) {
+                            isDragging = true;
+                            startX = e.touches[0].clientX - posX;
+                            startY = e.touches[0].clientY - posY;
+                        }
+                    }, { passive: true });
+
+                    cropCanvas.addEventListener('touchmove', function (e) {
+                        if (!isDragging || e.touches.length !== 1) return;
+                        posX = e.touches[0].clientX - startX;
+                        posY = e.touches[0].clientY - startY;
+                        drawWorkspace();
+                    }, { passive: true });
+
+                    cropCanvas.addEventListener('touchend', function () {
+                        isDragging = false;
+                    });
+
+                    cropCanvas.addEventListener('wheel', function (e) {
+                        e.preventDefault();
+                        const delta = e.deltaY > 0 ? -0.06 : 0.06;
+                        let nextScale = Math.min(3, Math.max(0.5, scale + delta));
+                        scale = parseFloat(nextScale.toFixed(2));
+                        if (cropZoomRange) cropZoomRange.value = scale;
+                        drawWorkspace();
+                    }, { passive: false });
+                }
+
+                if (cropZoomRange) {
+                    cropZoomRange.addEventListener('input', function () {
+                        scale = parseFloat(this.value);
+                        drawWorkspace();
+                    });
+                }
+
+                if (cropZoomInBtn) {
+                    cropZoomInBtn.addEventListener('click', function () {
+                        scale = Math.min(3, parseFloat((scale + 0.1).toFixed(2)));
+                        if (cropZoomRange) cropZoomRange.value = scale;
+                        drawWorkspace();
+                    });
+                }
+
+                if (cropZoomOutBtn) {
+                    cropZoomOutBtn.addEventListener('click', function () {
+                        scale = Math.max(0.5, parseFloat((scale - 0.1).toFixed(2)));
+                        if (cropZoomRange) cropZoomRange.value = scale;
+                        drawWorkspace();
+                    });
+                }
+
+                if (cropRotateLeftBtn) {
+                    cropRotateLeftBtn.addEventListener('click', function () {
+                        rotation = (rotation - 90 + 360) % 360;
+                        drawWorkspace();
+                    });
+                }
+
+                if (cropRotateRightBtn) {
+                    cropRotateRightBtn.addEventListener('click', function () {
+                        rotation = (rotation + 90) % 360;
+                        drawWorkspace();
+                    });
+                }
+
+                if (cropResetBtn) {
+                    cropResetBtn.addEventListener('click', function () {
+                        scale = 1;
+                        posX = 0;
+                        posY = 0;
+                        rotation = 0;
+                        if (cropZoomRange) cropZoomRange.value = 1;
+                        drawWorkspace();
+                    });
+                }
+
+                // Save Cropped Avatar
+                if (btnSaveAvatarCrop) {
+                    btnSaveAvatarCrop.addEventListener('click', function () {
+                        if (!currentImage) return;
+
+                        const exportSize = 400;
+                        const exportCanvas = document.createElement('canvas');
+                        exportCanvas.width = exportSize;
+                        exportCanvas.height = exportSize;
+                        const expCtx = exportCanvas.getContext('2d');
+
+                        const exportRatio = exportSize / cropDiameter;
+                        expCtx.translate(exportSize / 2 + posX * exportRatio, exportSize / 2 + posY * exportRatio);
+                        expCtx.rotate((rotation * Math.PI) / 180);
+                        const effectiveScale = baseScale * scale * exportRatio;
+                        expCtx.scale(effectiveScale, effectiveScale);
+                        expCtx.drawImage(currentImage, -imageWidth / 2, -imageHeight / 2);
+
+                        btnSaveAvatarCrop.disabled = true;
+                        if (saveAvatarSpinner) saveAvatarSpinner.classList.remove('d-none');
+                        if (saveAvatarCheckIcon) saveAvatarCheckIcon.classList.add('d-none');
+                        if (saveAvatarText) saveAvatarText.textContent = 'Saving...';
+
+                        const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92);
+                        const formData = new FormData();
+                        formData.append('avatar_data', dataUrl);
+
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                        fetch('{{ route("profile.avatar.update", [], false) }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        })
+                        .then(res => {
+                            return res.json().then(data => {
+                                if (!res.ok) {
+                                    throw new Error(data.message || ('Server error ' + res.status));
+                                }
+                                return data;
+                            });
+                        })
+                        .then(data => {
+                            btnSaveAvatarCrop.disabled = false;
+                            if (saveAvatarSpinner) saveAvatarSpinner.classList.add('d-none');
+                            if (saveAvatarCheckIcon) saveAvatarCheckIcon.classList.remove('d-none');
+                            if (saveAvatarText) saveAvatarText.textContent = 'Save & Apply Photo';
+
+                            if (data.success && data.avatar_url) {
+                                const newUrl = data.avatar_url + '?t=' + Date.now();
+                                updateAllAvatars(newUrl);
+
+                                if (typeof hideCropModal === 'function') {
+                                    hideCropModal();
+                                } else if (modalInstance) {
+                                    modalInstance.hide();
+                                }
+
+                                if (window.Toast) {
+                                    window.Toast.fire({
+                                        icon: 'success',
+                                        title: 'Profile photo updated successfully!'
+                                    });
+                                } else if (window.Swal) {
+                                    window.Swal.fire({
+                                        icon: 'success',
+                                        title: 'Profile Photo Updated',
+                                        text: 'Your new photo has been saved to storage and applied.',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            } else {
+                                if (window.Toast) {
+                                    window.Toast.fire({
+                                        icon: 'error',
+                                        title: data.message || 'Failed to update avatar.'
+                                    });
+                                } else if (window.Swal) {
+                                    window.Swal.fire({
+                                        icon: 'error',
+                                        title: 'Update Failed',
+                                        text: data.message || 'Failed to update avatar.'
+                                    });
+                                }
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Avatar upload error:', err);
+                            btnSaveAvatarCrop.disabled = false;
+                            if (saveAvatarSpinner) saveAvatarSpinner.classList.add('d-none');
+                            if (saveAvatarCheckIcon) saveAvatarCheckIcon.classList.remove('d-none');
+                            if (saveAvatarText) saveAvatarText.textContent = 'Save & Apply Photo';
+                            if (window.Toast) {
+                                window.Toast.fire({
+                                    icon: 'error',
+                                    title: err.message || 'An error occurred while uploading your avatar.'
+                                });
+                            } else if (window.Swal) {
+                                window.Swal.fire({
+                                    icon: 'error',
+                                    title: 'Upload Error',
+                                    text: err.message || 'An error occurred while uploading your avatar.'
+                                });
+                            }
+                        });
+                    });
+                }
+
+                // Remove Avatar Handlers (Supports Header Banner, Personal Info Tab, and Modal Footer)
+                function handleAvatarRemoval() {
+                    const doRemove = function () {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        fetch('{{ route("profile.avatar.destroy", [], false) }}', {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(res => {
+                            return res.json().then(data => {
+                                if (!res.ok) {
+                                    throw new Error(data.message || ('Server error ' + res.status));
+                                }
+                                return data;
+                            });
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                revertAllAvatarsToInitials('{{ $initials }}');
+                                document.querySelectorAll('.btn-remove-avatar-trigger, .btn-remove-avatar-item').forEach(el => {
+                                    el.classList.add('d-none');
+                                });
+                                if (typeof hideCropModal === 'function') {
+                                    hideCropModal();
+                                } else if (modalInstance) {
+                                    modalInstance.hide();
+                                }
+                                if (window.Toast) {
+                                    window.Toast.fire({
+                                        icon: 'success',
+                                        title: 'Profile photo removed successfully.'
+                                    });
+                                } else if (window.Swal) {
+                                    window.Swal.fire({
+                                        icon: 'success',
+                                        title: 'Photo Removed',
+                                        text: 'Your custom profile photo has been removed and initials restored.',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            } else {
+                                if (window.Toast) {
+                                    window.Toast.fire({
+                                        icon: 'error',
+                                        title: data.message || 'Failed to remove photo.'
+                                    });
+                                } else if (window.Swal) {
+                                    window.Swal.fire({
+                                        icon: 'error',
+                                        title: 'Remove Failed',
+                                        text: data.message || 'Failed to remove photo.'
+                                    });
+                                }
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Avatar delete error:', err);
+                            if (window.Toast) {
+                                window.Toast.fire({
+                                    icon: 'error',
+                                    title: err.message || 'Failed to remove photo.'
+                                });
+                            } else if (window.Swal) {
+                                window.Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: err.message || 'Failed to remove photo.'
+                                });
+                            }
+                        });
+                    };
+
+                    if (window.Swal) {
+                        window.Swal.fire({
+                            title: 'Remove Profile Photo?',
+                            text: 'Your custom avatar will be deleted and initials will be used.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, remove',
+                            cancelButtonText: 'Cancel',
+                            confirmButtonColor: '#dc3545'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                doRemove();
+                            }
+                        });
+                    } else {
+                        doRemove();
+                    }
+                }
+
+                document.querySelectorAll('.btn-remove-avatar-trigger').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAvatarRemoval();
+                    });
+                });
+
+                function updateAllAvatars(url) {
+                    document.querySelectorAll('.profile-avatar-display').forEach(wrapper => {
+                        let img = wrapper.querySelector('img');
+                        const initials = wrapper.querySelector('.user-avatar-initials');
+                        if (initials) initials.remove();
+                        if (!img) {
+                            img = document.createElement('img');
+                            img.className = 'w-100 h-100 object-fit-cover user-avatar-image';
+                            wrapper.appendChild(img);
+                        }
+                        img.src = url;
+                    });
+
+                    document.querySelectorAll('.topbar-user-avatar, .topbar-menu-avatar, .sidebar-user-avatar, .sidebar-menu-avatar').forEach(wrapper => {
+                        let img = wrapper.querySelector('.user-avatar-preview');
+                        const txt = wrapper.querySelector('.user-initials-text');
+                        if (txt) txt.style.display = 'none';
+                        if (!img) {
+                            img = document.createElement('img');
+                            img.className = 'w-100 h-100 object-fit-cover rounded-circle user-avatar-preview';
+                            wrapper.appendChild(img);
+                        }
+                        img.style.display = 'block';
+                        img.src = url;
+                    });
+
+                    document.querySelectorAll('.btn-remove-avatar-trigger, .btn-remove-avatar-item').forEach(el => {
+                        el.classList.remove('d-none');
+                    });
+                }
+
+                function revertAllAvatarsToInitials(initials) {
+                    document.querySelectorAll('.profile-avatar-display').forEach(wrapper => {
+                        const img = wrapper.querySelector('img');
+                        if (img) img.remove();
+                        let span = wrapper.querySelector('.user-avatar-initials');
+                        if (!span) {
+                            span = document.createElement('span');
+                            span.className = 'user-avatar-initials';
+                            wrapper.appendChild(span);
+                        }
+                        span.textContent = initials;
+                    });
+
+                    document.querySelectorAll('.topbar-user-avatar, .topbar-menu-avatar, .sidebar-user-avatar, .sidebar-menu-avatar').forEach(wrapper => {
+                        const img = wrapper.querySelector('.user-avatar-preview');
+                        if (img) img.remove();
+                        const txt = wrapper.querySelector('.user-initials-text');
+                        if (txt) {
+                            txt.style.display = 'inline';
+                        } else {
+                            const span = document.createElement('span');
+                            span.className = 'user-initials-text';
+                            span.textContent = initials;
+                            wrapper.appendChild(span);
+                        }
+                    });
+
+                    document.querySelectorAll('.btn-remove-avatar-trigger, .btn-remove-avatar-item').forEach(el => {
+                        el.classList.add('d-none');
+                    });
+                }
+
+                @if ($errors->userDeletion->isNotEmpty())
+                    setTimeout(function () {
+                        const deleteModalEl = document.getElementById('deleteAccountModal');
+                        if (deleteModalEl && window.bootstrap && window.bootstrap.Modal) {
+                            window.bootstrap.Modal.getOrCreateInstance(deleteModalEl).show();
+                        }
+                    }, 150);
+                @endif
+            })();
         </script>
     @endpush
 
@@ -1213,6 +2001,26 @@
                 background: var(--pri, #1890ff) !important;
                 color: #ffffff !important;
                 border-color: var(--pri, #1890ff) !important;
+            }
+            .avatar-badge-wrapper {
+                cursor: pointer;
+                border-radius: 50%;
+            }
+            .avatar-hover-overlay {
+                position: absolute;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.55);
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                border-radius: 50%;
+                pointer-events: none;
+            }
+            .avatar-badge-wrapper:hover .avatar-hover-overlay {
+                opacity: 1;
+            }
+            .crop-workspace-container {
+                user-select: none;
+                touch-action: none;
             }
         </style>
     @endpush
