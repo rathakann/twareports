@@ -36,17 +36,18 @@
     <form action="{{ route('users.store') }}" method="POST">
         @csrf
 
-        <div class="row g-4">
-            <!-- Account Details -->
-            <div class="col-lg-7">
-                <div class="card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-header bg-transparent border-bottom py-3">
-                        <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
-                            <i data-lucide="user" style="width: 18px; height: 18px;" class="text-primary"></i>
-                            <span>Account Details</span>
-                        </h2>
-                    </div>
-                    <div class="card-body p-4 d-flex flex-column gap-3">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- Account Details -->
+                    <div class="col-lg-7">
+                        <div class="border-bottom pb-3 mb-4">
+                            <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
+                                <i data-lucide="user" style="width: 18px; height: 18px;" class="text-primary"></i>
+                                <span>Account Details</span>
+                            </h2>
+                        </div>
+                        <div class="d-flex flex-column gap-3">
                         <div>
                             <label for="name" class="form-label small fw-semibold text-secondary">Full Name</label>
                             <div class="input-icon-left">
@@ -132,12 +133,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Role Assignment -->
-            <div class="col-lg-5">
-                <div class="card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
+                <!-- Role Assignment -->
+                <div class="col-lg-5">
+                    <div class="border-bottom pb-3 mb-4 d-flex justify-content-between align-items-center">
                         <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
                             <i data-lucide="shield-check" style="width: 18px; height: 18px;" class="text-primary"></i>
                             <span>Assign Roles</span>
@@ -146,7 +145,7 @@
                             Role-Based Access
                         </span>
                     </div>
-                    <div class="card-body p-4 d-flex flex-column gap-3">
+                    <div class="d-flex flex-column gap-3">
                         <p class="text-secondary small mb-1">
                             User permissions and system access rights are managed entirely through roles. Assign one or more roles to this user.
                         </p>
@@ -176,13 +175,13 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-end gap-2 mt-4">
-            <a href="{{ route('users.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+        <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-end">
             <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-2 shadow-sm">
                 <i data-lucide="check" style="width: 18px; height: 18px;"></i>
                 <span>Create User</span>
             </button>
         </div>
+    </div>
     </form>
 
     <script>

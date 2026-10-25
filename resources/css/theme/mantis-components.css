@@ -1110,6 +1110,7 @@
     display: flex;
     flex-direction: column;
     padding: 0;
+    box-shadow: var(--sh-sidebar, 4px 0 20px -1px rgba(17, 24, 39, 0.1), 2px 0 6px -1px rgba(17, 24, 39, 0.05));
 }
 
 @media (min-width: 992px) {
@@ -1593,6 +1594,910 @@ html[data-sidebar="collapsed"] .app-shell .sidebar-user-chevrons {
     cursor: not-allowed !important;
     opacity: 0.8 !important;
 }
+
+/* ==========================================================================
+   14. Compact Modern SweetAlert2 Modal & Toast Customization
+   ========================================================================== */
+
+/* Container Backdrop & Layout - Modals only */
+.swal2-container {
+    z-index: 1080 !important;
+}
+
+body:not(.swal2-toast-shown) .swal2-container.swal2-backdrop-show,
+body:not(.swal2-toast-shown) .swal2-container.swal2-noanimation,
+.swal2-container:not(:has(.swal2-toast)).swal2-backdrop-show,
+.swal2-container:not(:has(.swal2-toast)).swal2-noanimation {
+    background: rgba(15, 23, 42, 0.45) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    padding: 1rem !important;
+}
+
+[data-theme='dark'] body:not(.swal2-toast-shown) .swal2-container.swal2-backdrop-show,
+[data-bs-theme='dark'] body:not(.swal2-toast-shown) .swal2-container.swal2-backdrop-show,
+[data-theme='dark'] .swal2-container:not(:has(.swal2-toast)).swal2-backdrop-show,
+[data-bs-theme='dark'] .swal2-container:not(:has(.swal2-toast)).swal2-backdrop-show {
+    background: rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Explicit non-blocking & transparent setup for corner toasts */
+body.swal2-toast-shown .swal2-container,
+.swal2-container:has(.swal2-toast),
+.swal2-container.swal2-top:has(.swal2-toast),
+.swal2-container.swal2-top-end:has(.swal2-toast),
+.swal2-container.swal2-top-start:has(.swal2-toast),
+.swal2-container.swal2-center:has(.swal2-toast),
+.swal2-container.swal2-bottom:has(.swal2-toast),
+.swal2-container.swal2-bottom-end:has(.swal2-toast),
+.swal2-container.swal2-bottom-start:has(.swal2-toast) {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
+    padding: 0.75rem !important;
+    box-shadow: none !important;
+}
+
+body.swal2-toast-shown .swal2-container.swal2-backdrop-show,
+.swal2-container:has(.swal2-toast).swal2-backdrop-show {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Compact Modal Popup (Modals only - excluded for toasts) */
+.swal2-popup:not(.swal2-toast) {
+    width: 380px !important;
+    max-width: calc(100vw - 32px) !important;
+    padding: 1.25rem 1.25rem 1.15rem !important;
+    background: var(--bg-card, #ffffff) !important;
+    color: var(--tx1, #111827) !important;
+    border: 1px solid var(--bdr, #e5e7eb) !important;
+    border-radius: var(--rad, 12px) !important;
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.12), 0 6px 16px -4px rgba(0, 0, 0, 0.06) !important;
+    font-family: var(--font, 'Inter', sans-serif) !important;
+}
+
+[data-theme='dark'] .swal2-popup:not(.swal2-toast),
+[data-bs-theme='dark'] .swal2-popup:not(.swal2-toast) {
+    background: var(--bg-card, #1e2435) !important;
+    color: var(--tx1, #f1f5f9) !important;
+    border-color: var(--bdr, #2a3347) !important;
+    box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.6), 0 8px 16px -4px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Smooth subtle scale-in animation */
+.swal2-popup.swal2-show:not(.swal2-toast) {
+    animation: swal2CompactIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes swal2CompactIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.94) translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Compact Modern Icons */
+.swal2-popup:not(.swal2-toast) .swal2-icon {
+    font-size: 9.6px !important; /* Scale entire em-based internal geometry to 48px */
+    width: 5em !important;
+    height: 5em !important;
+    line-height: 5em !important;
+    margin: 0.35rem auto 0.65rem !important;
+    border-width: 2px !important;
+    box-shadow: none !important;
+}
+
+/* Circular masks matching card background (Modals only) */
+.swal2-popup:not(.swal2-toast) .swal2-icon.swal2-success [class^='swal2-success-circular-line'],
+.swal2-popup:not(.swal2-toast) .swal2-icon.swal2-success .swal2-success-fix {
+    background-color: var(--bg-card, #ffffff) !important;
+}
+
+[data-theme='dark'] .swal2-popup:not(.swal2-toast) .swal2-icon.swal2-success [class^='swal2-success-circular-line'],
+[data-theme='dark'] .swal2-popup:not(.swal2-toast) .swal2-icon.swal2-success .swal2-success-fix {
+    background-color: var(--bg-card, #1e2435) !important;
+}
+
+/* Success Icon */
+.swal2-popup .swal2-icon.swal2-success {
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+    background-color: rgba(16, 185, 129, 0.08) !important;
+}
+
+.swal2-popup .swal2-icon.swal2-success .swal2-success-ring {
+    border: 0.25em solid rgba(16, 185, 129, 0.22) !important;
+}
+
+.swal2-popup .swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #10b981 !important;
+}
+
+/* Error / Danger Icon */
+.swal2-popup .swal2-icon.swal2-error {
+    border-color: var(--red, #d92b2b) !important;
+    color: var(--red, #d92b2b) !important;
+    background-color: color-mix(in srgb, var(--red, #d92b2b) 8%, transparent) !important;
+}
+
+.swal2-popup .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: var(--red, #d92b2b) !important;
+}
+
+/* Warning Icon */
+.swal2-popup .swal2-icon.swal2-warning {
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+    background-color: rgba(245, 158, 11, 0.08) !important;
+}
+
+.swal2-popup .swal2-icon.swal2-warning .swal2-icon-content {
+    color: #f59e0b !important;
+}
+
+/* Info Icon */
+.swal2-popup .swal2-icon.swal2-info {
+    border-color: var(--pri, #1b4fe0) !important;
+    color: var(--pri, #1b4fe0) !important;
+    background-color: color-mix(in srgb, var(--pri, #1b4fe0) 8%, transparent) !important;
+}
+
+.swal2-popup .swal2-icon.swal2-info .swal2-icon-content {
+    color: var(--pri, #1b4fe0) !important;
+}
+
+/* Question Icon */
+.swal2-popup .swal2-icon.swal2-question {
+    border-color: #8b5cf6 !important;
+    color: #8b5cf6 !important;
+    background-color: rgba(139, 92, 246, 0.08) !important;
+}
+
+.swal2-popup .swal2-icon.swal2-question .swal2-icon-content {
+    color: #8b5cf6 !important;
+}
+
+/* Title & Content Body Typography */
+.swal2-popup .swal2-title {
+    font-size: 1.0625rem !important; /* ~17px */
+    font-weight: 600 !important;
+    color: var(--tx1, #111827) !important;
+    line-height: 1.35 !important;
+    margin: 0.25rem 0 0.45rem !important;
+    padding: 0 0.5rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+.swal2-popup .swal2-html-container {
+    font-size: 0.85rem !important; /* ~13.6px */
+    font-weight: 400 !important;
+    color: var(--tx2, #6b7280) !important;
+    line-height: 1.5 !important;
+    margin: 0 0 0.5rem !important;
+    padding: 0 0.5rem !important;
+}
+
+/* Action Buttons Container */
+.swal2-popup .swal2-actions {
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    margin: 1.15rem 0 0 !important;
+    padding: 0 !important;
+}
+
+/* Explicitly honor SweetAlert2 hidden display styles & ensure toasts never show modal action buttons */
+.swal2-popup [style*="display: none"],
+.swal2-popup .swal2-actions[style*="display: none"],
+.swal2-popup button.swal2-styled[style*="display: none"],
+.swal2-popup.swal2-toast .swal2-actions {
+    display: none !important;
+}
+
+/* Action Buttons Base */
+.swal2-popup button.swal2-styled {
+    font-family: var(--font, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important; /* ~13px */
+    font-weight: 500 !important;
+    height: 35px !important;
+    min-width: 82px !important;
+    padding: 0 14px !important;
+    border-radius: var(--rad-s, 6px) !important;
+    margin: 0 !important;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--tr, 0.2s) !important;
+    box-shadow: none !important;
+}
+
+.swal2-popup button.swal2-styled:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px color-mix(in srgb, var(--pri, #1b4fe0) 35%, transparent) !important;
+}
+
+/* Confirm Button (Default Primary) */
+.swal2-popup button.swal2-styled.swal2-confirm {
+    background-color: var(--pri, #1b4fe0) !important;
+    border: 1px solid var(--pri, #1b4fe0) !important;
+    color: #ffffff !important;
+}
+
+.swal2-popup button.swal2-styled.swal2-confirm:hover:not([disabled]) {
+    background-color: var(--pri-dark, #1338b0) !important;
+    border-color: var(--pri-dark, #1338b0) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--pri, #1b4fe0) 25%, transparent) !important;
+}
+
+.swal2-popup button.swal2-styled.swal2-confirm:active {
+    transform: translateY(0);
+}
+
+/* Confirm Button with Danger Tone (e.g. Delete confirmations) */
+.swal2-popup button.swal2-styled.swal2-confirm[style*="red"],
+.swal2-popup button.swal2-styled.swal2-confirm[style*="--red"],
+.swal2-popup button.swal2-styled.swal2-confirm[style*="#dc3545"],
+.swal2-popup button.swal2-styled.swal2-confirm[style*="#dc3741"],
+.swal2-popup button.swal2-styled.swal2-confirm[style*="rgb(220"],
+.swal2-popup button.swal2-styled.swal2-confirm.btn-danger {
+    background-color: var(--red, #d92b2b) !important;
+    border: 1px solid var(--red, #d92b2b) !important;
+    color: #ffffff !important;
+}
+
+.swal2-popup button.swal2-styled.swal2-confirm[style*="red"]:hover:not([disabled]),
+.swal2-popup button.swal2-styled.swal2-confirm[style*="--red"]:hover:not([disabled]),
+.swal2-popup button.swal2-styled.swal2-confirm[style*="#dc3545"]:hover:not([disabled]),
+.swal2-popup button.swal2-styled.swal2-confirm[style*="#dc3741"]:hover:not([disabled]),
+.swal2-popup button.swal2-styled.swal2-confirm[style*="rgb(220"]:hover:not([disabled]),
+.swal2-popup button.swal2-styled.swal2-confirm.btn-danger:hover:not([disabled]) {
+    background-color: #b91c1c !important;
+    border-color: #b91c1c !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(217, 43, 43, 0.3) !important;
+}
+
+/* Cancel Button */
+.swal2-popup button.swal2-styled.swal2-cancel {
+    background-color: var(--bg-card, #ffffff) !important;
+    border: 1px solid var(--bdr, #e5e7eb) !important;
+    color: var(--tx2, #6b7280) !important;
+}
+
+.swal2-popup button.swal2-styled.swal2-cancel:hover:not([disabled]) {
+    background-color: var(--bg-hov, #eef2ff) !important;
+    border-color: var(--bdr2, #d1d5db) !important;
+    color: var(--tx1, #111827) !important;
+}
+
+[data-theme='dark'] .swal2-popup button.swal2-styled.swal2-cancel {
+    background-color: var(--bg-inp, #252d3f) !important;
+    border-color: var(--bdr, #2a3347) !important;
+    color: var(--tx2, #94a3b8) !important;
+}
+
+[data-theme='dark'] .swal2-popup button.swal2-styled.swal2-cancel:hover:not([disabled]) {
+    background-color: var(--bg-hov, #1f2a44) !important;
+    border-color: var(--bdr2, #374151) !important;
+    color: var(--tx1, #f1f5f9) !important;
+}
+
+/* Deny Button */
+.swal2-popup button.swal2-styled.swal2-deny {
+    background-color: #f59e0b !important;
+    border: 1px solid #f59e0b !important;
+    color: #ffffff !important;
+}
+
+.swal2-popup button.swal2-styled.swal2-deny:hover:not([disabled]) {
+    background-color: #d97706 !important;
+    border-color: #d97706 !important;
+    transform: translateY(-1px);
+}
+
+/* Close Button (top-right X) */
+.swal2-popup .swal2-close {
+    top: 10px !important;
+    right: 10px !important;
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 16px !important;
+    line-height: 26px !important;
+    border-radius: 6px !important;
+    color: var(--tx3, #9ca3af) !important;
+    background: transparent !important;
+    transition: all var(--tr, 0.2s) !important;
+    box-shadow: none !important;
+}
+
+.swal2-popup .swal2-close:hover {
+    color: var(--tx1, #111827) !important;
+    background-color: var(--bg-hov, #eef2ff) !important;
+}
+
+[data-theme='dark'] .swal2-popup .swal2-close:hover {
+    color: var(--tx1, #f1f5f9) !important;
+    background-color: var(--bg-hov, #1f2a44) !important;
+}
+
+/* Input Fields inside Swal (Prompt Dialogs) */
+.swal2-popup input.swal2-input,
+.swal2-popup select.swal2-select,
+.swal2-popup textarea.swal2-textarea {
+    width: 100% !important;
+    margin: 0.75rem auto 0 !important;
+    box-sizing: border-box !important;
+    background-color: var(--bg-inp, #f4f6fb) !important;
+    border: 1px solid var(--bdr, #e5e7eb) !important;
+    border-radius: var(--rad-s, 4px) !important;
+    color: var(--tx1, #111827) !important;
+    font-family: var(--font, 'Inter', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    transition: border-color var(--tr, 0.2s), box-shadow var(--tr, 0.2s) !important;
+    box-shadow: none !important;
+}
+
+.swal2-popup input.swal2-input,
+.swal2-popup select.swal2-select {
+    height: 35px !important;
+    line-height: 35px !important;
+    padding: 0 10px !important;
+}
+
+.swal2-popup textarea.swal2-textarea {
+    padding: 8px 10px !important;
+    min-height: 70px !important;
+}
+
+.swal2-popup input.swal2-input:focus,
+.swal2-popup select.swal2-select:focus,
+.swal2-popup textarea.swal2-textarea:focus {
+    border-color: var(--pri, #1b4fe0) !important;
+    box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--pri, #1b4fe0) 20%, transparent) !important;
+    outline: none !important;
+}
+
+.swal2-popup input.swal2-input::placeholder,
+.swal2-popup textarea.swal2-textarea::placeholder {
+    color: var(--tx3, #9ca3af) !important;
+}
+
+[data-theme='dark'] .swal2-popup input.swal2-input,
+[data-theme='dark'] .swal2-popup select.swal2-select,
+[data-theme='dark'] .swal2-popup textarea.swal2-textarea {
+    background-color: var(--bg-inp, #252d3f) !important;
+    border-color: var(--bdr, #2a3347) !important;
+    color: var(--tx1, #f1f5f9) !important;
+}
+
+/* Spinner / Loader */
+.swal2-popup .swal2-loader {
+    width: 1.75em !important;
+    height: 1.75em !important;
+    border-width: 2px !important;
+    border-color: var(--pri, #1b4fe0) transparent var(--pri, #1b4fe0) transparent !important;
+}
+
+/* --------------------------------------------------------------------------
+   SweetAlert2 Compact Modern Toast Customization (toast: true)
+   -------------------------------------------------------------------------- */
+.swal2-popup.swal2-toast {
+    box-sizing: border-box !important;
+    width: auto !important;
+    max-width: 380px !important;
+    min-width: 260px !important;
+    padding: 0.625rem 0.875rem !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--bdr, #e5e7eb) !important;
+    background: var(--bg-card, #ffffff) !important;
+    color: var(--tx1, #111827) !important;
+    box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.12), 0 3px 8px -2px rgba(0, 0, 0, 0.04) !important;
+    pointer-events: auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.swal2-popup.swal2-toast[style*="display: none"] {
+    display: none !important;
+}
+
+[data-theme='dark'] .swal2-popup.swal2-toast {
+    background: var(--bg-card, #1e2435) !important;
+    border-color: var(--bdr, #2a3347) !important;
+    color: var(--tx1, #f1f5f9) !important;
+    box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.55), 0 4px 10px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* SweetAlert2 Toast Icons (toast: true uses 2em base geometry) */
+.swal2-popup.swal2-toast .swal2-icon {
+    font-size: 12px !important; /* 2em * 12px = 24px icon size */
+    width: 2em !important;
+    height: 2em !important;
+    min-width: 2em !important;
+    max-width: 2em !important;
+    line-height: 2em !important;
+    margin: 0 !important;
+    border-width: 2px !important;
+    border-style: solid !important;
+    border-radius: 50% !important;
+    box-sizing: content-box !important;
+    flex-shrink: 0 !important;
+    align-self: center !important;
+    position: relative !important;
+}
+
+/* Hide modal circular masks & duplicate ring in toasts so they don't block checkmark or leave white blotches */
+.swal2-popup.swal2-toast .swal2-icon.swal2-success [class^='swal2-success-circular-line'],
+.swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-fix,
+.swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-ring {
+    display: none !important;
+}
+
+/* Toast Success Checkmark lines - clearly visible, crisp & properly positioned */
+.swal2-popup.swal2-toast .swal2-icon.swal2-success [class^='swal2-success-line'] {
+    display: block !important;
+    height: 0.25em !important;
+    background-color: #10b981 !important;
+    border-radius: 2px !important;
+    z-index: 2 !important;
+}
+
+.swal2-popup.swal2-toast .swal2-icon.swal2-success [class^='swal2-success-line'][class$='tip'] {
+    top: 1.1em !important;
+    left: 0.1875em !important;
+    width: 0.75em !important;
+}
+
+.swal2-popup.swal2-toast .swal2-icon.swal2-success [class^='swal2-success-line'][class$='long'] {
+    top: 0.92em !important;
+    right: 0.1875em !important;
+    width: 1.35em !important;
+}
+
+/* Toast Error X-mark lines */
+.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    display: block !important;
+    height: 0.25em !important;
+    top: 0.88em !important;
+    width: 1.35em !important;
+    background-color: var(--red, #d92b2b) !important;
+    border-radius: 2px !important;
+}
+
+/* Toast Warning / Info / Question icon content centering */
+.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.35em !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.swal2-popup.swal2-toast .swal2-title {
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: var(--tx1, #111827) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.35 !important;
+    flex-grow: 1 !important;
+    text-align: left !important;
+    align-self: center !important;
+}
+
+[data-theme='dark'] .swal2-popup.swal2-toast .swal2-title {
+    color: var(--tx1, #f1f5f9) !important;
+}
+
+.swal2-popup.swal2-toast .swal2-close {
+    font-size: 14px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    margin: 0 !important;
+    position: static !important;
+    align-self: center !important;
+    flex-shrink: 0 !important;
+    color: var(--tx3, #9ca3af) !important;
+    background: transparent !important;
+}
+
+/* Toast Progress Bar */
+.swal2-popup.swal2-toast .swal2-timer-progress-bar {
+    height: 2.5px !important;
+    background: var(--pri, #1b4fe0) !important;
+    opacity: 0.85 !important;
+}
+
+/* --------------------------------------------------------------------------
+   17. Select2 Theme Setting Color Integration (Active Navigation Style)
+   -------------------------------------------------------------------------- */
+/* Selected option background and text color matching active navigation bar */
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected,
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[aria-selected="true"],
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected.select2-results__option--highlighted,
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[aria-selected="true"].select2-results__option--highlighted,
+.select2-container--default .select2-results__option.select2-results__option--selected,
+.select2-container--default .select2-results__option[aria-selected="true"],
+.select2-container--default .select2-results__option.select2-results__option--selected.select2-results__option--highlighted,
+.select2-container--default .select2-results__option[aria-selected="true"].select2-results__option--highlighted,
+.select2-container--bootstrap-5 .select2-results__option--selected,
+.select2-container--default .select2-results__option--selected {
+    background-color: var(--pri-soft, #eef2ff) !important;
+    color: var(--pri, #1b4fe0) !important;
+    font-weight: 600 !important;
+}
+
+/* Unselected options hover/highlighted */
+.select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted:not(.select2-results__option--selected):not([aria-selected="true"]),
+.select2-container--default .select2-results__option.select2-results__option--highlighted:not(.select2-results__option--selected):not([aria-selected="true"]) {
+    background-color: var(--bg-hov, #eef2ff) !important;
+    color: var(--tx1, #111827) !important;
+    font-weight: 400 !important;
+}
+
+[data-theme='dark'] .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted:not(.select2-results__option--selected):not([aria-selected="true"]),
+[data-bs-theme='dark'] .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted:not(.select2-results__option--selected):not([aria-selected="true"]),
+[data-theme='dark'] .select2-container--default .select2-results__option.select2-results__option--highlighted:not(.select2-results__option--selected):not([aria-selected="true"]),
+[data-bs-theme='dark'] .select2-container--default .select2-results__option.select2-results__option--highlighted:not(.select2-results__option--selected):not([aria-selected="true"]) {
+    background-color: var(--bg-hov, #1f2a44) !important;
+    color: var(--tx1, #f1f5f9) !important;
+    font-weight: 400 !important;
+}
+
+/* Ensure icons, svgs, and badges inside selected option match active navigation bar color */
+.select2-results__option--selected i,
+.select2-results__option--selected svg,
+.select2-results__option--selected .select2-opt-icon,
+.select2-results__option[aria-selected="true"] i,
+.select2-results__option[aria-selected="true"] svg,
+.select2-results__option[aria-selected="true"] .select2-opt-icon {
+    color: var(--pri, #1b4fe0) !important;
+    stroke: var(--pri, #1b4fe0) !important;
+}
+
+/* Select2 focus, open, and search input borders matching theme primary */
+.select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: var(--pri, #1b4fe0) !important;
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--pri, #1b4fe0) 25%, transparent) !important;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-color: var(--pri, #1b4fe0) !important;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field:focus {
+    border-color: var(--pri, #1b4fe0) !important;
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--pri, #1b4fe0) 25%, transparent) !important;
+}
+
+/* Multiple selection badges based on theme primary */
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+    background-color: var(--pri-soft, #eef2ff) !important;
+    border-color: color-mix(in srgb, var(--pri, #1b4fe0) 35%, transparent) !important;
+    color: var(--pri, #1b4fe0) !important;
+}
+
+[data-theme='dark'] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice,
+[data-bs-theme='dark'] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+    background-color: var(--pri-soft, #1e2f60) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+    color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   18. Theme Customization Drawer Color Integration (Same as Select2)
+   -------------------------------------------------------------------------- */
+/* Theme Customization Drawer Choice Buttons (Appearance, Layout, Width, Font Size, Radius, Toast Position) */
+.theme-choice-grid button,
+.theme-setting-toggle {
+    align-items: center;
+    background-color: var(--bg-sub, #f8faff);
+    border: 1px solid var(--bdr, #e5e7eb);
+    border-radius: var(--rad-s, 4px);
+    color: var(--tx1, #111827);
+    display: flex;
+    font-size: 12px;
+    font-weight: 500;
+    gap: 7px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: all var(--tr, 0.2s);
+}
+
+.theme-choice-grid button svg,
+.theme-choice-grid button i,
+.theme-setting-toggle svg,
+.theme-setting-toggle i {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--tx2, #6b7280);
+    stroke: var(--tx2, #6b7280);
+    transition: color var(--tr, 0.2s), stroke var(--tr, 0.2s);
+}
+
+/* Unselected Hover state - same as Select2 unselected hover */
+.theme-choice-grid button:hover:not([aria-pressed="true"]),
+.theme-setting-toggle:hover:not([aria-pressed="true"]) {
+    background-color: var(--bg-hov, #eef2ff) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+    color: var(--pri, #1b4fe0) !important;
+}
+
+.theme-choice-grid button:hover:not([aria-pressed="true"]) svg,
+.theme-choice-grid button:hover:not([aria-pressed="true"]) i,
+.theme-setting-toggle:hover:not([aria-pressed="true"]) svg,
+.theme-setting-toggle:hover:not([aria-pressed="true"]) i {
+    color: var(--pri, #1b4fe0) !important;
+    stroke: var(--pri, #1b4fe0) !important;
+}
+
+/* Active / Pressed State - EXACT SAME AS SELECT2 SELECTED OPTION & ACTIVE NAVIGATION BAR */
+.theme-choice-grid button[aria-pressed="true"],
+.theme-setting-toggle[aria-pressed="true"] {
+    background-color: var(--pri-soft, #eef2ff) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+    color: var(--pri, #1b4fe0) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.theme-choice-grid button[aria-pressed="true"] svg,
+.theme-choice-grid button[aria-pressed="true"] i,
+.theme-setting-toggle[aria-pressed="true"] svg,
+.theme-setting-toggle[aria-pressed="true"] i {
+    color: var(--pri, #1b4fe0) !important;
+    stroke: var(--pri, #1b4fe0) !important;
+}
+
+.theme-choice-grid button[aria-pressed="true"] span.border {
+    border-color: var(--pri, #1b4fe0) !important;
+}
+
+/* Dark Mode Overrides for Theme Customization */
+[data-theme='dark'] .theme-choice-grid button,
+[data-bs-theme='dark'] .theme-choice-grid button,
+[data-theme='dark'] .theme-setting-toggle,
+[data-bs-theme='dark'] .theme-setting-toggle {
+    background-color: var(--bg-sub, #1a2030);
+    border-color: var(--bdr, #2a3347);
+    color: var(--tx2, #94a3b8);
+}
+
+[data-theme='dark'] .theme-choice-grid button svg,
+[data-bs-theme='dark'] .theme-choice-grid button svg,
+[data-theme='dark'] .theme-choice-grid button i,
+[data-bs-theme='dark'] .theme-choice-grid button i,
+[data-theme='dark'] .theme-setting-toggle svg,
+[data-bs-theme='dark'] .theme-setting-toggle svg,
+[data-theme='dark'] .theme-setting-toggle i,
+[data-bs-theme='dark'] .theme-setting-toggle i {
+    color: var(--tx2, #94a3b8);
+    stroke: var(--tx2, #94a3b8);
+}
+
+[data-theme='dark'] .theme-choice-grid button:hover:not([aria-pressed="true"]),
+[data-bs-theme='dark'] .theme-choice-grid button:hover:not([aria-pressed="true"]),
+[data-theme='dark'] .theme-setting-toggle:hover:not([aria-pressed="true"]),
+[data-bs-theme='dark'] .theme-setting-toggle:hover:not([aria-pressed="true"]) {
+    background-color: var(--bg-hov, #1f2a44) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+    color: var(--pri, #1b4fe0) !important;
+}
+
+[data-theme='dark'] .theme-choice-grid button:hover:not([aria-pressed="true"]) svg,
+[data-bs-theme='dark'] .theme-choice-grid button:hover:not([aria-pressed="true"]) svg,
+[data-theme='dark'] .theme-choice-grid button:hover:not([aria-pressed="true"]) i,
+[data-bs-theme='dark'] .theme-choice-grid button:hover:not([aria-pressed="true"]) i,
+[data-theme='dark'] .theme-setting-toggle:hover:not([aria-pressed="true"]) svg,
+[data-bs-theme='dark'] .theme-setting-toggle:hover:not([aria-pressed="true"]) svg,
+[data-theme='dark'] .theme-setting-toggle:hover:not([aria-pressed="true"]) i,
+[data-bs-theme='dark'] .theme-setting-toggle:hover:not([aria-pressed="true"]) i {
+    color: var(--pri, #1b4fe0) !important;
+    stroke: var(--pri, #1b4fe0) !important;
+}
+
+[data-theme='dark'] .theme-choice-grid button[aria-pressed="true"],
+[data-bs-theme='dark'] .theme-choice-grid button[aria-pressed="true"],
+[data-theme='dark'] .theme-setting-toggle[aria-pressed="true"],
+[data-bs-theme='dark'] .theme-setting-toggle[aria-pressed="true"] {
+    background-color: var(--pri-soft, #1e2f60) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+    color: var(--pri, #1b4fe0) !important;
+    font-weight: 600 !important;
+}
+
+[data-theme='dark'] .theme-choice-grid button[aria-pressed="true"] svg,
+[data-bs-theme='dark'] .theme-choice-grid button[aria-pressed="true"] svg,
+[data-theme='dark'] .theme-choice-grid button[aria-pressed="true"] i,
+[data-bs-theme='dark'] .theme-choice-grid button[aria-pressed="true"] i,
+[data-theme='dark'] .theme-setting-toggle[aria-pressed="true"] svg,
+[data-bs-theme='dark'] .theme-setting-toggle[aria-pressed="true"] svg,
+[data-theme='dark'] .theme-setting-toggle[aria-pressed="true"] i,
+[data-bs-theme='dark'] .theme-setting-toggle[aria-pressed="true"] i {
+    color: var(--pri, #1b4fe0) !important;
+    stroke: var(--pri, #1b4fe0) !important;
+}
+
+[data-theme='dark'] .theme-choice-grid button[aria-pressed="true"] span.border,
+[data-bs-theme='dark'] .theme-choice-grid button[aria-pressed="true"] span.border {
+    border-color: var(--pri, #1b4fe0) !important;
+}
+
+/* Corner rounding badge & slider matching theme primary */
+#themeRadiusBadge {
+    background-color: var(--pri-soft, #eef2ff) !important;
+    color: var(--pri, #1b4fe0) !important;
+    border: 1px solid var(--pri, #1b4fe0) !important;
+    font-weight: 600;
+}
+
+[data-theme='dark'] #themeRadiusBadge,
+[data-bs-theme='dark'] #themeRadiusBadge {
+    background-color: var(--pri-soft, #1e2f60) !important;
+    color: var(--pri, #1b4fe0) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+}
+
+#themeRadiusRange {
+    accent-color: var(--pri, #1b4fe0) !important;
+}
+
+/* Theme Drawer Reset Button */
+[data-theme-reset]:hover,
+[data-theme-reset]:focus {
+    background-color: var(--bg-hov, #eef2ff) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+    color: var(--pri, #1b4fe0) !important;
+}
+
+[data-theme='dark'] [data-theme-reset]:hover,
+[data-bs-theme='dark'] [data-theme-reset]:hover {
+    background-color: var(--bg-hov, #1f2a44) !important;
+    border-color: var(--pri, #1b4fe0) !important;
+    color: var(--pri, #1b4fe0) !important;
+}
+
+/* Theme Drawer Toggle Icon in Topbar when expanded */
+.topbar-icon[data-theme-drawer-toggle][aria-expanded="true"] {
+    background-color: var(--pri-soft, #eef2ff) !important;
+    color: var(--pri, #1b4fe0) !important;
+}
+
+[data-theme='dark'] .topbar-icon[data-theme-drawer-toggle][aria-expanded="true"],
+[data-bs-theme='dark'] .topbar-icon[data-theme-drawer-toggle][aria-expanded="true"] {
+    background-color: var(--pri-soft, #1e2f60) !important;
+    color: var(--pri, #1b4fe0) !important;
+}
+
+/* --------------------------------------------------------------------------
+   19. DataTable & Table Style Customization Modes
+   -------------------------------------------------------------------------- */
+
+/* --- Row Pattern: Striped vs Plain --- */
+html[data-table-striped="plain"] .table,
+html[data-table-striped="plain"] table.dataTable,
+html[data-table-striped="plain"] .table-striped>tbody>tr:nth-of-type(odd)>*,
+html[data-table-striped="plain"] .table-striped>tbody>tr:nth-of-type(even)>*,
+html[data-table-striped="plain"] table.dataTable.table-striped>tbody>tr:nth-of-type(odd)>*,
+html[data-table-striped="plain"] table.dataTable.table-striped>tbody>tr:nth-of-type(even)>* {
+    --bs-table-striped-bg: transparent !important;
+    background-color: transparent !important;
+}
+
+html[data-table-striped="striped"] .table,
+html[data-table-striped="striped"] table.dataTable {
+    --bs-table-striped-bg: var(--tbl-stripe) !important;
+}
+
+/* --- Row Hover: Hover On vs Hover Off --- */
+html[data-table-hover="none"] .table,
+html[data-table-hover="none"] table.dataTable,
+html[data-table-hover="none"] .table-hover>tbody>tr:hover>*,
+html[data-table-hover="none"] table.dataTable.table-hover>tbody>tr:hover>* {
+    --bs-table-hover-bg: transparent !important;
+    background-color: transparent !important;
+}
+
+/* --- Table Borders: Divided vs Bordered vs Borderless --- */
+/* Bordered Grid */
+html[data-table-border="bordered"] .table,
+html[data-table-border="bordered"] table.dataTable,
+html[data-table-border="bordered"] .dt-container table {
+    border: 1px solid var(--bdr) !important;
+    border-collapse: collapse !important;
+}
+
+html[data-table-border="bordered"] .table> :not(caption)>*>*,
+html[data-table-border="bordered"] table.dataTable>thead>tr>th,
+html[data-table-border="bordered"] table.dataTable>tbody>tr>td {
+    border: 1px solid var(--bdr) !important;
+}
+
+/* Borderless */
+html[data-table-border="borderless"] .table,
+html[data-table-border="borderless"] table.dataTable,
+html[data-table-border="borderless"] .dt-container table {
+    border: 0 !important;
+}
+
+html[data-table-border="borderless"] .table> :not(caption)>*>*,
+html[data-table-border="borderless"] table.dataTable>tbody>tr>td {
+    border: 0 !important;
+    border-bottom: 0 !important;
+}
+
+html[data-table-border="borderless"] table.dataTable thead>tr>th,
+html[data-table-border="borderless"] .table>thead>tr>th {
+    border-bottom: 1px solid var(--bdr) !important;
+}
+
+/* --- Table Header Style: Subtle vs Primary Tint vs Clean --- */
+/* Primary Tinted Header */
+html[data-table-head="primary"] .table>thead,
+html[data-table-head="primary"] table.dataTable thead {
+    --bs-table-bg: var(--pri-soft) !important;
+    background-color: var(--pri-soft) !important;
+}
+
+html[data-table-head="primary"] .table>thead>tr>th,
+html[data-table-head="primary"] table.dataTable thead>tr>th,
+html[data-table-head="primary"] table.dataTable thead th,
+html[data-table-head="primary"] .table thead.table-light>tr>th {
+    background-color: var(--pri-soft) !important;
+    color: var(--pri) !important;
+    border-bottom: 2px solid var(--pri) !important;
+    font-weight: 700 !important;
+}
+
+html[data-table-head="primary"] table.dataTable thead th .dt-column-title,
+html[data-table-head="primary"] table.dataTable thead th span {
+    color: var(--pri) !important;
+}
+
+html[data-table-head="primary"] table.dataTable thead .dt-orderable-asc .dt-column-order:before,
+html[data-table-head="primary"] table.dataTable thead .dt-orderable-desc .dt-column-order:after {
+    color: var(--pri) !important;
+}
+
+/* Clean / Card Matching Header */
+html[data-table-head="clean"] .table>thead,
+html[data-table-head="clean"] table.dataTable thead {
+    --bs-table-bg: var(--bg-card) !important;
+    background-color: var(--bg-card) !important;
+}
+
+html[data-table-head="clean"] .table>thead>tr>th,
+html[data-table-head="clean"] table.dataTable thead>tr>th,
+html[data-table-head="clean"] table.dataTable thead th {
+    background-color: var(--bg-card) !important;
+    color: var(--tx1) !important;
+    border-bottom: 2px solid var(--bdr) !important;
+}
+
+html[data-table-head="clean"] table.dataTable thead th .dt-column-title,
+html[data-table-head="clean"] table.dataTable thead th span {
+    color: var(--tx1) !important;
+}
+
+
 
 
 

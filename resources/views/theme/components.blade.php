@@ -38,6 +38,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link py-1.5 px-3 rounded-2 fw-medium text-secondary" href="#sec-swal">
+                    <i data-lucide="message-square" class="me-1" style="width: 15px; height: 15px;"></i> SweetAlert2
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link py-1.5 px-3 rounded-2 fw-medium text-secondary" href="#sec-surfaces">
                     <i data-lucide="layers" class="me-1" style="width: 15px; height: 15px;"></i> Accordions & Surfaces
                 </a>
@@ -354,6 +359,210 @@
                     </div>
                 </x-content-card>
             </div>
+
+            <!-- SweetAlert2 Compact & Modern Showcase -->
+            <div class="col-12" id="sec-swal">
+                <x-content-card title="SweetAlert2 Modern & Compact Alerts" subtitle="Production-grade, high-density modal alerts, confirmation dialogs, prompt inputs, and animated corner toasts with dark mode support">
+                    <x-slot:actions>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1">Compact 380px Sizing</span>
+                    </x-slot:actions>
+
+                    <!-- Features Highlights Row -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6 col-md-3">
+                            <div class="p-2.5 rounded-3 border bg-sub h-100 d-flex align-items-center gap-2.5">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-2 bg-primary-subtle text-primary p-2" style="width: 34px; height: 34px;">
+                                    <i data-lucide="minimize-2" style="width: 16px; height: 16px;"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-semibold small text-dark">Compact 380px Width</div>
+                                    <div class="text-secondary" style="font-size: 11.5px;">Optimized density & padding</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-3">
+                            <div class="p-2.5 rounded-3 border bg-sub h-100 d-flex align-items-center gap-2.5">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-2 bg-success-subtle text-success p-2" style="width: 34px; height: 34px;">
+                                    <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-semibold small text-dark">Refined 48px Icons</div>
+                                    <div class="text-secondary" style="font-size: 11.5px;">Soft halos & proportional scale</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-3">
+                            <div class="p-2.5 rounded-3 border bg-sub h-100 d-flex align-items-center gap-2.5">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-2 bg-info-subtle text-info p-2" style="width: 34px; height: 34px;">
+                                    <i data-lucide="moon" style="width: 16px; height: 16px;"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-semibold small text-dark">Dark Mode Native</div>
+                                    <div class="text-secondary" style="font-size: 11.5px;">Theme token integration</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-3">
+                            <div class="p-2.5 rounded-3 border bg-sub h-100 d-flex align-items-center gap-2.5">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-2 bg-warning-subtle text-warning p-2" style="width: 34px; height: 34px;">
+                                    <i data-lucide="layers" style="width: 16px; height: 16px;"></i>
+                                </span>
+                                <div>
+                                    <div class="fw-semibold small text-dark">Backdrop Blur Glass</div>
+                                    <div class="text-secondary" style="font-size: 11.5px;">Smooth entrance animation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Trigger Categories -->
+                    <div class="row g-4">
+                        <!-- Category 1: Standard Modal Dialogs -->
+                        <div class="col-lg-6">
+                            <div class="border rounded-3 p-3 bg-card h-100 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                            <i data-lucide="layout-template" class="text-primary" style="width: 16px; height: 16px;"></i>
+                                            Interactive Modal Dialogs
+                                        </h6>
+                                        <span class="badge bg-secondary-subtle text-secondary small">Click to test</span>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <button type="button" class="btn btn-outline-success btn-sm d-inline-flex align-items-center gap-1.5" id="btn-swal-success">
+                                            <i data-lucide="check-circle-2" style="width: 15px; height: 15px;"></i> Success Alert
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1.5" id="btn-swal-danger">
+                                            <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i> Delete Confirm
+                                        </button>
+                                        <button type="button" class="btn btn-outline-warning btn-sm d-inline-flex align-items-center gap-1.5" id="btn-swal-warning">
+                                            <i data-lucide="alert-triangle" style="width: 15px; height: 15px;"></i> Warning Alert
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" id="btn-swal-info">
+                                            <i data-lucide="info" style="width: 15px; height: 15px;"></i> Info Notice
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5" id="btn-swal-prompt">
+                                            <i data-lucide="pen-square" style="width: 15px; height: 15px;"></i> Prompt Input
+                                        </button>
+                                        <button type="button" class="btn btn-outline-dark btn-sm d-inline-flex align-items-center gap-1.5" id="btn-swal-loading">
+                                            <i data-lucide="loader-2" style="width: 15px; height: 15px;"></i> Async Loading
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="p-2.5 rounded-2 bg-sub border font-monospace text-secondary mt-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-semibold text-dark small">Modal Usage Example</span>
+                                        <span class="badge bg-light text-muted border" style="font-size: 10px;">JavaScript</span>
+                                    </div>
+                                    <pre class="mb-0 text-secondary" style="font-size: 11.5px; line-height: 1.45; overflow-x: auto;"><code>Swal.fire({
+  icon: 'warning',
+  title: 'Delete Financial Period?',
+  text: 'This action cannot be undone.',
+  showCancelButton: true,
+  confirmButtonText: 'Yes, delete',
+  confirmButtonColor: 'var(--red)'
+});</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category 2: Modern Corner Toasts -->
+                        <div class="col-lg-6">
+                            <div class="border rounded-3 p-3 bg-card h-100 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                            <i data-lucide="bell-ring" class="text-primary" style="width: 16px; height: 16px;"></i>
+                                            Corner Toasts (<code class="small text-primary">toast: true</code>)
+                                        </h6>
+                                        <span class="badge bg-secondary-subtle text-secondary small">Auto-dismissing</span>
+                                    </div>
+
+                                    <!-- Toast Position Options -->
+                                    <div class="mb-3 p-2.5 bg-sub rounded-2 border">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <label class="form-label mb-0 fw-semibold text-dark small d-flex align-items-center gap-1.5">
+                                                <i data-lucide="crosshair" class="text-primary" style="width: 14px; height: 14px;"></i>
+                                                Toast Position Option
+                                            </label>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-2 py-0.5" id="demoToastPosBadge">top-end</span>
+                                        </div>
+                                        <div class="row g-1.5 mb-1.5">
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1 py-1 text-nowrap" data-demo-toast-pos="top-start" style="font-size: 11.5px;">
+                                                    <i data-lucide="arrow-up-left" style="width: 13px; height: 13px;"></i> Top Left
+                                                </button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1 py-1 text-nowrap" data-demo-toast-pos="top" style="font-size: 11.5px;">
+                                                    <i data-lucide="arrow-up" style="width: 13px; height: 13px;"></i> Top Center
+                                                </button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1 py-1 text-nowrap active" data-demo-toast-pos="top-end" style="font-size: 11.5px;">
+                                                    <i data-lucide="arrow-up-right" style="width: 13px; height: 13px;"></i> Top Right
+                                                </button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1 py-1 text-nowrap" data-demo-toast-pos="bottom-start" style="font-size: 11.5px;">
+                                                    <i data-lucide="arrow-down-left" style="width: 13px; height: 13px;"></i> Bottom Left
+                                                </button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1 py-1 text-nowrap" data-demo-toast-pos="bottom" style="font-size: 11.5px;">
+                                                    <i data-lucide="arrow-down" style="width: 13px; height: 13px;"></i> Bottom Center
+                                                </button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1 py-1 text-nowrap" data-demo-toast-pos="bottom-end" style="font-size: 11.5px;">
+                                                    <i data-lucide="arrow-down-right" style="width: 13px; height: 13px;"></i> Bottom Right
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted d-block" style="font-size: 11px;">Select a position to test live triggers and inspect the generated code below.</small>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <button type="button" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1.5 text-white" id="btn-toast-success">
+                                            <i data-lucide="check" style="width: 15px; height: 15px;"></i> Toast Success
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm d-inline-flex align-items-center gap-1.5 text-white" id="btn-toast-error">
+                                            <i data-lucide="shield-alert" style="width: 15px; height: 15px;"></i> Toast Error
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm d-inline-flex align-items-center gap-1.5 text-dark" id="btn-toast-warning">
+                                            <i data-lucide="clock" style="width: 15px; height: 15px;"></i> Toast Warning
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" id="btn-toast-info">
+                                            <i data-lucide="bell" style="width: 15px; height: 15px;"></i> Toast Info
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" id="btn-toast-bootstrap">
+                                            <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i> Bootstrap Toast
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="p-2.5 rounded-2 bg-sub border font-monospace text-secondary mt-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-semibold text-dark small">Toast Usage Example</span>
+                                        <span class="badge bg-light text-muted border" style="font-size: 10px;">JavaScript</span>
+                                    </div>
+                                    <pre class="mb-0 text-secondary" style="font-size: 11.5px; line-height: 1.45; overflow-x: auto;"><code id="toastCodeExample">Swal.fire({
+  toast: true,
+  position: 'top-end',
+  icon: 'success',
+  title: 'Payment entry posted successfully.',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true
+});</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </x-content-card>
+            </div>
         </div>
     </div>
 
@@ -556,4 +765,259 @@
             <x-button variant="primary" icon="check" data-bs-dismiss="modal">Confirm & Save</x-button>
         </x-slot:footer>
     </x-modal>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Modal Alert Demos
+            const btnSuccess = document.getElementById('btn-swal-success');
+            if (btnSuccess) {
+                btnSuccess.addEventListener('click', function () {
+                    window.Swal.fire({
+                        icon: 'success',
+                        title: 'Account Settings Saved',
+                        text: 'Your security preferences and organization profiles were updated successfully.',
+                        confirmButtonText: 'Great, thanks'
+                    });
+                });
+            }
+
+            const btnDanger = document.getElementById('btn-swal-danger');
+            if (btnDanger) {
+                btnDanger.addEventListener('click', function () {
+                    window.Swal.fire({
+                        icon: 'warning',
+                        title: 'Delete Financial Period?',
+                        text: 'All associated journal entries and trial balance snapshots will be removed. This action cannot be reversed.',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, delete period',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: 'var(--red)'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.Swal.fire({
+                                icon: 'success',
+                                title: 'Period Deleted',
+                                text: 'The selected period has been removed from reporting view.',
+                                confirmButtonText: 'Close'
+                            });
+                        }
+                    });
+                });
+            }
+
+            const btnWarning = document.getElementById('btn-swal-warning');
+            if (btnWarning) {
+                btnWarning.addEventListener('click', function () {
+                    window.Swal.fire({
+                        icon: 'warning',
+                        title: 'Session Timeout Warning',
+                        text: 'Your active ERP session will expire in 5 minutes due to inactivity. Would you like to keep working?',
+                        showCancelButton: true,
+                        confirmButtonText: 'Keep Working',
+                        cancelButtonText: 'Sign Out'
+                    });
+                });
+            }
+
+            const btnInfo = document.getElementById('btn-swal-info');
+            if (btnInfo) {
+                btnInfo.addEventListener('click', function () {
+                    window.Swal.fire({
+                        icon: 'info',
+                        title: 'Nightly Sync Notice',
+                        text: 'SAP Business One database sync will run automatically at 02:00 AM UTC. Reporting remains available during read mode.',
+                        confirmButtonText: 'Got it'
+                    });
+                });
+            }
+
+            const btnPrompt = document.getElementById('btn-swal-prompt');
+            if (btnPrompt) {
+                btnPrompt.addEventListener('click', function () {
+                    window.Swal.fire({
+                        title: 'Clone Report Template',
+                        text: 'Please enter a name for the duplicated report view:',
+                        input: 'text',
+                        inputPlaceholder: 'E.g. Profit & Loss Q2 - Operations',
+                        showCancelButton: true,
+                        confirmButtonText: 'Create Clone',
+                        cancelButtonText: 'Cancel',
+                        inputValidator: (value) => {
+                            if (!value || !value.trim()) {
+                                return 'Please provide a valid template name!';
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed && result.value) {
+                            window.Swal.fire({
+                                toast: true,
+                                position: currentDemoToastPosition,
+                                icon: 'success',
+                                title: `Created template "${result.value.trim()}"`,
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
+                        }
+                    });
+                });
+            }
+
+            const btnLoading = document.getElementById('btn-swal-loading');
+            if (btnLoading) {
+                btnLoading.addEventListener('click', function () {
+                    window.Swal.fire({
+                        title: 'Generating Excel Workbook...',
+                        text: 'Extracting 4,820 balance sheet line items. Please wait.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            window.Swal.showLoading();
+                        }
+                    });
+
+                    setTimeout(() => {
+                        window.Swal.fire({
+                            icon: 'success',
+                            title: 'Workbook Ready',
+                            text: 'TrialBalance_2026_Q1.xlsx has been compiled and is ready for download.',
+                            confirmButtonText: 'Download File'
+                        });
+                    }, 1800);
+                });
+            }
+
+            // Corner Toast Demos with Dynamic Position Option
+            let currentDemoToastPosition = localStorage.getItem('tc_toast_position') || 'top-end';
+            const demoToastBadge = document.getElementById('demoToastPosBadge');
+            const toastCodeExample = document.getElementById('toastCodeExample');
+            const demoPosButtons = document.querySelectorAll('[data-demo-toast-pos]');
+
+            const updateDemoToastPosition = (pos, triggerNotification = false) => {
+                currentDemoToastPosition = pos;
+                if (demoToastBadge) demoToastBadge.textContent = pos;
+                demoPosButtons.forEach(btn => {
+                    const isActive = btn.dataset.demoToastPos === pos;
+                    btn.classList.toggle('active', isActive);
+                    btn.classList.toggle('btn-primary', isActive);
+                    btn.classList.toggle('text-white', isActive);
+                    btn.classList.toggle('btn-outline-secondary', !isActive);
+                });
+                if (toastCodeExample) {
+                    toastCodeExample.textContent = `Swal.fire({
+  toast: true,
+  position: '${pos}',
+  icon: 'success',
+  title: 'Payment entry posted successfully.',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true
+});`;
+                }
+                if (triggerNotification) {
+                    window.Swal.fire({
+                        toast: true,
+                        position: pos,
+                        icon: 'info',
+                        title: `Toast position updated to: ${pos}`,
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                }
+            };
+
+            demoPosButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const pos = this.dataset.demoToastPos;
+                    localStorage.setItem('tc_toast_position', pos);
+                    if (typeof applyThemePreferences === 'function') applyThemePreferences();
+                    if (typeof syncThemeControls === 'function') syncThemeControls();
+                    updateDemoToastPosition(pos, false);
+                });
+            });
+
+            document.addEventListener('twa:toast-position-changed', function (e) {
+                if (e.detail && e.detail.position) {
+                    updateDemoToastPosition(e.detail.position, false);
+                }
+            });
+
+            updateDemoToastPosition(currentDemoToastPosition, false);
+
+            const btnToastSuccess = document.getElementById('btn-toast-success');
+            if (btnToastSuccess) {
+                btnToastSuccess.addEventListener('click', function () {
+                    window.Swal.fire({
+                        toast: true,
+                        position: currentDemoToastPosition,
+                        icon: 'success',
+                        title: 'Payment entry posted successfully.',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                });
+            }
+
+            const btnToastError = document.getElementById('btn-toast-error');
+            if (btnToastError) {
+                btnToastError.addEventListener('click', function () {
+                    window.Swal.fire({
+                        toast: true,
+                        position: currentDemoToastPosition,
+                        icon: 'error',
+                        title: 'Connection timeout to SAP gateway.',
+                        showConfirmButton: false,
+                        timer: 3500,
+                        timerProgressBar: true
+                    });
+                });
+            }
+
+            const btnToastWarning = document.getElementById('btn-toast-warning');
+            if (btnToastWarning) {
+                btnToastWarning.addEventListener('click', function () {
+                    window.Swal.fire({
+                        toast: true,
+                        position: currentDemoToastPosition,
+                        icon: 'warning',
+                        title: 'Debit and credit balance mismatch ($42.50).',
+                        showConfirmButton: false,
+                        timer: 3500,
+                        timerProgressBar: true
+                    });
+                });
+            }
+
+            const btnToastInfo = document.getElementById('btn-toast-info');
+            if (btnToastInfo) {
+                btnToastInfo.addEventListener('click', function () {
+                    window.Swal.fire({
+                        toast: true,
+                        position: currentDemoToastPosition,
+                        icon: 'info',
+                        title: 'New tax tables imported for FY2026.',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                });
+            }
+
+            const btnToastBootstrap = document.getElementById('btn-toast-bootstrap');
+            if (btnToastBootstrap) {
+                btnToastBootstrap.addEventListener('click', function () {
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(`Bootstrap toast triggered at ${currentDemoToastPosition}`, 'primary');
+                    }
+                });
+            }
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>

@@ -198,8 +198,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-end gap-2">
-                <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+            <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-2 shadow-sm">
                     <i data-lucide="check" style="width: 18px; height: 18px;"></i>
                     <span>Create Role</span>

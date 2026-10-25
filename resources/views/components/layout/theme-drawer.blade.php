@@ -56,6 +56,56 @@
         <section class="theme-setting"><label class="theme-field-label" for="themeFont">Typography</label><select id="themeFont" class="form-select js-select2" data-theme-font><option value="Inter" data-icon="type">Inter</option><option value="Roboto" data-icon="case-sensitive">Roboto</option><option value="Poppins" data-icon="heading">Poppins</option><option value="Public Sans" data-icon="baseline">Public Sans</option></select><small class="theme-help">Khmer content uses Nokora, Google Sans, Noto Sans, sans-serif.</small></section>
         <section class="theme-setting"><p>Font size & table density</p><div class="theme-choice-grid" style="grid-template-columns: repeat(3, 1fr);"><button type="button" data-font-size="small" aria-pressed="false"><i data-lucide="minimize-2"></i>Small</button><button type="button" data-font-size="normal" aria-pressed="false"><i data-lucide="type"></i>Normal</button><button type="button" data-font-size="large" aria-pressed="false"><i data-lucide="maximize-2"></i>Large</button></div></section>
         <section class="theme-setting">
+            <p>DataTable & table style</p>
+
+            <label class="theme-field-label mt-1 mb-2" style="font-size: 11px;">Row pattern</label>
+            <div class="theme-choice-grid mb-3" style="grid-template-columns: repeat(2, 1fr);">
+                <button type="button" data-table-striped="striped" aria-pressed="false" title="Alternating zebra striped rows">
+                    <i data-lucide="rows-3"></i>Striped
+                </button>
+                <button type="button" data-table-striped="plain" aria-pressed="false" title="Uniform plain rows">
+                    <i data-lucide="square"></i>Plain
+                </button>
+            </div>
+
+            <label class="theme-field-label mb-2" style="font-size: 11px;">Table borders</label>
+            <div class="theme-choice-grid mb-3" style="grid-template-columns: repeat(3, 1fr);">
+                <button type="button" data-table-border="horizontal" aria-pressed="false" title="Horizontal row divider borders only">
+                    <i data-lucide="minus"></i>Divided
+                </button>
+                <button type="button" data-table-border="bordered" aria-pressed="false" title="Full grid cell borders">
+                    <i data-lucide="grid"></i>Bordered
+                </button>
+                <button type="button" data-table-border="borderless" aria-pressed="false" title="Borderless minimalist table">
+                    <i data-lucide="align-justify"></i>Borderless
+                </button>
+            </div>
+
+            <label class="theme-field-label mb-2" style="font-size: 11px;">Row hover effect</label>
+            <div class="theme-choice-grid mb-3" style="grid-template-columns: repeat(2, 1fr);">
+                <button type="button" data-table-hover="hover" aria-pressed="false" title="Highlight rows on mouse hover">
+                    <i data-lucide="mouse-pointer"></i>Hover On
+                </button>
+                <button type="button" data-table-hover="none" aria-pressed="false" title="Static rows without hover highlight">
+                    <i data-lucide="ban"></i>Hover Off
+                </button>
+            </div>
+
+            <label class="theme-field-label mb-2" style="font-size: 11px;">Header style</label>
+            <div class="theme-choice-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <button type="button" data-table-head="subtle" aria-pressed="false" title="Soft neutral header background">
+                    <i data-lucide="panel-top"></i>Subtle
+                </button>
+                <button type="button" data-table-head="primary" aria-pressed="false" title="Theme primary color tinted header">
+                    <i data-lucide="sparkles"></i>Primary
+                </button>
+                <button type="button" data-table-head="clean" aria-pressed="false" title="Clean background matching card surface">
+                    <i data-lucide="table"></i>Clean
+                </button>
+            </div>
+            <small class="theme-help">Customizes table rows, borders, hover, and header appearance across all modules.</small>
+        </section>
+        <section class="theme-setting">
             <p>Corner rounding</p>
             <div class="theme-choice-grid mb-2" style="grid-template-columns: repeat(4, 1fr);">
                 <button type="button" data-theme-radius="0px" aria-pressed="false">
@@ -79,6 +129,30 @@
                 <input type="range" class="form-range flex-grow-1" min="0" max="20" step="2" id="themeRadiusRange" data-theme-radius-range value="8" aria-label="Corner rounding in pixels">
                 <span class="badge bg-light text-secondary border px-2 py-1 font-monospace" id="themeRadiusBadge" style="min-width: 42px;">8px</span>
             </div>
+        </section>
+        <section class="theme-setting">
+            <p>Toast position</p>
+            <div class="theme-choice-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <button type="button" data-toast-position="top-start" aria-pressed="false" title="Top Left">
+                    <i data-lucide="arrow-up-left"></i>Top Left
+                </button>
+                <button type="button" data-toast-position="top" aria-pressed="false" title="Top Center">
+                    <i data-lucide="arrow-up"></i>Top Center
+                </button>
+                <button type="button" data-toast-position="top-end" aria-pressed="false" title="Top Right">
+                    <i data-lucide="arrow-up-right"></i>Top Right
+                </button>
+                <button type="button" data-toast-position="bottom-start" aria-pressed="false" title="Bottom Left">
+                    <i data-lucide="arrow-down-left"></i>Bottom Left
+                </button>
+                <button type="button" data-toast-position="bottom" aria-pressed="false" title="Bottom Center">
+                    <i data-lucide="arrow-down"></i>Bottom Center
+                </button>
+                <button type="button" data-toast-position="bottom-end" aria-pressed="false" title="Bottom Right">
+                    <i data-lucide="arrow-down-right"></i>Bottom Right
+                </button>
+            </div>
+            <small class="theme-help">Alert notifications and toasts will appear at this screen location.</small>
         </section>
         <button class="btn btn-outline-secondary w-100 mt-3 mb-2" type="button" data-theme-reset><i data-lucide="rotate-ccw"></i>Restore default settings</button>
     </div>

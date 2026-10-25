@@ -286,6 +286,7 @@ kbd,
 .app-sidebar {
     background: var(--bg-side);
     border-right: 1px solid var(--bdr);
+    box-shadow: var(--sh-sidebar, 4px 0 20px -1px rgba(17, 24, 39, 0.1), 2px 0 6px -1px rgba(17, 24, 39, 0.05));
     bottom: 0;
     overflow-y: auto;
     padding: 15px 10px;
@@ -293,7 +294,8 @@ kbd,
     top: var(--th);
     transition:
         width var(--tr),
-        transform var(--tr);
+        transform var(--tr),
+        box-shadow var(--tr);
     width: var(--sw);
     z-index: 1025;
 }

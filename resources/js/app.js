@@ -199,6 +199,39 @@ window.lucide = {
     icons,
 };
 window.Swal = Swal;
+window.SwalToast = (title, icon = 'success', options = {}) => {
+    const currentPosition = localStorage.getItem('tc_toast_position') || 'top-end';
+    return Swal.fire({
+        toast: true,
+        position: options.position || currentPosition,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        icon,
+        title,
+        ...options,
+    });
+};
+window.SwalConfirm = async ({
+    title = 'Are you sure?',
+    text = 'This action cannot be undone.',
+    icon = 'warning',
+    confirmButtonText = 'Confirm',
+    cancelButtonText = 'Cancel',
+    isDanger = false,
+    ...rest
+} = {}) => {
+    return Swal.fire({
+        title,
+        text,
+        icon,
+        showCancelButton: true,
+        confirmButtonText,
+        cancelButtonText,
+        confirmButtonColor: isDanger ? 'var(--red)' : 'var(--pri)',
+        ...rest,
+    });
+};
 window.DataTable = DataTable;
 DataTable.use(jQuery);
 DataTable.use(bootstrap);
@@ -554,6 +587,18 @@ function setupDataTableExtensions(tableNode, customApi) {
     const tableId = settings.tableId || settings.sTableId || (settings.nTable ? settings.nTable.id : '') || (settings.table ? settings.table.id : '') || $table.attr('id') || 'table_' + Math.floor(Math.random() * 10000);
 
     applySavedColumnVisibility(tableNode, api);
+
+    const rootEl = document.documentElement;
+    const curTableStriped = rootEl.dataset.tableStriped || 'striped';
+    const curTableHover = rootEl.dataset.tableHover || 'hover';
+    const curTableBorder = rootEl.dataset.tableBorder || 'horizontal';
+    if (curTableStriped === 'plain') $table.removeClass('table-striped');
+    else $table.addClass('table-striped');
+    if (curTableHover === 'none') $table.removeClass('table-hover');
+    else $table.addClass('table-hover');
+    $table.removeClass('table-bordered table-borderless');
+    if (curTableBorder === 'bordered') $table.addClass('table-bordered');
+    else if (curTableBorder === 'borderless') $table.addClass('table-borderless');
 
     const $container = $table.closest('.dt-container, .dataTables_wrapper');
     if ($container.find(`.dt-action-buttons[data-dt-actions-for="${tableId}"]`).length) {
@@ -990,7 +1035,15 @@ jQuery(function () {
 
 const palettes = { blue: '#2563EB', sky: '#0EA5E9', purple: '#7C3AED', emerald: '#059669', royal: '#1D4ED8', orange: '#EA580C', cyan: '#06B6D4', mint: '#10B981', coral: '#F43F5E' };
 const fontSizes = { small: '12px', normal: '14px', large: '16px' };
-const themeDefaults = { mode: 'light', layout: 'vertical', container: 'fluid', sidebar: '0', primary: '#1b4fe0', bgPage: '#eeefff', font: 'Inter', radius: '8px', fontSize: 'normal' };
+const toastPositions = {
+    'top-end': { label: 'Top Right', bsClasses: ['top-0', 'end-0'] },
+    'top-start': { label: 'Top Left', bsClasses: ['top-0', 'start-0'] },
+    'top': { label: 'Top Center', bsClasses: ['top-0', 'start-50', 'translate-middle-x'] },
+    'bottom-end': { label: 'Bottom Right', bsClasses: ['bottom-0', 'end-0'] },
+    'bottom-start': { label: 'Bottom Left', bsClasses: ['bottom-0', 'start-0'] },
+    'bottom': { label: 'Bottom Center', bsClasses: ['bottom-0', 'start-50', 'translate-middle-x'] },
+};
+const themeDefaults = { mode: 'light', layout: 'vertical', container: 'fluid', sidebar: '0', primary: '#1b4fe0', bgPage: '#eeefff', font: 'Inter', radius: '8px', fontSize: 'normal', toastPosition: 'top-end', tableStriped: 'striped', tableBorder: 'horizontal', tableHover: 'hover', tableHead: 'subtle' };
 const availableFonts = ['Inter', 'Roboto', 'Poppins', 'Public Sans'];
 const khmerFont = "'Nokora', 'Noto Sans Khmer', 'Noto Sans', sans-serif";
 const isColor = (value) => /^#[0-9a-f]{6}$/i.test(value || '');
@@ -1072,6 +1125,53 @@ const applyThemePreferences = () => {
         root.style.setProperty('--bs-border-radius-lg', radNum === 0 ? '0px' : radLg);
         root.style.setProperty('--bs-border-radius-xl', radNum === 0 ? '0px' : radXl);
     }
+    const savedToastPos = localStorage.getItem('tc_toast_position');
+    const toastPos = toastPositions[savedToastPos] ? savedToastPos : themeDefaults.toastPosition;
+    root.dataset.toastPosition = toastPos;
+    root.setAttribute('data-toast-position', toastPos);
+
+    const toastStack = document.getElementById('ksToastStack');
+    if (toastStack) {
+        toastStack.classList.remove(
+            'top-0', 'bottom-0', 'start-0', 'end-0', 'start-50', 'translate-middle-x'
+        );
+        const bsClasses = toastPositions[toastPos]?.bsClasses || ['top-0', 'end-0'];
+        toastStack.classList.add(...bsClasses);
+    }
+
+    // DataTable & Table Style preferences
+    const tableStriped = localStorage.getItem('tc_table_striped') || themeDefaults.tableStriped;
+    const tableHover = localStorage.getItem('tc_table_hover') || themeDefaults.tableHover;
+    const tableBorder = localStorage.getItem('tc_table_border') || themeDefaults.tableBorder;
+    const tableHead = localStorage.getItem('tc_table_head') || themeDefaults.tableHead;
+
+    root.dataset.tableStriped = tableStriped;
+    root.setAttribute('data-table-striped', tableStriped);
+    root.dataset.tableHover = tableHover;
+    root.setAttribute('data-table-hover', tableHover);
+    root.dataset.tableBorder = tableBorder;
+    root.setAttribute('data-table-border', tableBorder);
+    root.dataset.tableHead = tableHead;
+    root.setAttribute('data-table-head', tableHead);
+
+    document.querySelectorAll('table.table').forEach((table) => {
+        if (tableStriped === 'plain') {
+            table.classList.remove('table-striped');
+        } else {
+            table.classList.add('table-striped');
+        }
+        if (tableHover === 'none') {
+            table.classList.remove('table-hover');
+        } else {
+            table.classList.add('table-hover');
+        }
+        table.classList.remove('table-bordered', 'table-borderless');
+        if (tableBorder === 'bordered') {
+            table.classList.add('table-bordered');
+        } else if (tableBorder === 'borderless') {
+            table.classList.add('table-borderless');
+        }
+    });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1127,14 +1227,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const font = localStorage.getItem('tc_font') || themeDefaults.font;
         const radius = localStorage.getItem('tc_rounding') || themeDefaults.radius;
         const fontSize = document.documentElement.dataset.fontSize || localStorage.getItem('tc_font_size') || themeDefaults.fontSize;
-        document.querySelectorAll('[data-theme-mode]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.themeMode === mode)));
-        document.querySelectorAll('[data-layout]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.layout === layout)));
-        document.querySelectorAll('[data-font-size]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.fontSize === fontSize)));
-        document.querySelectorAll('[data-primary-color]').forEach((button) => button.setAttribute('aria-pressed', String(palettes[button.dataset.primaryColor] === primary.toUpperCase())));
+        document.querySelectorAll('button[data-theme-mode]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.themeMode === mode)));
+        document.querySelectorAll('button[data-layout]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.layout === layout)));
+        document.querySelectorAll('button[data-font-size]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.fontSize === fontSize)));
+        document.querySelectorAll('button[data-primary-color]').forEach((button) => button.setAttribute('aria-pressed', String(palettes[button.dataset.primaryColor] === primary.toUpperCase())));
         const colorInput = document.querySelector('[data-primary-color-input]'); if (colorInput) colorInput.value = primary;
         const storedBg = localStorage.getItem('tc_bg_page') || themeDefaults.bgPage;
         const currentBg = (isColor(storedBg) ? storedBg : themeDefaults.bgPage).toLowerCase();
-        document.querySelectorAll('[data-bg-preset]').forEach((button) => {
+        document.querySelectorAll('button[data-bg-preset]').forEach((button) => {
             button.setAttribute('aria-pressed', String((button.dataset.bgPreset || '').toLowerCase() === currentBg));
         });
         const bgInput = document.querySelector('[data-bg-color-input]');
@@ -1149,13 +1249,38 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         const container = document.documentElement.dataset.container || localStorage.getItem('tc_container') || themeDefaults.container;
-        document.querySelectorAll('[data-container]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.container === container)));
+        document.querySelectorAll('button[data-container]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.container === container)));
 
-        document.querySelectorAll('[data-theme-radius]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.themeRadius === radius)));
+        document.querySelectorAll('button[data-theme-radius]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.themeRadius === radius)));
         const radiusRange = document.querySelector('[data-theme-radius-range]');
         if (radiusRange) radiusRange.value = parseFloat(radius) || 0;
         const radiusBadge = document.querySelector('#themeRadiusBadge');
         if (radiusBadge) radiusBadge.textContent = radius;
+
+        const activeToastPos = document.documentElement.dataset.toastPosition || localStorage.getItem('tc_toast_position') || themeDefaults.toastPosition;
+        document.querySelectorAll('button[data-toast-position]').forEach((button) => {
+            button.setAttribute('aria-pressed', String(button.dataset.toastPosition === activeToastPos));
+        });
+
+        const activeTableStriped = document.documentElement.dataset.tableStriped || localStorage.getItem('tc_table_striped') || themeDefaults.tableStriped;
+        document.querySelectorAll('button[data-table-striped]').forEach((button) => {
+            button.setAttribute('aria-pressed', String(button.dataset.tableStriped === activeTableStriped));
+        });
+
+        const activeTableBorder = document.documentElement.dataset.tableBorder || localStorage.getItem('tc_table_border') || themeDefaults.tableBorder;
+        document.querySelectorAll('button[data-table-border]').forEach((button) => {
+            button.setAttribute('aria-pressed', String(button.dataset.tableBorder === activeTableBorder));
+        });
+
+        const activeTableHover = document.documentElement.dataset.tableHover || localStorage.getItem('tc_table_hover') || themeDefaults.tableHover;
+        document.querySelectorAll('button[data-table-hover]').forEach((button) => {
+            button.setAttribute('aria-pressed', String(button.dataset.tableHover === activeTableHover));
+        });
+
+        const activeTableHead = document.documentElement.dataset.tableHead || localStorage.getItem('tc_table_head') || themeDefaults.tableHead;
+        document.querySelectorAll('button[data-table-head]').forEach((button) => {
+            button.setAttribute('aria-pressed', String(button.dataset.tableHead === activeTableHead));
+        });
 
         if (window.lucide) {
             window.lucide.createIcons({ icons });
@@ -1377,13 +1502,13 @@ document.addEventListener('DOMContentLoaded', () => {
             submenu.addEventListener('mouseleave', leaveHandler);
         }
     });
-    document.querySelectorAll('[data-theme-mode]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_mode', control.dataset.themeMode); applyThemePreferences(); syncThemeControls(); closePanels(); }));
-    document.querySelectorAll('[data-layout]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_layout', control.dataset.layout); applyThemePreferences(); syncThemeControls(); closeSidebar(); }));
-    document.querySelectorAll('[data-container]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_container', control.dataset.container); applyThemePreferences(); syncThemeControls(); }));
-    document.querySelectorAll('[data-primary-color]').forEach((control) => control.addEventListener('click', () => { const color = palettes[control.dataset.primaryColor] || control.dataset.primaryColor; if (isColor(color)) { localStorage.setItem('tc_primary', color); applyThemePreferences(); syncThemeControls(); } }));
+    document.querySelectorAll('button[data-theme-mode]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_mode', control.dataset.themeMode); applyThemePreferences(); syncThemeControls(); closePanels(); }));
+    document.querySelectorAll('button[data-layout]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_layout', control.dataset.layout); applyThemePreferences(); syncThemeControls(); closeSidebar(); }));
+    document.querySelectorAll('button[data-container]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_container', control.dataset.container); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-primary-color]').forEach((control) => control.addEventListener('click', () => { const color = palettes[control.dataset.primaryColor] || control.dataset.primaryColor; if (isColor(color)) { localStorage.setItem('tc_primary', color); applyThemePreferences(); syncThemeControls(); } }));
     document.querySelector('[data-primary-color-input]')?.addEventListener('input', (event) => { localStorage.setItem('tc_primary', event.target.value); applyThemePreferences(); syncThemeControls(); });
     document.querySelector('[data-primary-color-hex]')?.addEventListener('change', (event) => { const color = event.target.value.trim(); if (isColor(color)) { localStorage.setItem('tc_primary', color); applyThemePreferences(); syncThemeControls(); } else syncThemeControls(); });
-    document.querySelectorAll('[data-bg-preset]').forEach((control) => control.addEventListener('click', () => {
+    document.querySelectorAll('button[data-bg-preset]').forEach((control) => control.addEventListener('click', () => {
         const color = control.dataset.bgPreset;
         if (isColor(color)) {
             localStorage.setItem('tc_bg_page', color);
@@ -1415,13 +1540,34 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('tc_font');
         localStorage.removeItem('tc_rounding');
         localStorage.removeItem('tc_font_size');
+        localStorage.removeItem('tc_toast_position');
+        localStorage.removeItem('tc_table_striped');
+        localStorage.removeItem('tc_table_border');
+        localStorage.removeItem('tc_table_hover');
+        localStorage.removeItem('tc_table_head');
         localStorage.removeItem('ks_col');
         applyThemePreferences();
         syncThemeControls();
     });
+    document.querySelectorAll('button[data-table-striped]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_striped', control.dataset.tableStriped); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-table-border]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_border', control.dataset.tableBorder); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-table-hover]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_hover', control.dataset.tableHover); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-table-head]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_head', control.dataset.tableHead); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-toast-position]').forEach((control) => {
+        control.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const pos = control.dataset.toastPosition;
+            if (toastPositions[pos]) {
+                localStorage.setItem('tc_toast_position', pos);
+                applyThemePreferences();
+                syncThemeControls();
+                document.dispatchEvent(new CustomEvent('twa:toast-position-changed', { detail: { position: pos } }));
+            }
+        });
+    });
     document.querySelector('[data-theme-font]')?.addEventListener('change', (event) => { localStorage.setItem('tc_font', event.target.value); applyThemePreferences(); syncThemeControls(); });
-    document.querySelectorAll('[data-font-size]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_font_size', control.dataset.fontSize); applyThemePreferences(); syncThemeControls(); }));
-    document.querySelectorAll('[data-theme-radius]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_rounding', control.dataset.themeRadius); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-font-size]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_font_size', control.dataset.fontSize); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-theme-radius]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_rounding', control.dataset.themeRadius); applyThemePreferences(); syncThemeControls(); }));
     document.querySelector('[data-theme-radius-range]')?.addEventListener('input', (event) => { localStorage.setItem('tc_rounding', `${event.target.value}px`); applyThemePreferences(); syncThemeControls(); });
     document.querySelectorAll('[data-theme-drawer-toggle]').forEach((trigger) => {
         trigger.addEventListener('click', (event) => {

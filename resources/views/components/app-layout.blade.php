@@ -56,6 +56,19 @@
                 root.style.setProperty('--pri-soft', `${primary}1a`);
                 root.style.setProperty('--bs-primary-rgb', `${parseInt(primary.slice(1, 3), 16)}, ${parseInt(primary.slice(3, 5), 16)}, ${parseInt(primary.slice(5, 7), 16)}`);
             }
+            const tableStriped = localStorage.getItem('tc_table_striped') || 'striped';
+            const tableHover = localStorage.getItem('tc_table_hover') || 'hover';
+            const tableBorder = localStorage.getItem('tc_table_border') || 'horizontal';
+            const tableHead = localStorage.getItem('tc_table_head') || 'subtle';
+            root.dataset.tableStriped = tableStriped;
+            root.setAttribute('data-table-striped', tableStriped);
+            root.dataset.tableHover = tableHover;
+            root.setAttribute('data-table-hover', tableHover);
+            root.dataset.tableBorder = tableBorder;
+            root.setAttribute('data-table-border', tableBorder);
+            root.dataset.tableHead = tableHead;
+            root.setAttribute('data-table-head', tableHead);
+
             root.dataset.radius = radius;
             root.setAttribute('data-radius', radius);
             if (/^\d+(\.\d+)?px$/.test(radius)) {
