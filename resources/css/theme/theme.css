@@ -2341,7 +2341,7 @@ html[data-sidebar="collapsed"] .app-shell .sidebar-item.has-children > .sidebar-
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    padding: 15px 4px 10px 8px;
+    padding: 10px 0px 5px 0px;
     min-height: 0;
     scrollbar-width: thin;
     scrollbar-color: var(--bdr2, #cbd5e1) transparent;
