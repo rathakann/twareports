@@ -468,13 +468,18 @@ html[data-container="container"] .app-main {
         margin-left: calc(var(--sw-col) + max(0px, (100% - var(--sw-col) - var(--container-max-w, 1200px)) / 2));
         margin-right: auto;
     }
-    html[data-layout="horizontal"][data-container="container"] .app-main {
-        margin-inline: auto !important;
+    html[data-layout="horizontal"][data-container="container"] .app-main,
+    html[data-layout="horizontal"][data-container="container"] .app-shell .app-main {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: var(--container-max-w, 1200px) !important;
+        width: 100% !important;
     }
-    html[data-layout="horizontal"][data-container="container"] .horizontal-nav {
+    html[data-layout="horizontal"][data-container="container"] .horizontal-nav-container {
         max-width: var(--container-max-w, 1200px);
-        left: 50% !important;
-        transform: translateX(-50%);
+        margin-left: auto;
+        margin-right: auto;
+        padding-inline: 24px;
     }
 }
 .app-shell.is-sidebar-collapsed .app-sidebar {
@@ -626,11 +631,20 @@ html[data-container="container"] .app-main {
     display: none;
     height: var(--hh);
     left: 0;
-    padding-left: 20px;
+    padding: 0;
     position: fixed;
     right: 0;
     top: var(--th);
+    width: 100%;
     z-index: 1022;
+}
+.horizontal-nav-container {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    margin: 0 auto;
+    padding-inline: 24px;
+    width: 100%;
 }
 .horizontal-nav a,
 .horizontal-nav .horizontal-nav-link {
@@ -640,6 +654,7 @@ html[data-container="container"] .app-main {
     color: var(--tx2);
     cursor: pointer;
     display: flex;
+    flex-shrink: 0;
     font-size: var(--fs-base, 14px);
     font-weight: 500;
     gap: 7px;
@@ -648,6 +663,7 @@ html[data-container="container"] .app-main {
     text-decoration: none;
     transition: background-color var(--tr), color var(--tr);
     user-select: none;
+    white-space: nowrap;
 }
 .horizontal-nav a.active,
 .horizontal-nav .horizontal-nav-link.active {
@@ -770,8 +786,18 @@ html[data-layout="horizontal"] .horizontal-nav {
     }
     html[data-layout="horizontal"] .app-main,
     html[data-layout="horizontal"] .app-shell .app-main {
-        margin-left: 0 !important;
         padding-top: calc(var(--th) + var(--hh) + 25px);
+    }
+    html[data-layout="horizontal"]:not([data-container="container"]) .app-main,
+    html[data-layout="horizontal"]:not([data-container="container"]) .app-shell .app-main {
+        margin-left: 0 !important;
+    }
+    html[data-layout="horizontal"][data-container="container"] .app-main,
+    html[data-layout="horizontal"][data-container="container"] .app-shell .app-main {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: var(--container-max-w, 1200px) !important;
+        width: 100% !important;
     }
     html[data-layout="horizontal"] [data-sidebar-toggle],
     html[data-layout="horizontal"] #btnHamburger {
@@ -2330,9 +2356,16 @@ html[data-sidebar="collapsed"] .app-shell .sidebar-item.has-children > .sidebar-
         display: none !important;
     }
 
-    html[data-layout="horizontal"] .app-main,
-    html[data-layout="horizontal"] .app-shell .app-main {
+    html[data-layout="horizontal"]:not([data-container="container"]) .app-main,
+    html[data-layout="horizontal"]:not([data-container="container"]) .app-shell .app-main {
         margin-left: 0 !important;
+    }
+    html[data-layout="horizontal"][data-container="container"] .app-main,
+    html[data-layout="horizontal"][data-container="container"] .app-shell .app-main {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-width: var(--container-max-w, 1200px) !important;
+        width: 100% !important;
     }
 }
 

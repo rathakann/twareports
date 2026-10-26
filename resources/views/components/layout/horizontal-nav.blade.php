@@ -1,4 +1,5 @@
 <nav class="horizontal-nav" aria-label="Primary navigation">
+    <div class="horizontal-nav-container">
     @foreach ($navigation as $group)
         @php
             $groupLabel = $group['label'] ?? '';
@@ -109,4 +110,5 @@
             @endforeach
         @endif
     @endforeach
+    </div>
 </nav>
