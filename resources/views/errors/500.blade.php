@@ -8,7 +8,7 @@
         (() => {
             const root = document.documentElement;
             const mode = localStorage.getItem('tc_mode') === 'dark' ? 'dark' : 'light';
-            const primary = localStorage.getItem('tc_primary') || '#1b4fe0';
+            const primary = localStorage.getItem('tc_primary') || '#1ea754';
             root.setAttribute('data-theme', mode);
             root.setAttribute('data-bs-theme', mode);
             root.style.colorScheme = mode;

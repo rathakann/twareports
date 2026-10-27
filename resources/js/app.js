@@ -389,7 +389,7 @@ const executeExport = (format, title, headers, rows) => {
         xml += '<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
         xml += `<x:Name>${safeTitle.slice(0, 31)}</x:Name>`;
         xml += '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->';
-        xml += '<style>th { background-color: #1b4fe0; color: #ffffff; font-weight: bold; border: 1px solid #cbd5e1; padding: 6px 10px; } td { border: 1px solid #e2e8f0; padding: 5px 8px; }</style>';
+        xml += '<style>th { background-color: #1ea754; color: #ffffff; font-weight: bold; border: 1px solid #cbd5e1; padding: 6px 10px; } td { border: 1px solid #e2e8f0; padding: 5px 8px; }</style>';
         xml += '</head><body><table border="1">';
         xml += '<thead><tr>';
         headers.forEach(h => { xml += `<th>${escapeHtml(h)}</th>`; });
@@ -427,7 +427,7 @@ const executeExport = (format, title, headers, rows) => {
             return;
         }
         const humanTitle = title.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        const printHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(humanTitle)} - Print View</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:24px;color:#1e293b}.hdr{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #1b4fe0;padding-bottom:8px;margin-bottom:16px}h1{margin:0;font-size:20px;font-weight:700}.meta{color:#64748b;font-size:12px;margin:0}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}th{background:#f8fafc;color:#475569;font-weight:700;text-transform:uppercase;font-size:11px;border:1px solid #cbd5e1;padding:8px 10px;text-align:left}td{border:1px solid #e2e8f0;padding:7px 10px;vertical-align:top}tr:nth-child(even) td{background:#f8fafc}@media print{body{padding:0}@page{margin:1.2cm}}</style></head><body><div class="hdr"><h1>${escapeHtml(humanTitle)}</h1><p class="meta">Exported on ${new Date().toLocaleString()} · <strong>${rows.length} records</strong></p></div><table><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`;
+        const printHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(humanTitle)} - Print View</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:24px;color:#1e293b}.hdr{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #1ea754;padding-bottom:8px;margin-bottom:16px}h1{margin:0;font-size:20px;font-weight:700}.meta{color:#64748b;font-size:12px;margin:0}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}th{background:#f8fafc;color:#475569;font-weight:700;text-transform:uppercase;font-size:11px;border:1px solid #cbd5e1;padding:8px 10px;text-align:left}td{border:1px solid #e2e8f0;padding:7px 10px;vertical-align:top}tr:nth-child(even) td{background:#f8fafc}@media print{body{padding:0}@page{margin:1.2cm}}</style></head><body><div class="hdr"><h1>${escapeHtml(humanTitle)}</h1><p class="meta">Exported on ${new Date().toLocaleString()} · <strong>${rows.length} records</strong></p></div><table><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`;
         printWindow.document.write(printHtml);
         printWindow.document.close();
         printWindow.focus();
@@ -1099,7 +1099,7 @@ const toastPositions = {
     'bottom-start': { label: 'Bottom Left', bsClasses: ['bottom-0', 'start-0'] },
     'bottom': { label: 'Bottom Center', bsClasses: ['bottom-0', 'start-50', 'translate-middle-x'] },
 };
-const themeDefaults = { mode: 'light', layout: 'vertical', container: 'fluid', sidebar: '0', primary: '#1b4fe0', bgPage: '#eeefff', font: 'Inter', radius: '8px', fontSize: 'normal', toastPosition: 'top-end', tableStriped: 'striped', tableBorder: 'horizontal', tableHover: 'hover', tableHead: 'subtle' };
+const themeDefaults = { mode: 'light', layout: 'vertical', container: 'fluid', sidebar: '0', primary: '#1ea754', bgPage: '#eeefff', font: 'Inter', radius: '8px', fontSize: 'normal', toastPosition: 'top-end', tableStriped: 'striped', tableBorder: 'horizontal', tableHover: 'hover', tableHead: 'subtle' };
 const availableFonts = ['Inter', 'Roboto', 'Poppins', 'Public Sans'];
 const khmerFont = "'Nokora', 'Noto Sans Khmer', 'Noto Sans', sans-serif";
 const isColor = (value) => /^#[0-9a-f]{6}$/i.test(value || '');

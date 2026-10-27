@@ -20,7 +20,7 @@
                 </button>
             </div>
         </section>
-        <section class="theme-setting"><p>Primary color</p><div class="theme-colors">@foreach (['blue', 'sky', 'purple', 'emerald', 'royal', 'orange', 'cyan', 'mint', 'coral'] as $color)<button type="button" class="theme-color theme-color-{{ $color }}" data-primary-color="{{ $color }}" aria-label="Use {{ $color }} primary color" aria-pressed="false"></button>@endforeach</div><label class="theme-field-label mt-3" for="themePrimary">Custom hexadecimal color</label><div class="d-flex gap-2"><input id="themePrimary" class="form-control form-control-color" type="color" value="#1b4fe0" data-primary-color-input><input class="form-control" type="text" value="#1b4fe0" maxlength="7" pattern="#[0-9A-Fa-f]{6}" data-primary-color-hex aria-label="Custom hexadecimal color"></div></section>
+        <section class="theme-setting"><p>Primary color</p><div class="theme-colors">@foreach (['blue', 'sky', 'purple', 'emerald', 'royal', 'orange', 'cyan', 'mint', 'coral'] as $color)<button type="button" class="theme-color theme-color-{{ $color }}" data-primary-color="{{ $color }}" aria-label="Use {{ $color }} primary color" aria-pressed="false"></button>@endforeach</div><label class="theme-field-label mt-3" for="themePrimary">Custom hexadecimal color</label><div class="d-flex gap-2"><input id="themePrimary" class="form-control form-control-color" type="color" value="#1ea754" data-primary-color-input><input class="form-control" type="text" value="#1ea754" maxlength="7" pattern="#[0-9A-Fa-f]{6}" data-primary-color-hex aria-label="Custom hexadecimal color"></div></section>
         <section class="theme-setting">
             <p>Page background</p>
             <div class="theme-bg-presets">

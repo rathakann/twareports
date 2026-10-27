@@ -8,7 +8,7 @@
         (() => {
             const root = document.documentElement;
             const mode = localStorage.getItem('tc_mode') === 'dark' ? 'dark' : 'light';
-            const primary = localStorage.getItem('tc_primary') || '#1b4fe0';
+            const primary = localStorage.getItem('tc_primary') || '#1ea754';
             root.setAttribute('data-theme', mode);
             root.setAttribute('data-bs-theme', mode);
             root.style.colorScheme = mode;
@@ -19,7 +19,7 @@
 </head>
 <body class="d-flex align-items-center justify-content-center min-vh-100 p-3" style="background-color: var(--bg-page, #f4f6fb);">
     <div class="card border-0 shadow-sm rounded-4 text-center p-4 p-md-5" style="max-width: 520px; width: 100%; background-color: var(--bg-card, #ffffff);">
-        <div class="mb-4 d-inline-flex align-items-center justify-content-center rounded-circle mx-auto" style="width: 88px; height: 88px; background-color: var(--pri-soft, #eef2ff); color: var(--pri, #1b4fe0);">
+        <div class="mb-4 d-inline-flex align-items-center justify-content-center rounded-circle mx-auto" style="width: 88px; height: 88px; background-color: var(--pri-soft, #e8f7ee); color: var(--pri, #1ea754);">
             <i data-lucide="file-question" style="width: 44px; height: 44px;"></i>
         </div>
         <h1 class="display-6 fw-bold mb-2 text-dark">404</h1>
