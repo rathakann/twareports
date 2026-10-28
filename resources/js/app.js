@@ -642,9 +642,10 @@ function setupDataTableExtensions(tableNode, customApi) {
     applySavedColumnVisibility(tableNode, api);
 
     const rootEl = document.documentElement;
-    const curTableStriped = rootEl.dataset.tableStriped || 'striped';
+    const curTableStriped = rootEl.dataset.tableStriped || 'plain';
     const curTableHover = rootEl.dataset.tableHover || 'hover';
-    const curTableBorder = rootEl.dataset.tableBorder || 'horizontal';
+    const curTableBorder = rootEl.dataset.tableBorder || 'bordered';
+    const curTableWrap = rootEl.dataset.tableWrap || 'nowrap';
     if (curTableStriped === 'plain') $table.removeClass('table-striped');
     else $table.addClass('table-striped');
     if (curTableHover === 'none') $table.removeClass('table-hover');
@@ -652,6 +653,8 @@ function setupDataTableExtensions(tableNode, customApi) {
     $table.removeClass('table-bordered table-borderless');
     if (curTableBorder === 'bordered') $table.addClass('table-bordered');
     else if (curTableBorder === 'borderless') $table.addClass('table-borderless');
+    if (curTableWrap === 'nowrap') $table.addClass('nowrap text-nowrap');
+    else $table.removeClass('nowrap text-nowrap');
 
     const $container = $table.closest('.dt-container, .dataTables_wrapper');
     if ($container.find(`.dt-action-buttons[data-dt-actions-for="${tableId}"]`).length) {
@@ -1099,7 +1102,7 @@ const toastPositions = {
     'bottom-start': { label: 'Bottom Left', bsClasses: ['bottom-0', 'start-0'] },
     'bottom': { label: 'Bottom Center', bsClasses: ['bottom-0', 'start-50', 'translate-middle-x'] },
 };
-const themeDefaults = { mode: 'light', layout: 'vertical', container: 'fluid', sidebar: '0', primary: '#1ea754', bgPage: '#eeefff', font: 'Inter', radius: '8px', fontSize: 'normal', toastPosition: 'top-end', tableStriped: 'striped', tableBorder: 'horizontal', tableHover: 'hover', tableHead: 'subtle' };
+const themeDefaults = { mode: 'light', layout: 'vertical', container: 'fluid', sidebar: '0', primary: '#1ea754', bgPage: '#f3f4f6', font: 'Inter', radius: '0px', fontSize: 'normal', toastPosition: 'top-end', tableStyle: 'nowrap-grid', tableStriped: 'plain', tableBorder: 'bordered', tableHover: 'hover', tableHead: 'subtle', tableWrap: 'nowrap' };
 const availableFonts = ['Inter', 'Roboto', 'Poppins', 'Public Sans'];
 const khmerFont = "'Nokora', 'Noto Sans Khmer', 'Noto Sans', sans-serif";
 const isColor = (value) => /^#[0-9a-f]{6}$/i.test(value || '');
@@ -1127,14 +1130,26 @@ const applyThemePreferences = () => {
     const activeFontSize = fontSizes[fontSize] || '14px';
     root.style.setProperty('--fs-base', activeFontSize);
 
-    const savedBg = localStorage.getItem('tc_bg_page');
+    let savedBg = localStorage.getItem('tc_bg_page');
+    if (savedBg && (savedBg.toLowerCase() === '#eeefff' || savedBg.toLowerCase() === '#f0f2f5')) {
+        savedBg = '#f3f4f6';
+        localStorage.setItem('tc_bg_page', '#f3f4f6');
+    }
     const bgPage = isColor(savedBg) ? savedBg : themeDefaults.bgPage;
     if (mode === 'light') {
         root.style.setProperty('--bg-page', bgPage);
         root.style.setProperty('--bs-body-bg', bgPage);
+        if (document.body) {
+            document.body.style.setProperty('--bg-page', bgPage);
+            document.body.style.backgroundColor = bgPage;
+        }
     } else {
-        root.style.removeProperty('--bg-page');
-        root.style.removeProperty('--bs-body-bg');
+        root.style.setProperty('--bg-page', '#0f1117');
+        root.style.setProperty('--bs-body-bg', '#0f1117');
+        if (document.body) {
+            document.body.style.setProperty('--bg-page', '#0f1117');
+            document.body.style.backgroundColor = '#0f1117';
+        }
     }
 
     root.style.colorScheme = mode;
@@ -1165,21 +1180,23 @@ const applyThemePreferences = () => {
         root.style.setProperty('--bs-body-font-family', khmerFont);
     } else if (availableFonts.includes(font)) {
         root.style.setProperty('--font', `'${font}', sans-serif`);
-        root.style.removeProperty('--bs-body-font-family');
+        root.style.setProperty('--bs-body-font-family', `'${font}', sans-serif`);
     }
     const radNum = parseFloat(radius) || 0;
     root.dataset.radius = radius;
     root.setAttribute('data-radius', radius);
     if (/^\d+(\.\d+)?px$/.test(radius || '')) {
-        const radSm = `${Math.round(radNum * 0.75)}px`;
-        const radLg = `${Math.max(radNum, Math.round(radNum * 1.5 + 2))}px`;
-        const radXl = `${Math.max(radNum, Math.round(radNum * 2 + 4))}px`;
-        root.style.setProperty('--rad-s', radNum === 0 ? '0px' : radSm);
-        root.style.setProperty('--rad', radNum === 0 ? '0px' : radLg);
+        const radSm = radNum === 0 ? '0px' : `${Math.max(2, Math.round(radNum * 0.6))}px`;
+        const radXl = radNum === 0 ? '0px' : `${Math.max(radNum, Math.round(radNum * 1.5))}px`;
+        root.style.setProperty('--rad-s', radSm);
+        root.style.setProperty('--rad', radius);
+        root.style.setProperty('--rad-xl', radXl);
         root.style.setProperty('--bs-border-radius', radius);
-        root.style.setProperty('--bs-border-radius-sm', radNum === 0 ? '0px' : radSm);
-        root.style.setProperty('--bs-border-radius-lg', radNum === 0 ? '0px' : radLg);
-        root.style.setProperty('--bs-border-radius-xl', radNum === 0 ? '0px' : radXl);
+        root.style.setProperty('--bs-border-radius-sm', radSm);
+        root.style.setProperty('--bs-border-radius-lg', radius);
+        root.style.setProperty('--bs-border-radius-xl', radXl);
+        root.style.setProperty('--bs-border-radius-xxl', radXl);
+        root.style.setProperty('--bs-border-radius-2xl', radXl);
     }
     const savedToastPos = localStorage.getItem('tc_toast_position');
     const toastPos = toastPositions[savedToastPos] ? savedToastPos : themeDefaults.toastPosition;
@@ -1196,10 +1213,40 @@ const applyThemePreferences = () => {
     }
 
     // DataTable & Table Style preferences
-    const tableStriped = localStorage.getItem('tc_table_striped') || themeDefaults.tableStriped;
-    const tableHover = localStorage.getItem('tc_table_hover') || themeDefaults.tableHover;
-    const tableBorder = localStorage.getItem('tc_table_border') || themeDefaults.tableBorder;
+    const tableStyle = localStorage.getItem('tc_table_style') || themeDefaults.tableStyle;
     const tableHead = localStorage.getItem('tc_table_head') || themeDefaults.tableHead;
+
+    root.dataset.tableStyle = tableStyle;
+    root.setAttribute('data-table-style', tableStyle);
+    root.dataset.tableHead = tableHead;
+    root.setAttribute('data-table-head', tableHead);
+
+    let tableWrap = 'nowrap';
+    let tableBorder = 'bordered';
+    let tableHover = 'hover';
+    let tableStriped = 'plain';
+
+    if (tableStyle === 'standard') {
+        tableWrap = 'wrap';
+        tableBorder = 'horizontal';
+        tableHover = 'hover';
+        tableStriped = 'plain';
+    } else if (tableStyle === 'striped') {
+        tableWrap = 'wrap';
+        tableBorder = 'horizontal';
+        tableHover = 'hover';
+        tableStriped = 'striped';
+    } else if (tableStyle === 'borderless') {
+        tableWrap = 'wrap';
+        tableBorder = 'borderless';
+        tableHover = 'hover';
+        tableStriped = 'plain';
+    } else {
+        tableWrap = 'nowrap';
+        tableBorder = 'bordered';
+        tableHover = 'hover';
+        tableStriped = 'plain';
+    }
 
     root.dataset.tableStriped = tableStriped;
     root.setAttribute('data-table-striped', tableStriped);
@@ -1207,14 +1254,14 @@ const applyThemePreferences = () => {
     root.setAttribute('data-table-hover', tableHover);
     root.dataset.tableBorder = tableBorder;
     root.setAttribute('data-table-border', tableBorder);
-    root.dataset.tableHead = tableHead;
-    root.setAttribute('data-table-head', tableHead);
+    root.dataset.tableWrap = tableWrap;
+    root.setAttribute('data-table-wrap', tableWrap);
 
     document.querySelectorAll('table.table').forEach((table) => {
-        if (tableStriped === 'plain') {
-            table.classList.remove('table-striped');
-        } else {
+        if (tableStriped === 'striped') {
             table.classList.add('table-striped');
+        } else {
+            table.classList.remove('table-striped');
         }
         if (tableHover === 'none') {
             table.classList.remove('table-hover');
@@ -1226,6 +1273,11 @@ const applyThemePreferences = () => {
             table.classList.add('table-bordered');
         } else if (tableBorder === 'borderless') {
             table.classList.add('table-borderless');
+        }
+        if (tableWrap === 'nowrap') {
+            table.classList.add('nowrap', 'text-nowrap');
+        } else {
+            table.classList.remove('nowrap', 'text-nowrap');
         }
     });
 };
@@ -1318,19 +1370,14 @@ document.addEventListener('DOMContentLoaded', () => {
             button.setAttribute('aria-pressed', String(button.dataset.toastPosition === activeToastPos));
         });
 
-        const activeTableStriped = document.documentElement.dataset.tableStriped || localStorage.getItem('tc_table_striped') || themeDefaults.tableStriped;
-        document.querySelectorAll('button[data-table-striped]').forEach((button) => {
-            button.setAttribute('aria-pressed', String(button.dataset.tableStriped === activeTableStriped));
+        const currentTableStyle = document.documentElement.dataset.tableStyle || localStorage.getItem('tc_table_style') || themeDefaults.tableStyle;
+        document.querySelectorAll('button[data-table-style]').forEach((button) => {
+            button.setAttribute('aria-pressed', String(button.dataset.tableStyle === currentTableStyle));
         });
-
-        const activeTableBorder = document.documentElement.dataset.tableBorder || localStorage.getItem('tc_table_border') || themeDefaults.tableBorder;
-        document.querySelectorAll('button[data-table-border]').forEach((button) => {
-            button.setAttribute('aria-pressed', String(button.dataset.tableBorder === activeTableBorder));
-        });
-
-        const activeTableHover = document.documentElement.dataset.tableHover || localStorage.getItem('tc_table_hover') || themeDefaults.tableHover;
-        document.querySelectorAll('button[data-table-hover]').forEach((button) => {
-            button.setAttribute('aria-pressed', String(button.dataset.tableHover === activeTableHover));
+        document.querySelectorAll('button[data-table-preset]').forEach((button) => {
+            const p = button.dataset.tablePreset;
+            const matches = (p === 'nowrap-bordered-hover' && currentTableStyle === 'nowrap-grid') || (p === 'standard' && currentTableStyle === 'standard');
+            button.setAttribute('aria-pressed', String(matches));
         });
 
         const activeTableHead = document.documentElement.dataset.tableHead || localStorage.getItem('tc_table_head') || themeDefaults.tableHead;
@@ -1568,12 +1615,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const color = control.dataset.bgPreset;
         if (isColor(color)) {
             localStorage.setItem('tc_bg_page', color);
+            if (localStorage.getItem('tc_mode') === 'dark') {
+                localStorage.setItem('tc_mode', 'light');
+            }
             applyThemePreferences();
             syncThemeControls();
         }
     }));
     document.querySelector('[data-bg-color-input]')?.addEventListener('input', (event) => {
         localStorage.setItem('tc_bg_page', event.target.value);
+        if (localStorage.getItem('tc_mode') === 'dark') {
+            localStorage.setItem('tc_mode', 'light');
+        }
         applyThemePreferences();
         syncThemeControls();
     });
@@ -1581,6 +1634,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const color = event.target.value.trim();
         if (isColor(color)) {
             localStorage.setItem('tc_bg_page', color);
+            if (localStorage.getItem('tc_mode') === 'dark') {
+                localStorage.setItem('tc_mode', 'light');
+            }
             applyThemePreferences();
             syncThemeControls();
         } else {
@@ -1598,16 +1654,29 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('tc_font_size');
         localStorage.removeItem('tc_toast_position');
         localStorage.removeItem('tc_table_striped');
+        localStorage.removeItem('tc_table_style');
+        localStorage.removeItem('tc_table_striped');
         localStorage.removeItem('tc_table_border');
         localStorage.removeItem('tc_table_hover');
         localStorage.removeItem('tc_table_head');
+        localStorage.removeItem('tc_table_wrap');
         localStorage.removeItem('ks_col');
+        localStorage.setItem('tc_rounding_v2', 'true');
         applyThemePreferences();
         syncThemeControls();
     });
-    document.querySelectorAll('button[data-table-striped]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_striped', control.dataset.tableStriped); applyThemePreferences(); syncThemeControls(); }));
-    document.querySelectorAll('button[data-table-border]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_border', control.dataset.tableBorder); applyThemePreferences(); syncThemeControls(); }));
-    document.querySelectorAll('button[data-table-hover]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_hover', control.dataset.tableHover); applyThemePreferences(); syncThemeControls(); }));
+    document.querySelectorAll('button[data-table-style]').forEach((control) => control.addEventListener('click', () => {
+        localStorage.setItem('tc_table_style', control.dataset.tableStyle);
+        applyThemePreferences();
+        syncThemeControls();
+    }));
+    document.querySelectorAll('button[data-table-preset]').forEach((control) => control.addEventListener('click', () => {
+        const preset = control.dataset.tablePreset;
+        const style = preset === 'standard' ? 'standard' : 'nowrap-grid';
+        localStorage.setItem('tc_table_style', style);
+        applyThemePreferences();
+        syncThemeControls();
+    }));
     document.querySelectorAll('button[data-table-head]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_table_head', control.dataset.tableHead); applyThemePreferences(); syncThemeControls(); }));
     document.querySelectorAll('button[data-toast-position]').forEach((control) => {
         control.addEventListener('click', (event) => {
@@ -1621,10 +1690,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    document.querySelector('[data-theme-font]')?.addEventListener('change', (event) => { localStorage.setItem('tc_font', event.target.value); applyThemePreferences(); syncThemeControls(); });
+    const fontSelect = document.querySelector('[data-theme-font]');
+    const handleFontChange = (val) => {
+        if (availableFonts.includes(val) && localStorage.getItem('tc_font') !== val) {
+            localStorage.setItem('tc_font', val);
+            applyThemePreferences();
+            syncThemeControls();
+        }
+    };
+    fontSelect?.addEventListener('change', (event) => {
+        handleFontChange(event.target.value);
+    });
+    if (window.jQuery) {
+        jQuery(document).on('change select2:select', '[data-theme-font]', function () {
+            handleFontChange(this.value);
+        });
+    }
     document.querySelectorAll('button[data-font-size]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_font_size', control.dataset.fontSize); applyThemePreferences(); syncThemeControls(); }));
     document.querySelectorAll('button[data-theme-radius]').forEach((control) => control.addEventListener('click', () => { localStorage.setItem('tc_rounding', control.dataset.themeRadius); applyThemePreferences(); syncThemeControls(); }));
-    document.querySelector('[data-theme-radius-range]')?.addEventListener('input', (event) => { localStorage.setItem('tc_rounding', `${event.target.value}px`); applyThemePreferences(); syncThemeControls(); });
+    const handleRadiusChange = (event) => { localStorage.setItem('tc_rounding', `${event.target.value}px`); applyThemePreferences(); syncThemeControls(); };
+    const radiusRangeInput = document.querySelector('[data-theme-radius-range]');
+    radiusRangeInput?.addEventListener('input', handleRadiusChange);
+    radiusRangeInput?.addEventListener('change', handleRadiusChange);
     document.querySelectorAll('[data-theme-drawer-toggle]').forEach((trigger) => {
         trigger.addEventListener('click', (event) => {
             event.preventDefault();

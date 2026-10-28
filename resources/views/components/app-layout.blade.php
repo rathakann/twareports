@@ -1,6 +1,8 @@
 @props(['title' => null, 'navigation' => []])
 @php
-    $navigation = \App\Support\Navigation::filter(! empty($navigation) ? $navigation : config('navigation', []));
+    $useDynamic = empty($navigation) || $navigation === config('navigation');
+    $navSource = $useDynamic ? \App\Support\Navigation::getTree() : $navigation;
+    $navigation = \App\Support\Navigation::filter($navSource);
 @endphp
 
 <!doctype html>
@@ -19,8 +21,17 @@
             const fontSizes = { small: '12px', normal: '14px', large: '16px' };
             const mode = localStorage.getItem('tc_mode') === 'dark' ? 'dark' : 'light';
             const primary = localStorage.getItem('tc_primary');
-            const bgPage = localStorage.getItem('tc_bg_page') || '#eeefff';
-            const radius = localStorage.getItem('tc_rounding') || '8px';
+            let bgPage = localStorage.getItem('tc_bg_page');
+            if (!bgPage || bgPage.toLowerCase() === '#eeefff' || bgPage.toLowerCase() === '#f0f2f5') {
+                bgPage = '#f3f4f6';
+                localStorage.setItem('tc_bg_page', '#f3f4f6');
+            }
+            let radius = localStorage.getItem('tc_rounding');
+            if (!radius || !localStorage.getItem('tc_rounding_v2')) {
+                radius = '0px';
+                localStorage.setItem('tc_rounding', '0px');
+                localStorage.setItem('tc_rounding_v2', 'true');
+            }
             const fontSize = localStorage.getItem('tc_font_size') || 'normal';
             const layout = localStorage.getItem('tc_layout') === 'horizontal' ? 'horizontal' : 'vertical';
             const container = localStorage.getItem('tc_container') === 'container' ? 'container' : 'fluid';
@@ -48,6 +59,9 @@
             if (mode === 'light' && validColor.test(bgPage)) {
                 root.style.setProperty('--bg-page', bgPage);
                 root.style.setProperty('--bs-body-bg', bgPage);
+            } else if (mode === 'dark') {
+                root.style.setProperty('--bg-page', '#0f1117');
+                root.style.setProperty('--bs-body-bg', '#0f1117');
             }
 
             if (validColor.test(primary || '')) {
@@ -56,10 +70,37 @@
                 root.style.setProperty('--pri-soft', `${primary}1a`);
                 root.style.setProperty('--bs-primary-rgb', `${parseInt(primary.slice(1, 3), 16)}, ${parseInt(primary.slice(3, 5), 16)}, ${parseInt(primary.slice(5, 7), 16)}`);
             }
-            const tableStriped = localStorage.getItem('tc_table_striped') || 'striped';
-            const tableHover = localStorage.getItem('tc_table_hover') || 'hover';
-            const tableBorder = localStorage.getItem('tc_table_border') || 'horizontal';
+            const tableStyle = localStorage.getItem('tc_table_style') || 'nowrap-grid';
             const tableHead = localStorage.getItem('tc_table_head') || 'subtle';
+            let tableWrap = 'nowrap';
+            let tableBorder = 'bordered';
+            let tableHover = 'hover';
+            let tableStriped = 'plain';
+
+            if (tableStyle === 'standard') {
+                tableWrap = 'wrap';
+                tableBorder = 'horizontal';
+                tableHover = 'hover';
+                tableStriped = 'plain';
+            } else if (tableStyle === 'striped') {
+                tableWrap = 'wrap';
+                tableBorder = 'horizontal';
+                tableHover = 'hover';
+                tableStriped = 'striped';
+            } else if (tableStyle === 'borderless') {
+                tableWrap = 'wrap';
+                tableBorder = 'borderless';
+                tableHover = 'hover';
+                tableStriped = 'plain';
+            } else {
+                tableWrap = 'nowrap';
+                tableBorder = 'bordered';
+                tableHover = 'hover';
+                tableStriped = 'plain';
+            }
+
+            root.dataset.tableStyle = tableStyle;
+            root.setAttribute('data-table-style', tableStyle);
             root.dataset.tableStriped = tableStriped;
             root.setAttribute('data-table-striped', tableStriped);
             root.dataset.tableHover = tableHover;
@@ -68,20 +109,24 @@
             root.setAttribute('data-table-border', tableBorder);
             root.dataset.tableHead = tableHead;
             root.setAttribute('data-table-head', tableHead);
+            root.dataset.tableWrap = tableWrap;
+            root.setAttribute('data-table-wrap', tableWrap);
 
             root.dataset.radius = radius;
             root.setAttribute('data-radius', radius);
             if (/^\d+(\.\d+)?px$/.test(radius)) {
                 const radNum = parseFloat(radius) || 0;
-                const radSm = `${Math.round(radNum * 0.75)}px`;
-                const radLg = `${Math.max(radNum, Math.round(radNum * 1.5 + 2))}px`;
-                const radXl = `${Math.max(radNum, Math.round(radNum * 2 + 4))}px`;
-                root.style.setProperty('--rad-s', radNum === 0 ? '0px' : radSm);
-                root.style.setProperty('--rad', radNum === 0 ? '0px' : radLg);
+                const radSm = radNum === 0 ? '0px' : `${Math.max(2, Math.round(radNum * 0.6))}px`;
+                const radXl = radNum === 0 ? '0px' : `${Math.max(radNum, Math.round(radNum * 1.5))}px`;
+                root.style.setProperty('--rad-s', radSm);
+                root.style.setProperty('--rad', radius);
+                root.style.setProperty('--rad-xl', radXl);
                 root.style.setProperty('--bs-border-radius', radius);
-                root.style.setProperty('--bs-border-radius-sm', radNum === 0 ? '0px' : radSm);
-                root.style.setProperty('--bs-border-radius-lg', radNum === 0 ? '0px' : radLg);
-                root.style.setProperty('--bs-border-radius-xl', radNum === 0 ? '0px' : radXl);
+                root.style.setProperty('--bs-border-radius-sm', radSm);
+                root.style.setProperty('--bs-border-radius-lg', radius);
+                root.style.setProperty('--bs-border-radius-xl', radXl);
+                root.style.setProperty('--bs-border-radius-xxl', radXl);
+                root.style.setProperty('--bs-border-radius-2xl', radXl);
             }
             if (lang === 'km') {
                 root.style.setProperty('--font', "'Nokora', 'Noto Sans Khmer', sans-serif");
@@ -89,6 +134,7 @@
                 root.style.setProperty('--bs-body-font-family', "'Nokora', 'Noto Sans Khmer', sans-serif");
             } else if (fonts.includes(font)) {
                 root.style.setProperty('--font', `'${font}', sans-serif`);
+                root.style.setProperty('--bs-body-font-family', `'${font}', sans-serif`);
             }
         })();
     </script>

@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             ReportDummyDataSeeder::class,
             FinancialReportDataSeeder::class,
+            MasterDataSeeder::class,
+            ModuleSeeder::class,
         ]);
     }
 }

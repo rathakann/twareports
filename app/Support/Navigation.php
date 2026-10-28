@@ -2,8 +2,11 @@
 
 namespace App\Support;
 
+use App\Models\Module;
+use App\Models\NavigationGroup;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 
 class Navigation
 {
@@ -28,7 +31,148 @@ class Navigation
         'reports.financial.cash-flow.index' => 'reports.financial.cash-flow.view',
         'reports.financial.trial-balance.index' => 'reports.financial.trial-balance.view',
         'reports.financial.general-ledger.index' => 'reports.financial.general-ledger.view',
+        'master-data.branches.index' => 'master-data.branches.view',
+        'master-data.warehouses.index' => 'master-data.warehouses.view',
+        'master-data.bins.index' => 'master-data.bins.view',
+        'master-data.business-partners.index' => 'master-data.business-partners.view',
+        'master-data.items.index' => 'master-data.items.view',
+        'master-data.uoms.index' => 'master-data.uoms.view',
+        'master-data.uom-groups.index' => 'master-data.uom-groups.view',
+        'master-data.item-groups.index' => 'master-data.item-groups.view',
+        'master-data.item-classes.index' => 'master-data.item-classes.view',
+        'master-data.barcodes.index' => 'master-data.barcodes.view',
+        'master-data.boms.index' => 'master-data.boms.view',
+        'master-data.documents.index' => 'master-data.documents.view',
+        'master-data.document-series.index' => 'master-data.document-series.view',
+        'admin.modules.index' => 'admin.modules.view',
     ];
+
+    /**
+     * Get the navigation tree from the database modules, falling back to config('navigation').
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function getTree(): array
+    {
+        try {
+            if (Schema::hasTable('modules')) {
+                $hasSeededRoutes = Module::query()
+                    ->where('is_active', true)
+                    ->whereNotNull('route')
+                    ->exists();
+
+                if (! $hasSeededRoutes) {
+                    return config('navigation', []);
+                }
+            } else {
+                return config('navigation', []);
+            }
+
+            if (Schema::hasTable('navigation_groups')) {
+                $navGroups = NavigationGroup::query()
+                    ->where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->get();
+
+                if ($navGroups->isNotEmpty()) {
+                    $result = [];
+                    foreach ($navGroups as $group) {
+                        $items = Module::query()
+                            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order')])
+                            ->where(function ($q) use ($group): void {
+                                $q->where('navigation_group_id', $group->id)
+                                    ->orWhere(function ($sub) use ($group): void {
+                                        $sub->whereNull('navigation_group_id')
+                                            ->where('group_label', $group->label);
+                                    });
+                            })
+                            ->whereNull('parent_id')
+                            ->where('is_active', true)
+                            ->orderBy('sort_order')
+                            ->get()
+                            ->map(fn ($m) => $m->toMenuItem())
+                            ->values()
+                            ->all();
+
+                        if (! empty($items)) {
+                            $result[] = [
+                                'label' => $group->label,
+                                'icon' => $group->icon ?: 'folder',
+                                'sort_order' => $group->sort_order,
+                                'is_active' => (bool) $group->is_active,
+                                'items' => $items,
+                            ];
+                        }
+                    }
+
+                    // Also include any modules in custom groups that haven't been linked to navigation_groups
+                    $otherGroupLabels = Module::query()
+                        ->whereNull('parent_id')
+                        ->where('is_active', true)
+                        ->whereNotIn('group_label', $navGroups->pluck('label'))
+                        ->distinct()
+                        ->pluck('group_label');
+
+                    foreach ($otherGroupLabels as $otherLabel) {
+                        $items = Module::query()
+                            ->with('children')
+                            ->where('group_label', $otherLabel)
+                            ->whereNull('parent_id')
+                            ->where('is_active', true)
+                            ->orderBy('sort_order')
+                            ->get()
+                            ->map(fn ($m) => $m->toMenuItem())
+                            ->values()
+                            ->all();
+
+                        if (! empty($items)) {
+                            $result[] = [
+                                'label' => $otherLabel,
+                                'icon' => 'folder',
+                                'sort_order' => 99,
+                                'items' => $items,
+                            ];
+                        }
+                    }
+
+                    if (! empty($result)) {
+                        return $result;
+                    }
+                }
+            }
+
+            if (Schema::hasTable('modules')) {
+                $modules = Module::query()
+                    ->with('children')
+                    ->whereNull('parent_id')
+                    ->where('is_active', true)
+                    ->orderBy('group_order')
+                    ->orderBy('sort_order')
+                    ->get();
+
+                if ($modules->isNotEmpty()) {
+                    $grouped = [];
+                    foreach ($modules as $module) {
+                        $groupLabel = $module->group_label ?: 'General';
+                        if (! isset($grouped[$groupLabel])) {
+                            $grouped[$groupLabel] = [
+                                'label' => $groupLabel,
+                                'icon' => 'folder',
+                                'items' => [],
+                            ];
+                        }
+                        $grouped[$groupLabel]['items'][] = $module->toMenuItem();
+                    }
+
+                    return array_values($grouped);
+                }
+            }
+        } catch (\Throwable) {
+            // Database not ready or migration running
+        }
+
+        return config('navigation', []);
+    }
 
     /**
      * Filter navigation tree so that only items the given user has permission to see are returned.
@@ -37,13 +181,18 @@ class Navigation
      * @param  array<int, array<string, mixed>>  $navigation
      * @return array<int, array<string, mixed>>
      */
-    public static function filter(array $navigation, ?User $user = null): array
+    public static function filter(array $navigation = [], ?User $user = null): array
     {
+        $navigation = ! empty($navigation) ? $navigation : self::getTree();
         $user ??= auth()->user();
 
         $filtered = [];
 
         foreach ($navigation as $group) {
+            if (isset($group['is_active']) && ! $group['is_active']) {
+                continue;
+            }
+
             $items = $group['items'] ?? [];
             $visibleItems = self::filterItems($items, $user);
 
@@ -69,6 +218,10 @@ class Navigation
         $visible = [];
 
         foreach ($items as $item) {
+            if (isset($item['is_active']) && ! $item['is_active']) {
+                continue;
+            }
+
             if (! self::userCanAccess($item, $user)) {
                 continue;
             }

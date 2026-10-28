@@ -26,13 +26,13 @@
             <div class="theme-bg-presets">
                 @php
                     $bgPresets = [
-                        'indigo' => ['color' => '#eeefff', 'name' => 'Soft Indigo (Default)'],
-                        'slate' => ['color' => '#f4f6fb', 'name' => 'Cool Slate'],
+                        'gray' => ['color' => '#f3f4f6', 'name' => 'Gray 100 (Default)'],
                         'zinc' => ['color' => '#f8fafc', 'name' => 'Clean Zinc'],
-                        'pearl' => ['color' => '#fdfbf7', 'name' => 'Warm Pearl'],
+                        'slate' => ['color' => '#f4f6fb', 'name' => 'Cool Slate'],
                         'sky' => ['color' => '#f0f7ff', 'name' => 'Soft Sky'],
                         'mint' => ['color' => '#f0fdf4', 'name' => 'Soft Mint'],
-                        'violet' => ['color' => '#f5f3ff', 'name' => 'Soft Violet'],
+                        'pearl' => ['color' => '#fdfbf7', 'name' => 'Warm Pearl'],
+                        'indigo' => ['color' => '#eeefff', 'name' => 'Soft Indigo'],
                         'white' => ['color' => '#ffffff', 'name' => 'Pure White'],
                     ];
                 @endphp
@@ -49,8 +49,8 @@
             </div>
             <label class="theme-field-label mt-3" for="themeBgColor">Custom background color</label>
             <div class="d-flex gap-2">
-                <input id="themeBgColor" class="form-control form-control-color" type="color" value="#eeefff" data-bg-color-input aria-label="Color picker for custom background">
-                <input class="form-control" type="text" value="#eeefff" maxlength="7" pattern="#[0-9A-Fa-f]{6}" data-bg-color-hex aria-label="Custom background hexadecimal color">
+                <input id="themeBgColor" class="form-control form-control-color" type="color" value="#f3f4f6" data-bg-color-input aria-label="Color picker for custom background">
+                <input class="form-control" type="text" value="#f3f4f6" maxlength="7" pattern="#[0-9A-Fa-f]{6}" data-bg-color-hex aria-label="Custom background hexadecimal color">
             </div>
         </section>
         <section class="theme-setting"><label class="theme-field-label" for="themeFont">Typography</label><select id="themeFont" class="form-select js-select2" data-theme-font><option value="Inter" data-icon="type">Inter</option><option value="Roboto" data-icon="case-sensitive">Roboto</option><option value="Poppins" data-icon="heading">Poppins</option><option value="Public Sans" data-icon="baseline">Public Sans</option></select><small class="theme-help">Khmer content uses Nokora, Google Sans, Noto Sans, sans-serif.</small></section>
@@ -58,42 +58,29 @@
         <section class="theme-setting">
             <p>DataTable & table style</p>
 
-            <label class="theme-field-label mt-1 mb-2" style="font-size: 11px;">Row pattern</label>
+            <label class="theme-field-label mt-1 mb-2" style="font-size: 11px;">Table style</label>
             <div class="theme-choice-grid mb-3" style="grid-template-columns: repeat(2, 1fr);">
-                <button type="button" data-table-striped="striped" aria-pressed="false" title="Alternating zebra striped rows">
-                    <i data-lucide="rows-3"></i>Striped
+                <button type="button" data-table-style="nowrap-grid" data-table-preset="nowrap-bordered-hover" aria-pressed="true" title="nowrap table-bordered table table-hover">
+                    <i data-lucide="table-properties"></i>Nowrap Grid
+                    <small class="d-block text-muted" style="font-size: 9px; margin-top: 1px;">nowrap bordered hover</small>
                 </button>
-                <button type="button" data-table-striped="plain" aria-pressed="false" title="Uniform plain rows">
-                    <i data-lucide="square"></i>Plain
+                <button type="button" data-table-style="standard" data-table-preset="standard" aria-pressed="false" title="Standard divided rows with hover">
+                    <i data-lucide="minus"></i>Standard
+                    <small class="d-block text-muted" style="font-size: 9px; margin-top: 1px;">divided hover</small>
                 </button>
-            </div>
-
-            <label class="theme-field-label mb-2" style="font-size: 11px;">Table borders</label>
-            <div class="theme-choice-grid mb-3" style="grid-template-columns: repeat(3, 1fr);">
-                <button type="button" data-table-border="horizontal" aria-pressed="false" title="Horizontal row divider borders only">
-                    <i data-lucide="minus"></i>Divided
+                <button type="button" data-table-style="striped" aria-pressed="false" title="Alternating zebra striped rows">
+                    <i data-lucide="rows-3"></i>Zebra Striped
+                    <small class="d-block text-muted" style="font-size: 9px; margin-top: 1px;">striped hover</small>
                 </button>
-                <button type="button" data-table-border="bordered" aria-pressed="false" title="Full grid cell borders">
-                    <i data-lucide="grid"></i>Bordered
-                </button>
-                <button type="button" data-table-border="borderless" aria-pressed="false" title="Borderless minimalist table">
+                <button type="button" data-table-style="borderless" aria-pressed="false" title="Borderless minimalist table">
                     <i data-lucide="align-justify"></i>Borderless
-                </button>
-            </div>
-
-            <label class="theme-field-label mb-2" style="font-size: 11px;">Row hover effect</label>
-            <div class="theme-choice-grid mb-3" style="grid-template-columns: repeat(2, 1fr);">
-                <button type="button" data-table-hover="hover" aria-pressed="false" title="Highlight rows on mouse hover">
-                    <i data-lucide="mouse-pointer"></i>Hover On
-                </button>
-                <button type="button" data-table-hover="none" aria-pressed="false" title="Static rows without hover highlight">
-                    <i data-lucide="ban"></i>Hover Off
+                    <small class="d-block text-muted" style="font-size: 9px; margin-top: 1px;">clean minimal</small>
                 </button>
             </div>
 
             <label class="theme-field-label mb-2" style="font-size: 11px;">Header style</label>
             <div class="theme-choice-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <button type="button" data-table-head="subtle" aria-pressed="false" title="Soft neutral header background">
+                <button type="button" data-table-head="subtle" aria-pressed="true" title="Soft neutral header background">
                     <i data-lucide="panel-top"></i>Subtle
                 </button>
                 <button type="button" data-table-head="primary" aria-pressed="false" title="Theme primary color tinted header">
@@ -108,26 +95,26 @@
         <section class="theme-setting">
             <p>Corner rounding</p>
             <div class="theme-choice-grid mb-2" style="grid-template-columns: repeat(4, 1fr);">
-                <button type="button" data-theme-radius="0px" aria-pressed="false">
-                    <span class="d-block mx-auto mb-1 border border-2 rounded-0" style="width: 20px; height: 16px; border-color: currentColor;"></span>
+                <button type="button" data-theme-radius="0px" aria-pressed="true">
+                    <span class="d-block mx-auto mb-1 border border-2" style="width: 20px; height: 16px; border-color: currentColor; border-radius: 0px !important;"></span>
                     0px
                 </button>
                 <button type="button" data-theme-radius="4px" aria-pressed="false">
-                    <span class="d-block mx-auto mb-1 border border-2 rounded-1" style="width: 20px; height: 16px; border-color: currentColor;"></span>
+                    <span class="d-block mx-auto mb-1 border border-2" style="width: 20px; height: 16px; border-color: currentColor; border-radius: 4px !important;"></span>
                     4px
                 </button>
                 <button type="button" data-theme-radius="8px" aria-pressed="false">
-                    <span class="d-block mx-auto mb-1 border border-2 rounded-2" style="width: 20px; height: 16px; border-color: currentColor;"></span>
+                    <span class="d-block mx-auto mb-1 border border-2" style="width: 20px; height: 16px; border-color: currentColor; border-radius: 8px !important;"></span>
                     8px
                 </button>
                 <button type="button" data-theme-radius="12px" aria-pressed="false">
-                    <span class="d-block mx-auto mb-1 border border-2 rounded-3" style="width: 20px; height: 16px; border-color: currentColor;"></span>
+                    <span class="d-block mx-auto mb-1 border border-2" style="width: 20px; height: 16px; border-color: currentColor; border-radius: 12px !important;"></span>
                     12px
                 </button>
             </div>
             <div class="d-flex align-items-center gap-2 mt-2">
-                <input type="range" class="form-range flex-grow-1" min="0" max="20" step="2" id="themeRadiusRange" data-theme-radius-range value="8" aria-label="Corner rounding in pixels">
-                <span class="badge bg-light text-secondary border px-2 py-1 font-monospace" id="themeRadiusBadge" style="min-width: 42px;">8px</span>
+                <input type="range" class="form-range flex-grow-1" min="0" max="20" step="2" id="themeRadiusRange" data-theme-radius-range value="0" aria-label="Corner rounding in pixels">
+                <span class="badge bg-light text-secondary border px-2 py-1 font-monospace" id="themeRadiusBadge" style="min-width: 42px;">0px</span>
             </div>
         </section>
         <section class="theme-setting">
@@ -154,7 +141,7 @@
             </div>
             <small class="theme-help">Alert notifications and toasts will appear at this screen location.</small>
         </section>
-        <button class="btn btn-outline-secondary w-100 mt-3 mb-2" type="button" data-theme-reset><i data-lucide="rotate-ccw"></i>Restore default settings</button>
+        <button class="btn btn-outline-secondary w-100 mt-3 mb-3" type="button" data-theme-reset><i data-lucide="rotate-ccw"></i>Restore default settings</button>
     </div>
 </aside>
 <div class="theme-drawer-backdrop" data-theme-drawer-backdrop></div>

@@ -9,17 +9,18 @@
         <span class="fw-semibold text-dark" aria-current="page">AP Invoice</span>
     </x-slot:breadcrumb>
 
-    <x-management.page-header
-        title="AP Invoice Report"
-        section="Purchase Reports"
-        icon="receipt"
+    <x-management.page-header title="AP Invoice Report" section="Purchase Reports" icon="receipt"
         description="Monitor vendor accounts payable invoices, aging, settlement status, and balance liabilities.">
         <x-slot:actions>
-            <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 shadow-sm btn-filter-toggle" data-target="#inv-filter-card" title="Toggle Filters" aria-expanded="true">
+            <button type="button"
+                class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 shadow-sm btn-filter-toggle"
+                data-target="#inv-filter-card" title="Toggle Filters" aria-expanded="true">
                 <i data-lucide="filter" style="width: 16px; height: 16px;"></i>
                 <span>Filter</span>
             </button>
-            <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 shadow-sm btn-definition-toggle" data-target="#inv-definition-card" title="Toggle Report Definition" aria-expanded="false">
+            <button type="button"
+                class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 shadow-sm btn-definition-toggle"
+                data-target="#inv-definition-card" title="Toggle Report Definition" aria-expanded="false">
                 <i data-lucide="book-open" style="width: 16px; height: 16px;"></i>
                 <span>Definition</span>
             </button>
@@ -27,36 +28,35 @@
     </x-management.page-header>
 
     <!-- Report Definition & Accounting Purpose -->
-    <x-reports.report-purpose
-        card-id="inv-definition-card"
-        title="AP Invoices Report"
-        subtitle="Accounts Payable · Trade Liabilities & Settlement Monitoring"
-        icon="receipt"
+    <x-reports.report-purpose card-id="inv-definition-card" title="AP Invoices Report"
+        subtitle="Accounts Payable · Trade Liabilities & Settlement Monitoring" icon="receipt"
         standard="Accrual Accounting & Trade Liabilities Standard"
         definition="The Accounts Payable (AP) Invoices report compiles all formal vendor billing claims representing verified trade liabilities for received inventory and services."
         purpose="Manages cash outflow timing, tracks vendor payment credit terms (Net 30/60), prevents duplicate billing, and maintains strong supplier relationships."
         equation="Outstanding AP Balance = Total Invoiced - Disbursed Settlements - Withholding Tax"
-        :indicators="['Payable Aging', 'Overdue Invoices', 'Payment Terms Compliance', 'Vendor Balances']"
-    />
+        :indicators="['Payable Aging', 'Overdue Invoices', 'Payment Terms Compliance', 'Vendor Balances']" />
 
     <!-- Filters Section -->
-    <div id="inv-filter-card" class="card border-0 shadow-sm rounded-3 mb-4 filter-section">
+    <div id="inv-filter-card" class="page-card mb-4 filter-section">
         <div class="card-body p-3">
             <div class="row g-3 align-items-end">
                 <div class="col-md-3 col-sm-6">
-                    <label for="filter-vendor" class="form-label small fw-semibold text-secondary mb-1">Filter by Vendor</label>
+                    <label for="filter-vendor" class="form-label small fw-semibold text-secondary mb-1">Filter by
+                        Vendor</label>
                     <div class="input-icon-left">
                         <i class="input-icon-addon" data-lucide="building-2"></i>
                         <select id="filter-vendor" class="form-select js-select2">
                             <option value="all">All Vendors</option>
                             @foreach ($vendors as $vendor)
-                                <option value="{{ $vendor->vendor_code }}">{{ $vendor->vendor_name }} ({{ $vendor->vendor_code }})</option>
+                                <option value="{{ $vendor->vendor_code }}">{{ $vendor->vendor_name }}
+                                    ({{ $vendor->vendor_code }})</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
-                    <label for="filter-status" class="form-label small fw-semibold text-secondary mb-1">Filter by Status</label>
+                    <label for="filter-status" class="form-label small fw-semibold text-secondary mb-1">Filter by
+                        Status</label>
                     <div class="input-icon-left">
                         <i class="input-icon-addon" data-lucide="activity"></i>
                         <select id="filter-status" class="form-select js-select2">
@@ -68,10 +68,13 @@
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
-                    <x-reports.date-filter id="filter-created-date" label="Date Range" placeholder="YYYY-MM-DD to YYYY-MM-DD" />
+                    <x-reports.date-filter id="filter-created-date" label="Date Range"
+                        placeholder="YYYY-MM-DD to YYYY-MM-DD" />
                 </div>
                 <div class="col-md-3 col-12 d-flex align-items-end justify-content-md-end">
-                    <button type="button" id="btn-reset-filters" class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center gap-2 shadow-sm btn-reset-filters" title="Reset all filters">
+                    <button type="button" id="btn-reset-filters"
+                        class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center gap-2 shadow-sm btn-reset-filters"
+                        title="Reset all filters">
                         <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                         <span>Reset Filters</span>
                     </button>
@@ -81,10 +84,11 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="card border-0 shadow-sm rounded-3">
+    <div class="page-card">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table id="ap-invoices-table" data-export-module="reports.purchase.ap-invoices" class="table table-striped table-hover align-middle w-100 mb-0">
+                <table id="ap-invoices-table" data-export-module="reports.purchase.ap-invoices"
+                    class="table table-bordered table-hover nowrap text-nowrap align-middle w-100 mb-0">
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 50px;">#</th>
@@ -109,7 +113,8 @@
     </div>
 
     <!-- AP Invoice Details Modal -->
-    <div class="modal fade" id="modal-invoice-details" tabindex="-1" aria-labelledby="modal-invoice-details-title" aria-hidden="true">
+    <div class="modal fade" id="modal-invoice-details" tabindex="-1" aria-labelledby="modal-invoice-details-title"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-light">
@@ -125,8 +130,10 @@
                             <div class="p-3 bg-light rounded-3 h-100">
                                 <h6 class="fw-semibold text-secondary small text-uppercase mb-2">Vendor Information</h6>
                                 <div class="fs-6 fw-bold text-dark" id="modal-vendor-name">-</div>
-                                <div class="text-muted small">Vendor Code: <span id="modal-vendor-code" class="fw-medium text-dark">-</span></div>
-                                <div class="text-muted small mt-1">Payment Terms: <span id="modal-payment-terms" class="fw-medium text-dark">-</span></div>
+                                <div class="text-muted small">Vendor Code: <span id="modal-vendor-code"
+                                        class="fw-medium text-dark">-</span></div>
+                                <div class="text-muted small mt-1">Payment Terms: <span id="modal-payment-terms"
+                                        class="fw-medium text-dark">-</span></div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -154,7 +161,8 @@
 
                     <div class="card border mb-3">
                         <div class="card-header bg-transparent py-2">
-                            <h6 class="card-title mb-0 small fw-semibold text-uppercase text-secondary">Financial Overview</h6>
+                            <h6 class="card-title mb-0 small fw-semibold text-uppercase text-secondary">Financial
+                                Overview</h6>
                         </div>
                         <div class="card-body p-3">
                             <div class="row g-2">
@@ -225,8 +233,8 @@
                 }
             });
 
-            const formatDate = window.formatReportDate || function(v) { return v || '-'; };
-            const formatDateText = window.formatReportDateText || function(v) { return v || '-'; };
+            const formatDate = window.formatReportDate || function (v) { return v || '-'; };
+            const formatDateText = window.formatReportDateText || function (v) { return v || '-'; };
 
             const formatMoney = (val, currency = 'USD') => {
                 const num = parseFloat(val) || 0;
@@ -297,21 +305,21 @@
                     {
                         data: 'invoice_num',
                         name: 'invoice_num',
-                        render: function(data) {
+                        render: function (data) {
                             return `<span class="fw-semibold text-primary font-monospace">${data}</span>`;
                         }
                     },
                     {
                         data: 'po_reference',
                         name: 'po_reference',
-                        render: function(data) {
+                        render: function (data) {
                             return data ? `<span class="font-monospace text-secondary">${data}</span>` : '<span class="text-muted">-</span>';
                         }
                     },
                     {
                         data: 'vendor_name',
                         name: 'vendor_name',
-                        render: function(data, type, row) {
+                        render: function (data, type, row) {
                             return `
                                 <div class="d-flex flex-column">
                                     <span class="fw-semibold text-dark">${data}</span>
@@ -323,14 +331,14 @@
                     {
                         data: 'doc_date',
                         name: 'doc_date',
-                        render: function(data) {
+                        render: function (data) {
                             return formatDate(data);
                         }
                     },
                     {
                         data: 'due_date',
                         name: 'due_date',
-                        render: function(data) {
+                        render: function (data) {
                             return formatDate(data);
                         }
                     },
@@ -338,7 +346,7 @@
                         data: 'doc_total',
                         name: 'doc_total',
                         className: 'text-end fw-bold font-monospace text-dark',
-                        render: function(data, type, row) {
+                        render: function (data, type, row) {
                             return formatMoney(data, row.currency);
                         }
                     },
@@ -346,7 +354,7 @@
                         data: 'paid_amount',
                         name: 'paid_amount',
                         className: 'text-end fw-semibold font-monospace text-success',
-                        render: function(data, type, row) {
+                        render: function (data, type, row) {
                             return formatMoney(data, row.currency);
                         }
                     },
@@ -354,7 +362,7 @@
                         data: 'balance_due',
                         name: 'balance_due',
                         className: 'text-end fw-bold font-monospace text-danger',
-                        render: function(data, type, row) {
+                        render: function (data, type, row) {
                             return formatMoney(data, row.currency);
                         }
                     },
@@ -362,7 +370,7 @@
                         data: 'status',
                         name: 'status',
                         className: 'text-center',
-                        render: function(data) {
+                        render: function (data) {
                             return getStatusBadge(data);
                         }
                     }
@@ -393,7 +401,7 @@
             });
 
             // Invoice View Detail Modal Handler
-            $(document).on('click', '.btn-view-invoice, .btn-view-invoice *', function(e) {
+            $(document).on('click', '.btn-view-invoice, .btn-view-invoice *', function (e) {
                 e.preventDefault();
                 const btn = $(this).closest('.btn-view-invoice');
                 const invId = btn.data('id') || btn.attr('data-id');
@@ -431,12 +439,12 @@
                 $.ajax({
                     url: `/reports/purchase/ap-invoices/${invId}`,
                     type: 'GET',
-                    success: function(res) {
+                    success: function (res) {
                         if (res.success && res.data) {
                             renderInvoiceModal(res.data);
                         }
                     },
-                    complete: function() {
+                    complete: function () {
                         btn.prop('disabled', false);
                     }
                 });

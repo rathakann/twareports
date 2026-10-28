@@ -64,6 +64,25 @@ return [
             ]) : [],
         ],
 
+        'saphana' => [
+            'driver' => 'saphana',
+            'dsn' => 'odbc:DRIVER={HDBODBC};SERVERNODE='.env('HANA_HOST').':'.env('HANA_PORT', 30015).';DATABASE='.env('HANA_DATABASE').';CHAR_AS_UTF8=TRUE',
+            'host' => env('HANA_HOST'),
+            'port' => env('HANA_PORT', 30015),
+            'database' => env('HANA_DATABASE'),
+            'username' => env('HANA_USERNAME'),
+            'password' => env('HANA_PASSWORD'),
+            'prefix' => '',
+            'options' => [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                /*
+                    * We don't use PDO prepared statements in HanaConnection,
+                    * so this setting is not important for query execution.
+                */
+                PDO::ATTR_EMULATE_PREPARES => true,
+            ],
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

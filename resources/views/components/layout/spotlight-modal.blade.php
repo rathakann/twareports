@@ -114,6 +114,98 @@
                             'route' => 'reports.financial.general-ledger.index',
                             'icon' => 'book-open',
                         ],
+                        // Master Data
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Branches',
+                            'description' => 'SAP Business Places, branch codes and tax identification numbers',
+                            'route' => 'master-data.branches.index',
+                            'icon' => 'building-2',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Warehouses',
+                            'description' => 'Storage locations, bulk tank depots, bin activation and nettable status',
+                            'route' => 'master-data.warehouses.index',
+                            'icon' => 'warehouse',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Bins',
+                            'description' => 'Warehouse bin locations, aisles, shelves, levels and barcodes',
+                            'route' => 'master-data.bins.index',
+                            'icon' => 'boxes',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Business Partner',
+                            'description' => 'Customers, vendors, leads, payment terms and credit balances',
+                            'route' => 'master-data.business-partners.index',
+                            'icon' => 'users-round',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Items',
+                            'description' => 'SAP Item Master Data (OITM), stock levels, valuation, pricing and groups',
+                            'route' => 'master-data.items.index',
+                            'icon' => 'package',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'UoM',
+                            'description' => 'Units of measurement definitions (OUOM) and volume/weight standards',
+                            'route' => 'master-data.uoms.index',
+                            'icon' => 'scale',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'UoM Group',
+                            'description' => 'UoM Group definitions (OUGP), base units and conversion factors',
+                            'route' => 'master-data.uom-groups.index',
+                            'icon' => 'shapes',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Item Group',
+                            'description' => 'Inventory classifications, petroleum groups and valuation methods',
+                            'route' => 'master-data.item-groups.index',
+                            'icon' => 'tags',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Item Class',
+                            'description' => 'Material categories, inventory types, assets and service classes',
+                            'route' => 'master-data.item-classes.index',
+                            'icon' => 'layers',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Barcode',
+                            'description' => 'EAN13, Code128, item barcode associations and scanning codes',
+                            'route' => 'master-data.barcodes.index',
+                            'icon' => 'barcode',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Bom',
+                            'description' => 'Bill of Materials, product trees, component counts and costs',
+                            'route' => 'master-data.boms.index',
+                            'icon' => 'git-fork',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Documents',
+                            'description' => 'SAP Document Master (ONNM) types, object codes and database tables',
+                            'route' => 'master-data.documents.index',
+                            'icon' => 'files',
+                        ],
+                        [
+                            'category' => 'Master Data',
+                            'title' => 'Document Series',
+                            'description' => 'Document numbering series (NNM1), sequence ranges and prefix rules',
+                            'route' => 'master-data.document-series.index',
+                            'icon' => 'file-spreadsheet',
+                        ],
                         // Access Control
                         [
                             'category' => 'Access Control',
@@ -135,6 +227,14 @@
                             'description' => 'Audit granular permission codes and module access rights',
                             'route' => 'permissions.index',
                             'icon' => 'key',
+                        ],
+                        // Administrator
+                        [
+                            'category' => 'Administrator',
+                            'title' => 'Modules',
+                            'description' => 'Dynamic navigation modules, menu items, ordering and permissions',
+                            'route' => 'admin.modules.index',
+                            'icon' => 'blocks',
                         ],
                         // Account & Profile
                         [

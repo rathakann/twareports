@@ -12,22 +12,115 @@ return [
         ],
     ],
     [
+        'label' => 'Master Data',
+        'items' => [
+            [
+                'label' => 'SAP',
+                'icon' => 'database',
+                'children' => [
+                    [
+                        'label' => 'Branches',
+                        'icon' => 'building-2',
+                        'route' => 'master-data.branches.index',
+                        'permission' => 'master-data.branches.view',
+                    ],
+                    [
+                        'label' => 'Warehouses',
+                        'icon' => 'warehouse',
+                        'route' => 'master-data.warehouses.index',
+                        'permission' => 'master-data.warehouses.view',
+                    ],
+                    [
+                        'label' => 'Bins',
+                        'icon' => 'boxes',
+                        'route' => 'master-data.bins.index',
+                        'permission' => 'master-data.bins.view',
+                    ],
+                    [
+                        'label' => 'Business Partner',
+                        'icon' => 'users-round',
+                        'route' => 'master-data.business-partners.index',
+                        'permission' => 'master-data.business-partners.view',
+                    ],
+                    [
+                        'label' => 'Items',
+                        'icon' => 'package',
+                        'route' => 'master-data.items.index',
+                        'permission' => 'master-data.items.view',
+                    ],
+                    [
+                        'label' => 'UoM',
+                        'icon' => 'scale',
+                        'route' => 'master-data.uoms.index',
+                        'permission' => 'master-data.uoms.view',
+                    ],
+                    [
+                        'label' => 'UoM Group',
+                        'icon' => 'shapes',
+                        'route' => 'master-data.uom-groups.index',
+                        'permission' => 'master-data.uom-groups.view',
+                    ],
+                    [
+                        'label' => 'Item Group',
+                        'icon' => 'tags',
+                        'route' => 'master-data.item-groups.index',
+                        'permission' => 'master-data.item-groups.view',
+                    ],
+                    [
+                        'label' => 'Item Class',
+                        'icon' => 'layers',
+                        'route' => 'master-data.item-classes.index',
+                        'permission' => 'master-data.item-classes.view',
+                    ],
+                    [
+                        'label' => 'Barcode',
+                        'icon' => 'barcode',
+                        'route' => 'master-data.barcodes.index',
+                        'permission' => 'master-data.barcodes.view',
+                    ],
+                    [
+                        'label' => 'Bom',
+                        'icon' => 'git-fork',
+                        'route' => 'master-data.boms.index',
+                        'permission' => 'master-data.boms.view',
+                    ],
+                    [
+                        'label' => 'Documents',
+                        'icon' => 'files',
+                        'route' => 'master-data.documents.index',
+                        'permission' => 'master-data.documents.view',
+                    ],
+                    [
+                        'label' => 'Document Series',
+                        'icon' => 'file-spreadsheet',
+                        'route' => 'master-data.document-series.index',
+                        'permission' => 'master-data.document-series.view',
+                    ],
+                ],
+            ],
+        ],
+    ],
+    [
         'label' => 'Components',
+        'is_active' => false,
         'items' => [
             [
                 'label' => 'UI Components',
                 'icon' => 'blocks',
                 'route' => 'theme.components',
+                'is_active' => false,
             ],
             [
                 'label' => 'Example Listing',
                 'icon' => 'table-properties',
                 'route' => 'theme.listing',
+                'is_active' => false,
             ],
             [
                 'label' => 'Example Form',
                 'icon' => 'file-pen-line',
                 'route' => 'theme.form',
+                'is_active' => false,
             ],
         ],
     ],
@@ -146,6 +239,23 @@ return [
                 'icon' => 'key',
                 'route' => 'permissions.index',
                 'permission' => 'permissions.view|permissions.manage',
+            ],
+        ],
+    ],
+    [
+        'label' => 'Administrator',
+        'items' => [
+            [
+                'label' => 'Modules',
+                'icon' => 'blocks',
+                'route' => 'admin.modules.index',
+                'permission' => 'admin.modules.view',
+            ],
+            [
+                'label' => 'Navigation Groups',
+                'icon' => 'layers',
+                'route' => 'admin.navigation-groups.index',
+                'permission' => 'admin.modules.view',
             ],
         ],
     ],

@@ -98,7 +98,7 @@ class NavigationPermissionTest extends TestCase
 
         $groupLabels = collect($filtered)->pluck('label')->all();
         $this->assertContains('Workspace', $groupLabels);
-        $this->assertContains('Components', $groupLabels);
+        $this->assertNotContains('Components', $groupLabels);
         $this->assertContains('Access Control', $groupLabels);
 
         $accessGroup = collect($filtered)->firstWhere('label', 'Access Control');

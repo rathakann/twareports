@@ -40,7 +40,7 @@
     />
 
     <!-- Filters Section -->
-    <div id="po-filter-card" class="card border-0 shadow-sm rounded-3 mb-4 filter-section">
+    <div id="po-filter-card" class="page-card mb-4 filter-section">
         <div class="card-body p-3">
             <div class="row g-3 align-items-end">
                 <div class="col-md-3 col-sm-6">
@@ -81,10 +81,10 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="card border-0 shadow-sm rounded-3">
+    <div class="page-card">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table id="purchase-orders-table" data-export-module="reports.purchase.purchase-orders" class="table table-striped table-hover align-middle w-100 mb-0">
+                <table id="purchase-orders-table" data-export-module="reports.purchase.purchase-orders" class="table table-bordered table-hover nowrap text-nowrap align-middle w-100 mb-0">
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 50px;">#</th>
